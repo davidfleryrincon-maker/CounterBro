@@ -1,0 +1,13 @@
+{
+  "name": "mlbb-counter-api",
+  "version": "1.0.0",
+  "description": "Backend API Serverless para MLBB Counter Master V4",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
