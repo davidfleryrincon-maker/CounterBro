@@ -1,16 +1,5 @@
 const API_URL = "/api/counter";
 
-// Lista base de respaldo para autocorrección rápida en el navegador
-const HEROES_BASE = [
-  "Suyou", "Fanny", "Ling", "Hayabusa", "Gusion", "Lancelot", 
-  "Valentina", "Yve", "Kagura", "Pharsa", "Lunox", 
-  "Brody", "Claude", "Beatrix", "Moskov", "Natan", 
-  "Terizla", "Dyrroth", "Chou", "Lapu-Lapu", "Arlott", 
-  "Tigreal", "Minotaur", "Diggie", "Mathilda", "Angela", 
-  "Nana", "Miya", "Layla", "Balmond", "Eudora", "Zilong", "Alucard", "Lesley"
-];
-
-// Estructura del pool por líneas
 let miPoolPorLineas = JSON.parse(localStorage.getItem("counterbro_pool_lineas")) || {
   EXP: [],
   JUNGLE: [],
@@ -63,40 +52,55 @@ function setupEventListeners() {
   }
 }
 
-// Autocorrector local en el frontend antes de guardar al pool
-function autocorregirHeroeLocal(input) {
-  if (!input) return "";
-  const userInput = input.toLowerCase().trim();
-
-  const exacta = HEROES_BASE.find(h => h.toLowerCase() === userInput);
-  if (exacta) return exacta;
-
-  const parcial = HEROES_BASE.find(h => h.toLowerCase().includes(userInput));
-  if (parcial) return parcial;
-
-  // Si no lo encuentra exacto, capitaliza la primera letra como respaldo limpio
-  return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
-}
-
-function agregarHeroeAPool() {
+async function agregarHeroeAPool() {
   const nombreRaw = inputNuevoHeroe.value.trim();
   if (!nombreRaw) return;
 
-  // Aplicar autocorrector antes de meterlo al pool
-  const nombreHeroe = autocorregirHeroeLocal(nombreRaw);
+  btnAgregarHeroe.disabled = true;
+  btnAgregarHeroe.innerText = "Verificando...";
 
-  if (!miPoolPorLineas[lineaSeleccionadaPool]) {
-    miPoolPorLineas[lineaSeleccionadaPool] = [];
+  try {
+    // Validar en tiempo real contra mlbbhub a través de la API
+    const response = await fetch(`${API_URL}?action=validate_hero`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        hero: nombreRaw,
+        lane: lineaSeleccionadaPool
+      })
+    });
+
+    const data = await response.json();
+
+    if (!data.valido) {
+      alert(data.mensaje);
+      return;
+    }
+
+    const heroNombreOficial = data.heroCorregido;
+
+    if (!miPoolPorLineas[lineaSeleccionadaPool]) {
+      miPoolPorLineas[lineaSeleccionadaPool] = [];
+    }
+
+    if (!miPoolPorLineas[lineaSeleccionadaPool].includes(heroNombreOficial)) {
+      miPoolPorLineas[lineaSeleccionadaPool].push(heroNombreOficial);
+      guardarPoolEnLocalStorage();
+      renderPoolTags();
+    } else {
+      alert(`El héroe ${heroNombreOficial} ya está en tu pool para ${lineaSeleccionadaPool}.`);
+    }
+
+    inputNuevoHeroe.value = "";
+    inputNuevoHeroe.focus();
+
+  } catch (error) {
+    console.error("Error al agregar héroe:", error);
+    alert("Hubo un problema de conexión al validar el héroe.");
+  } finally {
+    btnAgregarHeroe.disabled = false;
+    btnAgregarHeroe.innerText = "Agregar";
   }
-
-  if (!miPoolPorLineas[lineaSeleccionadaPool].includes(nombreHeroe)) {
-    miPoolPorLineas[lineaSeleccionadaPool].push(nombreHeroe);
-    guardarPoolEnLocalStorage();
-    renderPoolTags();
-  }
-
-  inputNuevoHeroe.value = "";
-  inputNuevoHeroe.focus();
 }
 
 window.eliminarHeroeDelPool = function(linea, heroe) {
@@ -143,12 +147,8 @@ async function analizarMatchup() {
     return;
   }
 
-  // Autocorregir en el input visualmente antes de enviar
-  const enemigoCorregido = autocorregirHeroeLocal(enemigoRaw);
-  inputEnemigo.value = enemigoCorregido;
-
   btnAnalizar.disabled = true;
-  btnAnalizar.innerText = "Validando línea y buscando counters...";
+  btnAnalizar.innerText = "Consultando MLBBHub en tiempo real...";
 
   const poolActualLinea = miPoolPorLineas[linea] || [];
 
@@ -157,7 +157,8 @@ async function analizarMatchup() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        hero: enemigoCorregido,
+        action: "analyze",
+        hero: enemigoRaw,
         lane: linea,
         userPool: poolActualLinea
       })
@@ -167,11 +168,15 @@ async function analizarMatchup() {
 
     const data = await response.json();
 
-    // Si la API detecta que el héroe no pertenece a esa línea (ej. Roamer en Oro)
     if (data.errorInvalido) {
       alert(data.mensaje);
       resultadosSection.classList.add("hidden");
       return;
+    }
+
+    // Actualiza el campo de texto con el nombre corregido si aplica
+    if (data.heroAnalizado) {
+      inputEnemigo.value = data.heroAnalizado;
     }
 
     mostrarResultados(data, linea);
