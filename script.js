@@ -1,6 +1,16 @@
 const API_URL = "/api/counter";
 
-// Estructura del pool por líneas: { EXP: [...], JUNGLE: [...], MID: [...], GOLD: [...], ROAM: [...] }
+// Lista base de respaldo para autocorrección rápida en el navegador
+const HEROES_BASE = [
+  "Suyou", "Fanny", "Ling", "Hayabusa", "Gusion", "Lancelot", 
+  "Valentina", "Yve", "Kagura", "Pharsa", "Lunox", 
+  "Brody", "Claude", "Beatrix", "Moskov", "Natan", 
+  "Terizla", "Dyrroth", "Chou", "Lapu-Lapu", "Arlott", 
+  "Tigreal", "Minotaur", "Diggie", "Mathilda", "Angela", 
+  "Nana", "Miya", "Layla", "Balmond", "Eudora", "Zilong", "Alucard", "Lesley"
+];
+
+// Estructura del pool por líneas
 let miPoolPorLineas = JSON.parse(localStorage.getItem("counterbro_pool_lineas")) || {
   EXP: [],
   JUNGLE: [],
@@ -53,18 +63,34 @@ function setupEventListeners() {
   }
 }
 
-function agregarHeroeAPool() {
-  const nombreHeroe = inputNuevoHeroe.value.trim();
-  if (!nombreHeroe) return;
+// Autocorrector local en el frontend antes de guardar al pool
+function autocorregirHeroeLocal(input) {
+  if (!input) return "";
+  const userInput = input.toLowerCase().trim();
 
-  const heroeNormalizado = normalizarNombre(nombreHeroe);
+  const exacta = HEROES_BASE.find(h => h.toLowerCase() === userInput);
+  if (exacta) return exacta;
+
+  const parcial = HEROES_BASE.find(h => h.toLowerCase().includes(userInput));
+  if (parcial) return parcial;
+
+  // Si no lo encuentra exacto, capitaliza la primera letra como respaldo limpio
+  return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
+}
+
+function agregarHeroeAPool() {
+  const nombreRaw = inputNuevoHeroe.value.trim();
+  if (!nombreRaw) return;
+
+  // Aplicar autocorrector antes de meterlo al pool
+  const nombreHeroe = autocorregirHeroeLocal(nombreRaw);
 
   if (!miPoolPorLineas[lineaSeleccionadaPool]) {
     miPoolPorLineas[lineaSeleccionadaPool] = [];
   }
 
-  if (!miPoolPorLineas[lineaSeleccionadaPool].includes(heroeNormalizado)) {
-    miPoolPorLineas[lineaSeleccionadaPool].push(heroeNormalizado);
+  if (!miPoolPorLineas[lineaSeleccionadaPool].includes(nombreHeroe)) {
+    miPoolPorLineas[lineaSeleccionadaPool].push(nombreHeroe);
     guardarPoolEnLocalStorage();
     renderPoolTags();
   }
@@ -108,17 +134,21 @@ function renderPoolTags() {
 }
 
 async function analizarMatchup() {
-  const enemigo = inputEnemigo.value.trim();
+  const enemigoRaw = inputEnemigo.value.trim();
   const linea = selectLineaMatchup.value;
 
-  if (!enemigo) {
+  if (!enemigoRaw) {
     alert("Por favor, ingresa el nombre del héroe enemigo.");
     inputEnemigo.focus();
     return;
   }
 
+  // Autocorregir en el input visualmente antes de enviar
+  const enemigoCorregido = autocorregirHeroeLocal(enemigoRaw);
+  inputEnemigo.value = enemigoCorregido;
+
   btnAnalizar.disabled = true;
-  btnAnalizar.innerText = "Consultando base de datos y analizando...";
+  btnAnalizar.innerText = "Validando línea y buscando counters...";
 
   const poolActualLinea = miPoolPorLineas[linea] || [];
 
@@ -127,7 +157,7 @@ async function analizarMatchup() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        hero: normalizarNombre(enemigo),
+        hero: enemigoCorregido,
         lane: linea,
         userPool: poolActualLinea
       })
@@ -136,11 +166,19 @@ async function analizarMatchup() {
     if (!response.ok) throw new Error("Error en el servidor");
 
     const data = await response.json();
+
+    // Si la API detecta que el héroe no pertenece a esa línea (ej. Roamer en Oro)
+    if (data.errorInvalido) {
+      alert(data.mensaje);
+      resultadosSection.classList.add("hidden");
+      return;
+    }
+
     mostrarResultados(data, linea);
 
   } catch (error) {
     console.error("Error analizando matchup:", error);
-    mostrarResultadosDemo(enemigo, linea, poolActualLinea);
+    alert("Hubo un error de conexión procesando el matchup.");
   } finally {
     btnAnalizar.disabled = false;
     btnAnalizar.innerHTML = "<span>⚡ ANALIZAR MATCHUP Y COUNTERS</span>";
@@ -150,57 +188,31 @@ async function analizarMatchup() {
 function mostrarResultados(data, linea) {
   resultadosSection.classList.remove("hidden");
 
-  // Bloque 1: Comparación con el Pool del usuario en esa línea
+  // Bloque 1: Tu Pool Personal
   if (data.poolCounter) {
     tituloPoolCounter.innerText = `${data.poolCounter.nombre} (${data.poolCounter.winrate || 'Alta'}% Winrate)`;
-    descPoolCounter.innerText = data.poolCounter.razon || `Encontrado en tu pool de ${linea} como opción viable contra ${data.heroAnalizado}.`;
+    descPoolCounter.innerText = data.poolCounter.razon;
   } else {
-    tituloPoolCounter.innerText = "Ningún héroe de tu pool en esta línea coincide";
-    descPoolCounter.innerText = `No tienes registrado en tu pool de ${linea} un counter directo para este héroe. Revisa las opciones globales abajo.`;
+    tituloPoolCounter.innerText = "Ningún héroe de tu pool en esta línea";
+    descPoolCounter.innerText = `No tienes registrado en tu pool de ${linea} un counter directo para este héroe.`;
   }
 
-  // Bloque 2: Lista de Counters filtrados por la línea en mlbbhub
+  // Bloque 2: Lista de Counters del Meta por Línea
   listaMetaCounters.innerHTML = "";
   if (data.metaCounters && data.metaCounters.length > 0) {
     data.metaCounters.forEach((counter) => {
       const item = document.createElement("div");
       item.className = "meta-counter-item";
+      item.style.marginBottom = "10px";
       item.innerHTML = `
-        <strong>${counter.nombre}</strong> <span class="badge-winrate">${counter.winrate || 'Meta'}</span>
+        <strong>${counter.nombre}</strong> <span style="color: #10b981; font-size: 0.85rem;">(${counter.winrate})</span>
         <p class="text-muted">${counter.razon}</p>
       `;
       listaMetaCounters.appendChild(item);
     });
   } else {
-    listaMetaCounters.innerHTML = `<p class="text-muted">No se encontraron counters específicos para ${linea} en esta consulta.</p>`;
+    listaMetaCounters.innerHTML = `<p class="text-muted">No se encontraron counters válidos para ${linea}.</p>`;
   }
 
   resultadosSection.scrollIntoView({ behavior: "smooth" });
-}
-
-function mostrarResultadosDemo(enemigo, linea, poolLinea) {
-  resultadosSection.classList.remove("hidden");
-
-  const mejorPool = poolLinea.length > 0 ? poolLinea[0] : null;
-
-  if (mejorPool) {
-    tituloPoolCounter.innerText = `${mejorPool} (Tu Pool en ${linea})`;
-    descPoolCounter.innerText = `Sugerido desde tu lista personal para la línea de ${linea}.`;
-  } else {
-    tituloPoolCounter.innerText = "Pool vacío para esta línea";
-    descPoolCounter.innerText = `Agrega héroes a tu pool de ${linea} en la sección superior para ver recomendaciones personalizadas aquí.`;
-  }
-
-  listaMetaCounters.innerHTML = `
-    <div class="meta-counter-item">
-      <strong>Counter Sugerido (${linea})</strong>
-      <p class="text-muted">Héroe óptimo extraído de mlbbhub.com/es/counter/${normalizarNombre(enemigo).toLowerCase()} validado para la línea de ${linea}.</p>
-    </div>
-  `;
-
-  resultadosSection.scrollIntoView({ behavior: "smooth" });
-}
-
-function normalizarNombre(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
