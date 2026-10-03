@@ -14,7 +14,7 @@
 
   <div class="dashboard-container">
     
-    <!-- Header Principal con nueva marca -->
+    <!-- Header Principal -->
     <header class="app-header">
       <div class="logo-badge">CB</div>
       <div>
@@ -23,15 +23,28 @@
       </div>
     </header>
 
-    <!-- Panel de Control / Pool de Héroes -->
+    <!-- Panel de Control / Pool de Héroes por Línea -->
     <section class="card pool-section">
-      <h2>🛡️ Mi Pool de Héroes</h2>
+      <h2>🛡️ Mi Pool de Héroes por Línea</h2>
       
+      <div class="form-grid" style="margin-bottom: 12px;">
+        <div class="form-field">
+          <label for="selectLineaPool">Selecciona la Línea</label>
+          <select id="selectLineaPool">
+            <option value="EXP">EXP Lane</option>
+            <option value="JUNGLE">Jungla</option>
+            <option value="MID">Mid Lane</option>
+            <option value="GOLD">Gold Lane</option>
+            <option value="ROAM">Roamer</option>
+          </select>
+        </div>
+      </div>
+
       <div class="input-group">
         <input 
           type="text" 
           id="nuevoHeroePool" 
-          placeholder="Escribe un héroe (ej. Chou, Valentina)..." 
+          placeholder="Escribe un héroe para esta línea..." 
           autocomplete="off"
         />
         <button id="btnAgregarHeroe" class="btn-secondary">Agregar</button>
@@ -42,7 +55,7 @@
 
     <!-- Panel de Análisis del Matchup -->
     <section class="card analysis-section">
-      <h2>⚔️ Análisis de Matchup</h2>
+      <h2>⚔️ Análisis de Matchup por Línea</h2>
       
       <div class="form-grid">
         <div class="form-field">
@@ -50,15 +63,14 @@
           <input 
             type="text" 
             id="enemigoPick" 
-            placeholder="Ej. Fanny, Tigreal..." 
+            placeholder="Ej. Suyou, Fanny..." 
             autocomplete="off"
           />
         </div>
 
         <div class="form-field">
-          <label for="rolFiltro">Filtrar por Rol (Opcional)</label>
-          <select id="rolFiltro">
-            <option value="ALL">Todos los Roles</option>
+          <label for="selectLineaMatchup">¿En qué línea jugarás?</label>
+          <select id="selectLineaMatchup">
             <option value="EXP">EXP Lane</option>
             <option value="JUNGLE">Jungla</option>
             <option value="MID">Mid Lane</option>
@@ -69,24 +81,27 @@
       </div>
 
       <button id="btnAnalizar" class="btn-primary">
-        <span>⚡ ANALIZAR MATCHUP</span>
+        <span>⚡ ANALIZAR MATCHUP Y COUNTERS</span>
       </button>
     </section>
 
-    <!-- Resultados del Análisis -->
+    <!-- Resultados del Análisis (Dividido en dos bloques) -->
     <section id="resultadosSection" class="results-section hidden">
-      <h2>📊 Recomendaciones</h2>
+      <h2>📊 Recomendaciones de Counter</h2>
 
+      <!-- Bloque 1: Tu Pool Personal -->
       <div class="card result-card pool-matchup">
-        <div class="card-header-badge success-badge">TU MEJOR OPCIÓN</div>
+        <div class="card-header-badge success-badge">TU MEJOR OPCIÓN (SEGÚN TU POOL)</div>
         <h3 id="tituloPoolCounter">Buscando en tu Pool...</h3>
         <p id="descPoolCounter" class="text-muted"></p>
       </div>
 
+      <!-- Bloque 2: Lista de Counters del Meta por Línea -->
       <div class="card result-card meta-matchup">
-        <div class="card-header-badge meta-badge">COUNTER DEL META</div>
-        <h3 id="tituloMetaCounter">Buscando en el Meta...</h3>
-        <p id="descMetaCounter" class="text-muted"></p>
+        <div class="card-header-badge meta-badge">COUNTERS RECOMENDADOS (MLBBHUB)</div>
+        <div id="listaMetaCounters" class="meta-counters-list">
+          <!-- Aquí se insertará la lista de counters filtrados por la línea -->
+        </div>
       </div>
     </section>
 
