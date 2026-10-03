@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Counter Master V4</title>
+  
+  <!-- Configuración de Favicon y PWA Icon -->
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <meta name="theme-color" content="#0b1120">
+
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: #1e293b;
+      --card-inner: #0f172a;
+      --accent: #38bdf8;
+      --accent-dark: #0284c7;
+      --gold: #eab308;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 15px;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: var(--card);
+      padding: 20px;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      border: 1px solid #334155;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .app-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      object-fit: cover;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    h2 {
+      color: var(--accent);
+      margin-top: 10px;
+      font-size: 1.4rem;
+    }
+
+    .app-subtitle {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 6px;
+      line-height: 1.3;
+    }
+
+    h3 {
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+
+    .step-card {
+      background-color: var(--card-inner);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #334155;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background-color: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-group button {
+      width: 35%;
+      margin: 0;
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--accent-dark) 0%, #075985 100%);
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      margin-top: 12px;
+      transition: all 0.2s ease;
+      color: white;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #475569 0%, #334155 100%);
+      margin-top: 15px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+      min-height: 28px;
+    }
+
+    .tag {
+      background: #1e293b;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tag span {
+      cursor: pointer;
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    .block-title {
+      font-weight: bold;
+      color: var(--gold);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+    }
+
+    .block-subtitle {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .item-badge {
+      background: #1e293b;
+      border-left: 3px solid var(--accent);
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .hero-reason {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.3;
+      padding-left: 2px;
+    }
+
+    .fuzzy-notice {
+      font-size: 0.8rem;
+      color: var(--gold);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .empty-msg {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- ENCABEZADO Y LOGO -->
+  <div class="header">
+    <img src="logo.png" alt="Logo" class="app-logo" onerror="this.style.display='none'">
+    <h2>MLBB Counter Master V4</h2>
+    <p class="app-subtitle">Encuentra el counter ideal para dominar tu línea.</p>
+  </div>
+
+  <!-- PASO 1: POOL PERSONAL -->
+  <div class="step-card">
+    <h3 id="t-step1">1. Configurar tu Pool de Héroes</h3>
+    <label for="poolLinea" id="t-selectLane">Seleccionar Línea:</label>
+    <select id="poolLinea" onchange="mostrarPoolActual()">
+      <option value="exp">EXP Lane</option>
+      <option value="mid">MID Lane</option>
+      <option value="gold">GOLD Lane</option>
+      <option value="jungle">JUNGLE</option>
+      <option value="roam">ROAM</option>
+    </select>
+    
+    <label id="t-addHero">Agregar héroe a esta línea:</label>
+    <div class="input-group">
+      <input type="text" id="nuevoHeroePool" placeholder="Ej: Paquito, Chou...">
+      <button onclick="agregarHeroePool()" id="t-btnAdd">Agregar</button>
+    </div>
+
+    <div class="hero-tags" id="poolTags"></div>
+  </div>
+
+  <!-- PASO 2: BÚSQUEDA DE COUNTER -->
+  <div class="step-card">
+    <h3 id="t-step2">2. Buscar Counter de Línea</h3>
+    <label for="partidaLinea" id="t-yourLane">Línea que jugarás:</label>
+    <select id="partidaLinea">
+      <option value="exp">EXP Lane</option>
+      <option value="mid">MID Lane</option>
+      <option value="gold">GOLD Lane</option>
+      <option value="jungle">JUNGLE</option>
+      <option value="roam">ROAM</option>
+    </select>
+
+    <label for="enemigoPick" id="t-enemyPick">Pick Enemigo en tu línea:</label>
+    <input type="text" id="enemigoPick" placeholder="Ej: Uranus, Kaela, Brody...">
+
+    <button onclick="buscarCounter()" id="t-btnAnalyze">Analizar Matchup</button>
+  </div>
+
+  <!-- PASO 3: PANEL DE RESULTADOS -->
+  <div id="resultadosCounter" style="display:none;">
+    <div class="step-card">
+      <div class="block-title" id="t-block1Title">🥇 TU MEJOR OPCIÓN</div>
+      <div class="block-subtitle" id="t-block1Sub">Según los héroes que sabes usar en esta línea</div>
+      <div id="poolResult"></div>
+    </div>
+
+    <div class="step-card">
+      <div class="block-title" style="color:var(--accent);" id="t-block2Title">🌍 OPCIÓN ESTADÍSTICAMENTE FAVORABLE</div>
+      <div class="block-subtitle" id="t-block2Sub">Según los datos del meta</div>
+      <div id="generalResult"></div>
+    </div>
+
+    <!-- BOTÓN DE REINICIO -->
+    <button class="btn-reset" onclick="reiniciarBusqueda()" id="t-btnReset">🔄 Analizar Nueva Partida</button>
+  </div>
+</div>
+
+<script>
+const VERCEL_URL = "https://mlbb-counter-api-five.vercel.app"; 
+
+let HERO_DATABASE = [
+  "Miya", "Balmond", "Saber", "Alice", "Nana", "Tigreal", "Alucard", "Akai", "Franco", "Bane",
+  "Bruno", "Clint", "Rafaela", "Eudora", "Zilong", "Fanny", "Layla", "Minotauro", "Minotaur", "Lolita", "Hayabusa",
+  "Freya", "Gord", "Natalia", "Kagura", "Chou", "Sun", "Alpha", "Ruby", "Yi Sun-shin", "Moskov", "Moscov",
+  "Johnson", "Cyclops", "Estes", "Hilda", "Aurora", "Lapu-Lapu", "Vexana", "Harley", "Irithel", "Grock",
+  "Argus", "Odette", "Lancelot", "Diggie", "Hylos", "Zhask", "Helcurt", "Pharsa", "Lesley", "Jawhead",
+  "Angela", "Gusion", "Valir", "Martis", "Uranus", "Hanabi", "Chang'e", "Kaja", "Selena", "Aldous",
+  "Claude", "Vale", "Leomord", "Lunox", "Hanzo", "Belerick", "Kimmy", "Thamuz", "Harith", "Minsitthar",
+  "Badang", "Khufra", "Granger", "Guinevere", "Esmeralda", "Terizla", "X.Borg", "Ling", "Dyrroth", "Lylia",
+  "Baxia", "Masha", "Wanwan", "Silvanna", "Cecilion", "Carmilla", "Atlas", "Popol and Kupa", "Yu Zhong", "Luo Yi",
+  "Benedetta", "Khaleed", "Barats", "Brody", "Yve", "Mathilda", "Paquito", "Gloo", "Phoveus", "Natan",
+  "Aulus", "Aamon", "Valentina", "Edith", "Yin", "Melissa", "Xavier", "Julian", "Fredrinn", "Joy",
+  "Novaria", "Arlott", "Ixia", "Nolan", "Cici", "Chip", "Zhuxin", "Lukas", "Suyu", "Suyou", "Kaela", "Calea",
+  "Gatotkaca", "Beatrix", "Karina", "Marcel", "Kadita", "Faramis", "Floryn", "Hirara"
+];
+
+const HERO_LANES = {
+  exp: [
+    "Balmond", "Zilong", "Chou", "Sun", "Alpha", "Ruby", "Hilda", "Lapu-Lapu", "Argus", "Jawhead",
+    "Martis", "Uranus", "Aldous", "Leomord", "Thamuz", "Minsitthar", "Badang", "Guinevere", "Esmeralda",
+    "Terizla", "X.Borg", "Dyrroth", "Masha", "Silvanna", "Yu Zhong", "Benedetta", "Khaleed", "Barats",
+    "Paquito", "Gloo", "Phoveus", "Aulus", "Edith", "Yin", "Julian", "Fredrinn", "Joy", "Arlott",
+    "Cici", "Lukas", "Suyu", "Suyou", "Alice", "Bane", "Gatotkaca"
+  ],
+  mid: [
+    "Alice", "Nana", "Eudora", "Gord", "Kagura", "Cyclops", "Aurora", "Vexana", "Odette", "Pharsa",
+    "Valir", "Chang'e", "Vale", "Lunox", "Harith", "Lylia", "Cecilion", "Luo Yi", "Yve", "Valentina",
+    "Xavier", "Novaria", "Zhuxin", "Julian", "Zhask", "Kadita", "Faramis"
+  ],
+  gold: [
+    "Miya", "Bruno", "Clint", "Layla", "Moskov", "Moscov", "Irithel", "Lesley", "Hanabi", "Claude", "Kimmy",
+    "Granger", "Wanwan", "Brody", "Natan", "Melissa", "Ixia", "Popol and Kupa", "Harith", "Lunox", "Alice", "Beatrix"
+  ],
+  jungle: [
+    "Saber", "Alucard", "Fanny", "Hayabusa", "Freya", "Yi Sun-shin", "Harley", "Lancelot", "Helcurt",
+    "Gusion", "Hanzo", "Ling", "Baxia", "Aamon", "Nolan", "Barats", "Martis", "Alpha", "Julian",
+    "Balmond", "Bane", "Jawhead", "Paquito", "Fredrinn", "Dyrroth", "Gloo", "Chou", "Popol and Kupa",
+    "Karina", "Lukas", "Suyu", "Suyou"
+  ],
+  roam: [
+    "Tigreal", "Akai", "Franco", "Rafaela", "Minotauro", "Minotaur", "Lolita", "Natalia", "Johnson", "Estes",
+    "Grock", "Diggie", "Hylos", "Angela", "Kaja", "Selena", "Belerick", "Khufra", "Carmilla",
+    "Atlas", "Mathilda", "Chip", "Chou", "Jawhead", "Edith", "Minsitthar", "Hilda", "Valir", "Gatotkaca", "Kadita", "Marcel", "Faramis", "Floryn"
+  ]
+};
+
+async function sincronizarHeroesEnVivo() {
+  try {
+    const res = await fetch(`${VERCEL_URL}/?getHeroes=true`);
+    const data = await res.json();
+    if (data.heroes && Array.isArray(data.heroes) && data.heroes.length > 0) {
+      const setUnico = new Set([...HERO_DATABASE, ...data.heroes]);
+      HERO_DATABASE = Array.from(setUnico);
+    }
+  } catch (e) {
+    console.warn("Usando base de datos local de reserva.");
+  }
+}
+sincronizarHeroesEnVivo();
+
+const i18n = {
+  es: {
+    step1: "1. Configurar tu Pool de Héroes",
+    selectLane: "Seleccionar Línea:",
+    addHero: "Agregar héroe a esta línea:",
+    btnAdd: "Agregar",
+    step2: "2. Buscar Counter de Línea",
+    yourLane: "Línea que jugarás:",
+    enemyPick: "Pick Enemigo en tu línea:",
+    btnAnalyze: "Analizar Matchup",
+    block1Title: "🥇 TU MEJOR OPCIÓN",
+    block1Sub: "Según los héroes que sabes usar en esta línea",
+    block2Title: "🌍 OPCIÓN ESTADÍSTICAMENTE FAVORABLE",
+    block2Sub: "Según los datos del meta",
+    btnReset: "🔄 Analizar Nueva Partida",
+    emptyPool: "Tu pool está vacío para esta línea. Agrega héroes arriba.",
+    fuzzyFound: "Interpretado como: ",
+    enterEnemy: "Por favor, ingresa el nombre del héroe enemigo."
+  },
+  en: {
+    step1: "1. Configure Your Hero Pool",
+    selectLane: "Select Lane:",
+    addHero: "Add hero to this lane:",
+    btnAdd: "Add",
+    step2: "2. Search Lane Counter",
+    yourLane: "Lane you will play:",
+    enemyPick: "Enemy Pick in your lane:",
+    btnAnalyze: "Analyze Matchup",
+    block1Title: "🥇 YOUR BEST OPTION",
+    block1Sub: "Based on the heroes you know how to use in this lane",
+    block2Title: "🌍 STATISTICALLY FAVORABLE OPTION",
+    block2Sub: "Based on meta data",
+    btnReset: "🔄 Analyze New Matchup",
+    emptyPool: "Your pool is empty for this lane. Add heroes above.",
+    fuzzyFound: "Interpreted as: "
+  }
+};
+
+const lang = window.navigator.language.startsWith('es') ? 'es' : 'en';
+const txt = i18n[lang];
+
+document.getElementById('t-step1').innerText = txt.step1;
+document.getElementById('t-selectLane').innerText = txt.selectLane;
+document.getElementById('t-addHero').innerText = txt.addHero;
+document.getElementById('t-btnAdd').innerText = txt.btnAdd;
+document.getElementById('t-step2').innerText = txt.step2;
+document.getElementById('t-yourLane').innerText = txt.yourLane;
+document.getElementById('t-enemyPick').innerText = txt.enemyPick;
+document.getElementById('t-btnAnalyze').innerText = txt.btnAnalyze;
+document.getElementById('t-block1Title').innerText = txt.block1Title;
+document.getElementById('t-block1Sub').innerText = txt.block1Sub;
+document.getElementById('t-block2Title').innerText = txt.block2Title;
+document.getElementById('t-block2Sub').innerText = txt.block2Sub;
+document.getElementById('t-btnReset').innerText = txt.btnReset;
+
+let userPool = JSON.parse(localStorage.getItem('mlbb_user_pool')) || {
+  exp: [], mid: [], gold: [], jungle: [], roam: []
+};
+
+function guardarPool() {
+  localStorage.setItem('mlbb_user_pool', JSON.stringify(userPool));
+}
+
+function mostrarPoolActual() {
+  const linea = document.getElementById('poolLinea').value;
+  const container = document.getElementById('poolTags');
+  container.innerHTML = "";
+  
+  const heroes = userPool[linea] || [];
+  if (heroes.length === 0) {
+    container.innerHTML = `<span class="empty-msg">${txt.emptyPool}</span>`;
+    return;
+  }
+
+  heroes.forEach((h, index) => {
+    container.innerHTML += `<div class="tag">${h} <span onclick="eliminarHeroePool('${linea}', ${index})">&times;</span></div>`;
+  });
+}
+
+function agregarHeroePool() {
+  const linea = document.getElementById('poolLinea').value;
+  const input = document.getElementById('nuevoHeroePool');
+  const nombreRaw = input.value.trim();
+  
+  if (nombreRaw) {
+    const nombreIdentificado = identificarHeroe(nombreRaw);
+    if (!userPool[linea]) userPool[linea] = [];
+    if (!userPool[linea].includes(nombreIdentificado)) {
+      userPool[linea].push(nombreIdentificado);
+      guardarPool();
+    }
+    mostrarPoolActual();
+    input.value = "";
+  }
+}
+
+function eliminarHeroePool(linea, index) {
+  userPool[linea].splice(index, 1);
+  guardarPool();
+  mostrarPoolActual();
+}
+
+function levenshtein(a, b) {
+  const tmp = [];
+  let i, j;
+  for (i = 0; i <= a.length; i++) tmp[i] = [i];
+  for (j = 0; j <= b.length; j++) tmp[0][j] = j;
+
+  for (i = 1; i <= a.length; i++) {
+    for (j = 1; j <= b.length; j++) {
+      tmp[i][j] = a[i - 1] === b[j - 1] 
+        ? tmp[i - 1][j - 1] 
+        : Math.min(tmp[i - 1][j - 1] + 1, Math.min(tmp[i][j - 1] + 1, tmp[i - 1][j] + 1));
+    }
+  }
+  return tmp[a.length][b.length];
+}
+
+// LÓGICA DE IDENTIFICACIÓN CON NORMALIZACIÓN DE SÍMBOLOS Y CARACTERES
+function limpiarTexto(str) {
+  return str.toLowerCase()
+    .replace(/[''\.\-\s]/g, '') // Elimina apóstrofes, puntos, guiones y espacios
+    .trim();
+}
+
+function identificarHeroe(entrada) {
+  if (!entrada) return entrada;
+  const limpia = limpiarTexto(entrada);
+
+  // 1. Coincidencia Exacta Limpia
+  const coincidenciaExacta = HERO_DATABASE.find(h => limpiarTexto(h) === limpia);
+  if (coincidenciaExacta) return coincidenciaExacta;
+
+  // 2. Distancia Levenshtein sobre strings limpios
+  let mejorCoincidencia = entrada;
+  let menorDistancia = Infinity;
+
+  HERO_DATABASE.forEach(heroe => {
+    const distancia = levenshtein(limpia, limpiarTexto(heroe));
+    if (distancia < menorDistancia) {
+      menorDistancia = distancia;
+      mejorCoincidencia = heroe;
+    }
+  });
+
+  if (menorDistancia <= 2 && limpia.length >= 3) {
+    return mejorCoincidencia;
+  }
+
+  return entrada;
+}
+
+function esHeroeDeLinea(nombreHeroe, linea) {
+  const heroesDeLinea = HERO_LANES[linea];
+  if (!heroesDeLinea) return true;
+  
+  // Si el héroe está mapeado en la línea dada
+  const enLinea = heroesDeLinea.some(h => limpiarTexto(h) === limpiarTexto(nombreHeroe));
+  if (enLinea) return true;
+
+  // Si no está mapeado en NINGUNA línea conocida, asumir true para no descartarlo por error de sincro
+  const mapeadoEnAlgunaParte = Object.values(HERO_LANES).some(lista => 
+    lista.some(h => limpiarTexto(h) === limpiarTexto(nombreHeroe))
+  );
+
+  return !mapeadoEnAlgunaParte;
+}
+
+function parseWinRate(wrStr) {
+  if (!wrStr) return 0;
+  const num = parseFloat(wrStr.replace('%', ''));
+  return isNaN(num) ? 0 : num;
+}
+
+async function buscarCounter() {
+  const linea = document.getElementById('partidaLinea').value;
+  const inputEnemigo = document.getElementById('enemigoPick').value.trim();
+  
+  if (!inputEnemigo) { 
+    alert(txt.enterEnemy); 
+    return; 
+  }
+
+  const enemigoFinal = identificarHeroe(inputEnemigo);
+  const pool = userPool[linea] || [];
+
+  document.getElementById('poolResult').innerHTML = "<p style='color:var(--muted); font-size:0.85rem;'>Analizando matchup...</p>";
+  document.getElementById('generalResult').innerHTML = "<p style='color:var(--accent); font-size:0.9rem;'>Consultando counters en vivo en MLBB Hub...</p>";
+  document.getElementById('resultadosCounter').style.display = "block";
+
+  let fuzzyNotice = (limpiarTexto(enemigoFinal) !== limpiarTexto(inputEnemigo)) 
+    ? `<div class="fuzzy-notice">${txt.fuzzyFound} <strong>${enemigoFinal}</strong></div>` 
+    : "";
+
+  try {
+    const response = await fetch(`${VERCEL_URL}/?hero=${encodeURIComponent(enemigoFinal)}&lane=${encodeURIComponent(linea)}`);
+    const data = await response.json();
+
+    const apiCounters = data.counters || [];
+
+    // --- BLOQUE 2: MEJOR OPCIÓN GENERAL ---
+    if (apiCounters.length > 0) {
+      const countersFiltradosPorLinea = apiCounters.filter(c => esHeroeDeLinea(c.name, linea));
+      const listaFinal = countersFiltradosPorLinea.length >= 3 ? countersFiltradosPorLinea : apiCounters;
+
+      let htmlBloque2 = "";
+      listaFinal.slice(0, 6).forEach((c, i) => {
+        const reasonHtml = c.reason ? `<div class="hero-reason">💡 ${c.reason}</div>` : "";
+        htmlBloque2 += `
+          <div class="item-badge">
+            ${i + 1}. <strong>${c.name}</strong> - Ventaja: ${c.winRate}
+            ${reasonHtml}
+          </div>`;
+      });
+
+      document.getElementById('generalResult').innerHTML = htmlBloque2;
+    } else {
+      document.getElementById('generalResult').innerHTML = `
+        <p style="color:var(--gold); font-size:0.85rem;">No se encontraron counters específicos registrados para <strong>${enemigoFinal}</strong>.</p>`;
+    }
+
+    // --- BLOQUE 1: MEJOR OPCIÓN DE TU POOL ---
+    if (pool.length === 0) {
+      document.getElementById('poolResult').innerHTML = `<p class="empty-msg">${txt.emptyPool}</p>`;
+    } else {
+      const poolCoincidentes = [];
+
+      pool.forEach(miHeroe => {
+        const coincidencia = apiCounters.find(c => limpiarTexto(c.name) === limpiarTexto(miHeroe));
+        
+        if (coincidencia) {
+          poolCoincidentes.push({ 
+            name: miHeroe, 
+            winRate: coincidencia.winRate,
+            wrValue: parseWinRate(coincidencia.winRate),
+            reason: coincidencia.reason || null
+          });
+        }
+      });
+
+      // ORDENAR POR VENTAJAS (WIN RATE) DE MAYOR A MENOR
+      poolCoincidentes.sort((a, b) => b.wrValue - a.wrValue);
+
+      if (poolCoincidentes.length > 0) {
+        let htmlBloque1 = `${fuzzyNotice}`;
+        poolCoincidentes.forEach((item) => {
+          const reasonHtml = item.reason ? `<div class="hero-reason">💡 ${item.reason}</div>` : "";
+          htmlBloque1 += `
+            <div class="item-badge" style="border-left-color:var(--success);">
+              🥇 <strong>${item.name}</strong> (Ventaja en MLBB Hub: ${item.winRate})
+              ${reasonHtml}
+            </div>`;
+        });
+        htmlBloque1 += `<p style="margin-top:6px; font-size:0.85rem; color:var(--success);">¡Opción recomendada! Este personaje de tu pool figura en el meta actual contra ${enemigoFinal}.</p>`;
+        document.getElementById('poolResult').innerHTML = htmlBloque1;
+      } else {
+        document.getElementById('poolResult').innerHTML = `
+          ${fuzzyNotice}
+          <div style="margin-top:4px;">
+            <span style="color:var(--muted); font-size:0.85rem;">Ningún personaje de tu pool tiene un counter directo registrado en MLBB Hub. Tu mejor opción principal guardada para esta línea es:</span><br>
+            <strong style="color:var(--gold); font-size:1.1rem; display:inline-block; margin-top:6px;">${pool[0]}</strong>
+          </div>`;
+      }
+    }
+
+  } catch (err) {
+    document.getElementById('generalResult').innerHTML = `<p style="color:var(--danger); font-size:0.85rem;">Error al conectar con el servidor de Vercel.</p>`;
+    document.getElementById('poolResult').innerHTML = `<p style="color:var(--danger); font-size:0.85rem;">No se pudo procesar la consulta.</p>`;
+  }
+}
+
+function reiniciarBusqueda() {
+  document.getElementById('enemigoPick').value = "";
+  document.getElementById('resultadosCounter').style.display = "none";
+}
+
+mostrarPoolActual();
+</script>
+
+</body>
+</html>
