@@ -157,7 +157,7 @@ function nombreHeroeDesdeHref(href) {
     );
 }
 
-function obtenerBloqueCounter(link) {
+function obtenerBloqueCounter($, link) {
   let nodo = $(link);
 
   for (let nivel = 0; nivel < 8; nivel += 1) {
@@ -221,7 +221,7 @@ function extraerCounters(html, enemigo) {
     }
 
     const textoBloque =
-      obtenerBloqueCounter(link);
+      obtenerBloqueCounter($, link);
 
     const delta =
       extraerDelta(textoBloque);
