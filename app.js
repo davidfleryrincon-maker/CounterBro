@@ -2037,3 +2037,761 @@ async function buscarCounter() {
 
     analyzeButton.dataset.originalText =
       analyzeButton.innerHTML;
+
+    analyzeButton.innerHTML =
+      `
+        <span class="analysis-spinner"></span>
+        Analizando...
+      `;
+
+  }
+
+
+  resultados.style.display =
+    "block";
+
+
+  const fuzzyNotice =
+    limpiarTexto(
+      enemigoFinal
+    ) !==
+    limpiarTexto(
+      inputEnemigo
+    )
+
+      ? `
+        <div class="fuzzy-notice">
+          ${txt.fuzzyFound}
+          <strong>
+            ${escapeHtml(enemigoFinal)}
+          </strong>
+        </div>
+        `
+
+      : "";
+
+
+  try {
+
+    const heroReconocido =
+      HERO_DATABASE.some(
+        hero =>
+          limpiarTexto(hero) ===
+          limpiarTexto(enemigoFinal)
+      );
+
+
+    if (!heroReconocido) {
+
+      finalizarEstadoAnalisis();
+
+      generalResult.innerHTML =
+        `
+        <div class="error-result hero-not-found">
+          <strong>No pude identificar ese héroe.</strong>
+          <p>
+            Revisa el nombre e inténtalo nuevamente.
+            Puedes escribirlo aunque tenga pequeños errores.
+          </p>
+        </div>
+        `;
+
+      poolResult.innerHTML =
+        `
+        <div class="error-result hero-not-found">
+          CounterBro necesita identificar primero
+          el héroe enemigo.
+        </div>
+        `;
+
+      return;
+
+    }
+
+
+    const response =
+      await fetch(
+        `${VERCEL_URL}/?hero=${encodeURIComponent(
+          enemigoFinal
+        )}&lane=${encodeURIComponent(
+          linea
+        )}`
+      );
+
+
+    if (
+      !response.ok
+    ) {
+
+      throw new Error(
+        `HTTP ${response.status}`
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const apiCounters =
+      Array.isArray(
+        data.counters
+      )
+        ? data.counters
+        : [];
+
+
+    const resultsEnemy =
+      document.getElementById(
+        "resultsEnemy"
+      );
+
+    const resultsLane =
+      document.getElementById(
+        "resultsLane"
+      );
+
+
+    if (resultsEnemy) {
+      resultsEnemy.textContent =
+        enemigoFinal;
+    }
+
+
+    if (resultsLane) {
+      resultsLane.textContent =
+        linea.toUpperCase();
+    }
+
+
+    /*
+       =====================================================
+       FILTRO ESTRICTO DE LÍNEA
+       =====================================================
+
+       Este punto es fundamental.
+
+       Aunque la API devuelva un héroe con un
+       win rate excelente, CounterBro lo elimina
+       si no pertenece a la línea seleccionada.
+
+       NO existe fallback a apiCounters.
+    */
+
+    const countersFiltradosPorLinea =
+      apiCounters
+        .filter(
+          counter =>
+            counter &&
+            counter.name &&
+            esHeroeDeLinea(
+              counter.name,
+              linea
+            )
+        );
+
+
+    /*
+       =====================================================
+       ORDENAR COUNTERS VÁLIDOS
+       =====================================================
+    */
+
+    countersFiltradosPorLinea.sort(
+      (a, b) =>
+        parseWinRate(
+          b.winRate
+        ) -
+        parseWinRate(
+          a.winRate
+        )
+    );
+
+
+    /*
+       =====================================================
+       BLOQUE GENERAL
+       =====================================================
+    */
+
+    if (
+      countersFiltradosPorLinea.length >
+      0
+    ) {
+
+      let htmlBloque =
+        fuzzyNotice;
+
+
+      htmlBloque +=
+        `
+        <div class="result-context">
+          <strong>
+            Counters válidos para ${escapeHtml(
+              linea.toUpperCase()
+            )}
+          </strong>
+          <span>
+            ${countersFiltradosPorLinea.length}
+            opción(es) verificadas
+          </span>
+        </div>
+        `;
+
+
+      countersFiltradosPorLinea
+        .slice(0, 6)
+        .forEach(
+          (counter, index) => {
+
+            const reasonHtml =
+              counter.reason
+
+                ? `
+                  <div class="hero-reason">
+                    💡 ${escapeHtml(
+                      counter.reason
+                    )}
+                  </div>
+                  `
+
+                : "";
+
+
+            htmlBloque +=
+              `
+              <div class="item-badge">
+
+                <div class="counter-rank">
+                  ${index + 1}
+                </div>
+
+                <div class="counter-content">
+
+                  <strong>
+                    ${escapeHtml(
+                      counter.name
+                    )}
+                  </strong>
+
+                  <span class="counter-winrate">
+                    ${escapeHtml(
+                      counter.winRate ??
+                      "N/D"
+                    )}
+                  </span>
+
+                  ${reasonHtml}
+
+                </div>
+
+              </div>
+              `;
+
+          }
+        );
+
+
+      generalResult.innerHTML =
+        htmlBloque;
+
+    } else {
+
+      generalResult.innerHTML =
+        `
+        ${fuzzyNotice}
+
+        <div class="empty-result">
+
+          <strong>
+            No encontramos counters verificados
+            para ${escapeHtml(
+              enemigoFinal
+            )}.
+          </strong>
+
+          <p>
+            No mostraremos héroes de otras líneas
+            como reemplazo.
+          </p>
+
+        </div>
+        `;
+
+    }
+
+
+    /*
+       =====================================================
+       BLOQUE DEL POOL PERSONAL
+       =====================================================
+    */
+
+    if (
+      pool.length === 0
+    ) {
+
+      poolResult.innerHTML =
+        `
+        ${fuzzyNotice}
+
+        <p class="empty-msg">
+          ${txt.emptyPool}
+        </p>
+        `;
+
+    } else {
+
+      const poolCoincidentes =
+        [];
+
+
+      /*
+         Solo buscamos dentro de:
+         1. Los héroes que el usuario tiene en su pool.
+         2. Los counters devueltos por la API.
+         3. Los counters que pasaron el filtro
+            obligatorio de línea.
+      */
+
+      pool.forEach(
+        miHeroe => {
+
+          if (
+            !esHeroeDeLinea(
+              miHeroe,
+              linea
+            )
+          ) {
+
+            return;
+
+          }
+
+
+          const coincidencia =
+            countersFiltradosPorLinea.find(
+              counter =>
+                limpiarTexto(
+                  counter.name
+                ) ===
+                limpiarTexto(
+                  miHeroe
+                )
+            );
+
+
+          if (
+            coincidencia
+          ) {
+
+            poolCoincidentes.push({
+
+              name:
+                miHeroe,
+
+              winRate:
+                coincidencia.winRate,
+
+              wrValue:
+                parseWinRate(
+                  coincidencia.winRate
+                ),
+
+              reason:
+                coincidencia.reason ||
+                null
+
+            });
+
+          }
+
+        }
+      );
+
+
+      poolCoincidentes.sort(
+        (a, b) =>
+          b.wrValue -
+          a.wrValue
+      );
+
+
+      if (
+        poolCoincidentes.length >
+        0
+      ) {
+
+        const mejor =
+          poolCoincidentes[0];
+
+
+        const alternativas =
+          poolCoincidentes
+            .slice(1);
+
+
+        let htmlPool =
+          fuzzyNotice;
+
+
+        htmlPool +=
+          `
+          <div class="pool-recommendation">
+
+            <div class="recommendation-label">
+              🏆 TU MEJOR PICK
+            </div>
+
+            <div class="recommendation-hero">
+              ${escapeHtml(
+                mejor.name
+              )}
+            </div>
+
+            <div class="recommendation-meta">
+
+              <span>
+                Ventaja: ${escapeHtml(
+                  mejor.winRate
+                )}
+              </span>
+
+              <span>
+                Línea:
+                ${escapeHtml(
+                  linea.toUpperCase()
+                )}
+              </span>
+
+            </div>
+
+            ${
+              mejor.reason
+                ? `
+                  <div class="hero-reason">
+                    💡 ${escapeHtml(
+                      mejor.reason
+                    )}
+                  </div>
+                  `
+                : ""
+            }
+
+          </div>
+          `;
+
+
+        if (
+          alternativas.length >
+          0
+        ) {
+
+          htmlPool +=
+            `
+            <div class="pool-alternatives">
+
+              <div class="alternatives-title">
+                Otras opciones de tu pool
+              </div>
+            `;
+
+
+          alternativas.forEach(
+            alternativa => {
+
+              htmlPool +=
+                `
+                <div class="item-badge">
+
+                  <div class="counter-rank">
+                    +
+                  </div>
+
+                  <div class="counter-content">
+
+                    <strong>
+                      ${escapeHtml(
+                        alternativa.name
+                      )}
+                    </strong>
+
+                    <span class="counter-winrate">
+                      ${escapeHtml(
+                        alternativa.winRate
+                      )}
+                    </span>
+
+                    ${
+                      alternativa.reason
+                        ? `
+                          <div class="hero-reason">
+                            💡 ${escapeHtml(
+                              alternativa.reason
+                            )}
+                          </div>
+                          `
+                        : ""
+                    }
+
+                  </div>
+
+                </div>
+                `;
+
+            }
+          );
+
+
+          htmlPool +=
+            `
+            </div>
+            `;
+
+        }
+
+
+        poolResult.innerHTML =
+          htmlPool;
+
+      } else {
+
+        poolResult.innerHTML =
+          `
+          ${fuzzyNotice}
+
+          <div class="empty-result">
+
+            <strong>
+              Ningún héroe de tu pool tiene
+              un counter verificado para
+              ${escapeHtml(
+                linea.toUpperCase()
+              )}.
+            </strong>
+
+            <p>
+              CounterBro no reemplazará esta
+              recomendación con un héroe de
+              otra línea.
+            </p>
+
+          </div>
+          `;
+
+      }
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Error CounterBro:",
+      error
+    );
+
+
+    generalResult.innerHTML =
+      `
+      <div class="error-result">
+
+        <strong>
+          No pudimos consultar los counters.
+        </strong>
+
+        <p>
+          Revisa tu conexión e inténtalo
+          nuevamente.
+        </p>
+
+      </div>
+      `;
+
+
+    poolResult.innerHTML =
+      `
+      <div class="error-result">
+
+        No se pudo procesar el matchup.
+
+      </div>
+      `;
+
+  }
+
+  finalizarEstadoAnalisis();
+
+}
+
+
+/* =======================================================
+   FINALIZAR ESTADO DE ANÁLISIS
+   ======================================================= */
+
+function finalizarEstadoAnalisis() {
+
+  const analyzeButton =
+    document.getElementById(
+      "t-btnAnalyze"
+    );
+
+
+  if (!analyzeButton) {
+    return;
+  }
+
+
+  analyzeButton.disabled =
+    false;
+
+  ocultarModalAnalisis();
+
+
+  analyzeButton.classList.remove(
+    "is-loading"
+  );
+
+
+  if (
+    analyzeButton.dataset.originalText
+  ) {
+
+    analyzeButton.innerHTML =
+      analyzeButton.dataset.originalText;
+
+    delete analyzeButton.dataset.originalText;
+
+  }
+
+}
+
+
+/* =======================================================
+   REINICIAR BÚSQUEDA
+   ======================================================= */
+
+function reiniciarBusqueda() {
+
+  const enemigo =
+    document.getElementById(
+      "enemigoPick"
+    );
+
+
+  const resultados =
+    document.getElementById(
+      "resultadosCounter"
+    );
+
+
+  if (enemigo) {
+
+    enemigo.value =
+      "";
+
+  }
+
+
+  if (resultados) {
+
+    resultados.style.display =
+      "none";
+
+  }
+
+}
+
+
+/* =======================================================
+   ENTER PARA ANALIZAR
+   ======================================================= */
+
+function activarEnterEnInput() {
+
+  const enemigo =
+    document.getElementById(
+      "enemigoPick"
+    );
+
+
+  const nuevoHeroe =
+    document.getElementById(
+      "nuevoHeroePool"
+    );
+
+
+  if (enemigo) {
+
+    enemigo.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key ===
+          "Enter"
+        ) {
+
+          event.preventDefault();
+
+          buscarCounter();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (nuevoHeroe) {
+
+    nuevoHeroe.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key ===
+          "Enter"
+        ) {
+
+          event.preventDefault();
+
+          agregarHeroePool();
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =======================================================
+   INICIALIZACIÓN
+   ======================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    aplicarIdioma();
+
+    sincronizarSelectoresDeLinea();
+
+    mostrarPoolActual();
+
+    activarEnterEnInput();
+
+    const baseLista =
+      await asegurarHeroesListos();
+
+    if (baseLista) {
+      sincronizarSelectoresDeLinea();
+      mostrarPoolActual();
+    }
+
+  }
+);
