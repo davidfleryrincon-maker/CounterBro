@@ -443,7 +443,16 @@ function identificarHeroe(entrada) {
   }
 
 
+  /*
+     =====================================================
+     RECONOCIMIENTO TOLERANTE
+
+     Combina coincidencia parcial, prefijo y distancia
+     para tolerar errores habituales al escribir héroes.
+  */
+
   let mejorCoincidencia = null;
+  let mejorPuntaje = -Infinity;
   let mejorDistancia = Infinity;
 
 
@@ -456,16 +465,86 @@ function identificarHeroe(entrada) {
       return;
     }
 
+
     const distancia =
       distanciaLevenshtein(
         texto,
         limpio
       );
 
+
+    const longitudMaxima =
+      Math.max(
+        texto.length,
+        limpio.length
+      );
+
+
+    const similitud =
+      longitudMaxima === 0
+        ? 0
+        : 1 -
+          (
+            distancia /
+            longitudMaxima
+          );
+
+
+    const contiene =
+      texto.length >= 4 &&
+      (
+        limpio.includes(texto) ||
+        texto.includes(limpio)
+      );
+
+
+    const mismoInicio =
+      texto.length >= 4 &&
+      limpio.startsWith(
+        texto.slice(
+          0,
+          Math.min(
+            5,
+            texto.length
+          )
+        )
+      );
+
+
+    let puntaje =
+      similitud;
+
+
+    if (contiene) {
+      puntaje += 0.18;
+    }
+
+
+    if (mismoInicio) {
+      puntaje += 0.08;
+    }
+
+
     if (
-      distancia <
-      mejorDistancia
+      texto.length >= 5 &&
+      limpio.length >= 5 &&
+      texto.slice(0, 3) ===
+      limpio.slice(0, 3)
     ) {
+      puntaje += 0.04;
+    }
+
+
+    if (
+      puntaje > mejorPuntaje ||
+      (
+        puntaje === mejorPuntaje &&
+        distancia < mejorDistancia
+      )
+    ) {
+
+      mejorPuntaje =
+        puntaje;
 
       mejorDistancia =
         distancia;
@@ -478,7 +557,7 @@ function identificarHeroe(entrada) {
   });
 
 
-  const limite =
+  const limiteDistancia =
     texto.length <= 4
       ? 1
       : texto.length <= 7
@@ -486,9 +565,24 @@ function identificarHeroe(entrada) {
         : 3;
 
 
+  const limiteSimilitud =
+    texto.length <= 4
+      ? 0.80
+      : texto.length <= 7
+        ? 0.68
+        : 0.62;
+
+
   if (
     mejorCoincidencia &&
-    mejorDistancia <= limite
+    mejorDistancia <= limiteDistancia &&
+    (
+      mejorPuntaje >= limiteSimilitud ||
+      (
+        texto.length >= 5 &&
+        mejorPuntaje >= 0.68
+      )
+    )
   ) {
 
     return mejorCoincidencia;
@@ -1096,25 +1190,66 @@ async function buscarCounter() {
   }
 
 
+  /*
+     =====================================================
+     ESTADO DE ANÁLISIS
+     =====================================================
+  */
+
+  const analyzeButton =
+    document.getElementById(
+      "t-btnAnalyze"
+    );
+
+
+  if (analyzeButton) {
+
+    analyzeButton.disabled =
+      true;
+
+    analyzeButton.classList.add(
+      "is-loading"
+    );
+
+    analyzeButton.dataset.originalText =
+      analyzeButton.innerHTML;
+
+    analyzeButton.innerHTML =
+      `
+        <span class="analysis-spinner"></span>
+        Analizando matchup...
+      `;
+
+  }
+
+
   poolResult.innerHTML =
     `
-    <p style="
-      color:var(--muted);
-      font-size:0.85rem;
-    ">
-      Analizando matchup...
-    </p>
+    <div class="analysis-state">
+      <div class="analysis-orb">
+        <span></span>
+      </div>
+
+      <div>
+        <strong>CounterBro está pensando</strong>
+        <p>Evaluando tu línea y buscando la mejor respuesta.</p>
+      </div>
+    </div>
     `;
 
 
   generalResult.innerHTML =
     `
-    <p style="
-      color:var(--accent);
-      font-size:0.9rem;
-    ">
-      Consultando counters en vivo...
-    </p>
+    <div class="analysis-state analysis-state-secondary">
+      <div class="analysis-orb">
+        <span></span>
+      </div>
+
+      <div>
+        <strong>Analizando datos</strong>
+        <p>Consultando counters y verificando la línea.</p>
+      </div>
+    </div>
     `;
 
 
@@ -1143,6 +1278,42 @@ async function buscarCounter() {
 
 
   try {
+
+    const heroReconocido =
+      HERO_DATABASE.some(
+        hero =>
+          limpiarTexto(hero) ===
+          limpiarTexto(enemigoFinal)
+      );
+
+
+    if (!heroReconocido) {
+
+      finalizarEstadoAnalisis();
+
+      generalResult.innerHTML =
+        `
+        <div class="error-result hero-not-found">
+          <strong>No pude identificar ese héroe.</strong>
+          <p>
+            Revisa el nombre e inténtalo nuevamente.
+            Puedes escribirlo aunque tenga pequeños errores.
+          </p>
+        </div>
+        `;
+
+      poolResult.innerHTML =
+        `
+        <div class="error-result hero-not-found">
+          CounterBro necesita identificar primero
+          el héroe enemigo.
+        </div>
+        `;
+
+      return;
+
+    }
+
 
     const response =
       await fetch(
@@ -1629,6 +1800,47 @@ async function buscarCounter() {
 
       </div>
       `;
+
+  }
+
+  finalizarEstadoAnalisis();
+
+}
+
+
+/* =======================================================
+   FINALIZAR ESTADO DE ANÁLISIS
+   ======================================================= */
+
+function finalizarEstadoAnalisis() {
+
+  const analyzeButton =
+    document.getElementById(
+      "t-btnAnalyze"
+    );
+
+
+  if (!analyzeButton) {
+    return;
+  }
+
+
+  analyzeButton.disabled =
+    false;
+
+  analyzeButton.classList.remove(
+    "is-loading"
+  );
+
+
+  if (
+    analyzeButton.dataset.originalText
+  ) {
+
+    analyzeButton.innerHTML =
+      analyzeButton.dataset.originalText;
+
+    delete analyzeButton.dataset.originalText;
 
   }
 
