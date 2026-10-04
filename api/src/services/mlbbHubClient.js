@@ -185,235 +185,85 @@ function extractLaneKeysFromText(text) {
   return lanes;
 }
 
-function extractLaneKeysFromStructuredData(html) {
-  const $ = cheerio.load(html);
-  const candidates = [];
-
-  function addCandidate(value) {
-    if (typeof value === 'string') {
-      candidates.push(value);
-      return;
-    }
-
-    if (Array.isArray(value)) {
-      value.forEach(addCandidate);
-    }
-  }
-
-  function inspectObject(value, depth = 0) {
-    if (
-      value === null ||
-      typeof value !== 'object' ||
-      depth > 6
-    ) {
-      return;
-    }
-
-    Object.entries(value).forEach(
-      ([key, child]) => {
-        const normalizedKey =
-          String(key || '').toLowerCase();
-
-        if (
-          normalizedKey === 'lane' ||
-          normalizedKey === 'lanes'
-        ) {
-          addCandidate(child);
-        }
-
-        if (
-          child &&
-          typeof child === 'object'
-        ) {
-          inspectObject(
-            child,
-            depth + 1
-          );
-        }
-      }
-    );
-  }
-
-  $('script').each(
-    (_, element) => {
-      const scriptText =
-        $(element).text();
-
-      if (!scriptText) {
-        return;
-      }
-
-      try {
-        const parsed =
-          JSON.parse(scriptText);
-
-        inspectObject(parsed);
-      } catch {
-        const matches =
-          scriptText.matchAll(
-            /"(?:lane|lanes)"\s*:\s*(?:"((?:\\.|[^"])*)"|\[([^\]]*)\])/gi
-          );
-
-        for (const match of matches) {
-          if (match[1]) {
-            candidates.push(
-              match[1]
-                .replace(
-                  /\\\"/g,
-                  '"'
-                )
-                .replace(
-                  /\\\\/g,
-                  '\\'
-                )
-            );
-          }
-
-          if (match[2]) {
-            candidates.push(
-              match[2]
-            );
-          }
-        }
-      }
-    }
-  );
-
-  return Array.from(
-    new Set(
-      candidates
-        .flatMap(
-          candidate =>
-            extractLaneKeysFromText(
-              candidate
-            )
-        )
-    )
-  );
-}
-
 function extractLaneKeys(html) {
-  const structuredLanes =
-    extractLaneKeysFromStructuredData(
-      html
+  const source =
+    String(html || '');
+
+  const tierMatches =
+    source.matchAll(
+      /\bTier\b/gi
     );
 
-  if (structuredLanes.length > 0) {
-    return structuredLanes;
-  }
+  for (const match of tierMatches) {
+    const startIndex =
+      match.index;
 
-  const $ = cheerio.load(html);
-  const candidates = [];
-
-  $('body *').each(
-    (_, element) => {
-      const label =
-        cleanName(
-          $(element).clone()
-            .children()
-            .remove()
-            .end()
-            .text()
-        );
-
-      if (!/^Lane$/i.test(label)) {
-        return;
-      }
-
-      const parent =
-        $(element).parent();
-
-      const siblingText =
-        parent
-          .children()
-          .map(
-            (_, child) =>
-              cleanName(
-                $(child).text()
-              )
-          )
-          .get()
-          .filter(Boolean)
-          .join(' ');
-
-      const parentText =
-        cleanName(
-          parent.text()
-        );
-
-      const grandParentText =
-        cleanName(
-          parent.parent().text()
-        );
-
-      [
-        siblingText,
-        parentText,
-        grandParentText
-      ].forEach(
-        candidate => {
-          if (
-            candidate &&
-            candidate.length <= 180
-          ) {
-            candidates.push(
-              candidate
-            );
-          }
-        }
-      );
+    if (
+      typeof startIndex !== 'number'
+    ) {
+      continue;
     }
-  );
 
-  const directLaneCandidates =
-    candidates
-      .map(
-        candidate => ({
-          candidate,
-          lanes:
-            extractLaneKeysFromText(
-              candidate
-            )
-        })
-      )
-      .filter(
-        item =>
-          item.lanes.length > 0
-      )
-      .sort(
-        (a, b) =>
-          a.candidate.length -
-          b.candidate.length
+    let block =
+      source.slice(
+        startIndex,
+        startIndex + 1200
       );
 
-  if (
-    directLaneCandidates.length > 0
-  ) {
-    return Array.from(
-      new Set(
-        directLaneCandidates[0].lanes
-      )
-    );
-  }
+    const endMatch =
+      block.match(
+        /\b(?:Specialty|Especialidad|Difficulty|Dificultad)\b/i
+      );
 
-  const bodyText =
-    cleanName(
-      $('body').text()
-    );
+    if (endMatch) {
+      block =
+        block.slice(
+          0,
+          endMatch.index
+        );
+    }
 
-  const laneFieldMatch =
-    bodyText.match(
-      /\bLane\b([^]{0,140})/i
-    );
+    const text =
+      cleanName(
+        block
+          .replace(
+            /<[^>]+>/g,
+            ' '
+          )
+          .replace(
+            /&amp;/gi,
+            '&'
+          )
+          .replace(
+            /&nbsp;/gi,
+            ' '
+          )
+      );
 
-  if (laneFieldMatch) {
-    return Array.from(
-      new Set(
+    const laneFieldMatch =
+      text.match(
+        /\bLane\b\s+([^]{1,120})/i
+      );
+
+    if (laneFieldMatch) {
+      const lanes =
         extractLaneKeysFromText(
           laneFieldMatch[1]
-        )
-      )
-    );
+        );
+
+      if (lanes.length > 0) {
+        return lanes;
+      }
+    }
+
+    const lanes =
+      extractLaneKeysFromText(
+        text
+      );
+
+    if (lanes.length > 0) {
+      return lanes;
+    }
   }
 
   return [];
@@ -422,54 +272,17 @@ function extractLaneKeys(html) {
 async function fetchHeroLanes(entry) {
   const html =
     await fetchPage(
-      `${BASE_URL}/${entry.slug}`
+      BASE_URL + '/' + entry.slug
     );
 
   const lanes =
     extractLaneKeys(html);
 
   if (lanes.length === 0) {
-    const diagnosticHtml =
-      String(html || '');
-
-    const diagnosticTitle =
-      diagnosticHtml.match(
-        /<title[^>]*>([\s\S]*?)<\/title>/i
-      );
-
-    const hasLaneText =
-      /\\bLane\\b/i.test(
-        diagnosticHtml
-      );
-
-    const hasJunglerText =
-      /Jungler/i.test(
-        diagnosticHtml
-      );
-
-    const hasExpLaneText =
-      /EXP\\s+Lane/i.test(
-        diagnosticHtml
-      );
-
     throw new Error(
       'No se pudo detectar la línea de ' +
       entry.name +
-      ' en su página de MLBBHub. ' +
-      'Diagnóstico: html=' +
-      diagnosticHtml.length +
-      ', title=' +
-      (diagnosticTitle
-        ? cleanName(
-            diagnosticTitle[1]
-          )
-        : '(sin title)') +
-      ', Lane=' +
-      hasLaneText +
-      ', Jungler=' +
-      hasJunglerText +
-      ', EXP Lane=' +
-      hasExpLaneText
+      ' en su página de MLBBHub.'
     );
   }
 
