@@ -1869,7 +1869,7 @@ function activarEnterEnInput() {
 
 document.addEventListener(
   "DOMContentLoaded",
-  () => {
+  async () => {
 
     aplicarIdioma();
 
@@ -1878,6 +1878,17 @@ document.addEventListener(
     mostrarPoolActual();
 
     activarEnterEnInput();
+
+    /*
+       La lista de héroes y sus líneas llega desde
+       MLBBHub a través del backend.
+
+       Esperamos la sincronización antes de permitir
+       acciones que dependan de la validación de línea.
+    */
+    await sincronizarHeroesEnVivo();
+
+    mostrarPoolActual();
 
   }
 );
