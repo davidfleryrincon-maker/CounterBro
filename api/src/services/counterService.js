@@ -102,171 +102,122 @@ function extraerCounters(html, enemigo) {
   const $ = cheerio.load(html);
   const counters = [];
   const vistos = new Set();
+  const enemigoKey = limpiarNombre(enemigo).toLowerCase();
+
+  function agregarCounter(link) {
+    if (counters.length >= 12) return;
+
+    const href = $(link).attr('href') || '';
+    const match = href.match(/\/heroes\/([^/?#]+)/i);
+
+    if (!match) return;
+
+    const nombre = limpiarNombre($(link).text());
+    if (!nombre) return;
+
+    const clave = nombre.toLowerCase();
+
+    if (clave === enemigoKey || vistos.has(clave)) return;
+
+    const contenedor =
+      $(link).closest('li').length
+        ? $(link).closest('li')
+        : $(link).closest('article').length
+          ? $(link).closest('article')
+          : $(link).parent();
+
+    const textoBloque = limpiarNombre(
+      contenedor.text()
+    );
+
+    const delta = extraerDelta(textoBloque);
+
+    if (delta === null) return;
+
+    vistos.add(clave);
+
+    counters.push({
+      name: nombre,
+      winRate: '+' + delta.toFixed(1) + ' pp',
+      edge: delta,
+      reason: extraerRazonMatchup(
+        textoBloque,
+        nombre
+      )
+    });
+  }
 
   /*
-    MLBBHub muestra una sección "Proven Counters".
-    Tomamos los héroes enlazados desde esa sección y
-    buscamos su ventaja estadística en el bloque cercano.
+    MLBBHub cambia ocasionalmente los wrappers HTML de las
+    tarjetas de counters. En vez de depender de que cada
+    tarjeta sea un hermano directo del heading, buscamos la
+    sección semántica que contiene "Proven Counters".
   */
 
   const headings = $('h2, h3').toArray();
 
-  let inicio = null;
-  let fin = null;
-
   for (const heading of headings) {
-    const texto = limpiarNombre($(heading).text());
+    const textoHeading =
+      limpiarNombre($(heading).text());
 
-    if (!inicio && /^Proven Counters$/i.test(texto)) {
-      inicio = heading;
+    if (!/^Proven Counters$/i.test(textoHeading)) {
       continue;
     }
 
-    if (
-      inicio &&
-      /^Kit Matchups$/i.test(texto)
-    ) {
-      fin = heading;
+    const seccion =
+      $(heading).closest('section').length
+        ? $(heading).closest('section')
+        : $(heading).parent();
+
+    seccion
+      .find('a[href*="/heroes/"]')
+      .each((_, link) => {
+        agregarCounter(link);
+      });
+
+    if (counters.length > 0) {
       break;
     }
   }
 
-  if (inicio) {
-    let actual = $(inicio).next();
+  /*
+    Fallback adicional: buscamos tarjetas individuales que
+    contengan un enlace de héroe y una ventaja estadística.
+    Esto permite sobrevivir a cambios de layout sin mezclar
+    la lista de "Strong Against" cuando la sección principal
+    sí fue encontrada.
+  */
 
-    while (actual.length) {
+  if (counters.length === 0) {
+    $('li, article, div').each((_, bloque) => {
+      if (counters.length >= 12) return false;
+
+      const nodo = $(bloque);
+      const texto = limpiarNombre(nodo.text());
+
       if (
-        fin &&
-        actual[0] === fin
+        !/[+-]\d+(?:[.,]\d+)?\s*(?:pp|percentage points|%)/i.test(texto)
       ) {
-        break;
+        return;
       }
 
-      actual.find('a[href*="/heroes/"]').each((_, link) => {
-        const href = $(link).attr('href') || '';
-        const match = href.match(
-          /\/heroes\/([^/?#]+)/i
-        );
-
-        if (!match) return;
-
-        const nombre = limpiarNombre(
-          $(link).text()
-        );
-
-        if (!nombre) return;
-
-        const clave = nombre.toLowerCase();
-
-        if (
-          clave ===
-          limpiarNombre(enemigo).toLowerCase()
-        ) {
-          return;
-        }
-
-        if (vistos.has(clave)) return;
-
-        const contenedor = $(link).closest('li').length
-          ? $(link).closest('li')
-          : $(link).parent();
-
-        const textoBloque = limpiarNombre(
-          contenedor.text()
-        );
-
-        const delta = extraerDelta(
-          textoBloque
-        );
-
-        if (delta === null) return;
-
-        vistos.add(clave);
-
-        counters.push({
-          name: nombre,
-          winRate:
-            '+' +
-            delta.toFixed(1) +
-            ' pp',
-          edge:
-            delta,
-          reason:
-            extraerRazonMatchup(
-              textoBloque,
-              nombre
-            )
+      nodo
+        .find('a[href*="/heroes/"]')
+        .each((_, link) => {
+          agregarCounter(link);
         });
-      });
-
-      actual = actual.next();
-    }
+    });
   }
 
   /*
-    Fallback para cambios de estructura de MLBBHub:
-    si el bloque anterior no pudo localizarse, buscamos
-    enlaces de héroes y su delta en el contenedor cercano.
+    Último fallback: enlaces de héroes con delta en su contenedor
+    inmediato. Conservamos el límite para evitar ruido del resto
+    de la página.
   */
 
   if (counters.length === 0) {
     $('a[href*="/heroes/"]').each((_, link) => {
-      if (counters.length >= 12) return;
-
-      const href = $(link).attr('href') || '';
-
-      if (!href.match(/\/heroes\/[^/?#]+/i)) {
-        return;
-      }
-
-      const nombre = limpiarNombre(
-        $(link).text()
-      );
-
-      if (!nombre) return;
-
-      const clave = nombre.toLowerCase();
-
-      if (
-        clave ===
-        limpiarNombre(enemigo).toLowerCase()
-      ) {
-        return;
-      }
-
-      if (vistos.has(clave)) return;
-
-      const contenedor = $(link).closest('li').length
-        ? $(link).closest('li')
-        : $(link).parent();
-
-      const textoBloque =
-        limpiarNombre(
-          contenedor.text()
-        );
-
-      const delta = extraerDelta(
-        textoBloque
-      );
-
-      if (delta === null) return;
-
-      vistos.add(clave);
-
-      counters.push({
-        name: nombre,
-        winRate:
-          '+' +
-          delta.toFixed(1) +
-          ' pp',
-        edge:
-          delta,
-        reason:
-          extraerRazonMatchup(
-            textoBloque,
-            nombre
-          )
-      });
+      agregarCounter(link);
     });
   }
 
