@@ -163,169 +163,181 @@
            POOL PERSONAL
            =================================================== -->
 
-      <section class="pool-manager">
+      <section class="pool-manager battle-card">
 
-        <div class="pool-manager-header">
+        <div class="step-block">
 
-          <div>
+          <div class="pool-manager-header">
 
-            <span class="section-kicker">
-              PASO 01 · TU POOL
-            </span>
+            <div class="step-heading">
 
-            <h2>
-              Dime qué héroes sabes jugar
-            </h2>
+              <div class="step-number">
+                01
+              </div>
 
-            <p>
-              Guarda tus picks por línea y CounterBro los tendrá en cuenta al recomendarte.
-            </p>
+              <div>
+
+                <span class="step-kicker">
+                  PASO 01 · TU POOL
+                </span>
+
+                <h2>
+                  Dime qué héroes sabes jugar
+                </h2>
+
+                <p>
+                  Guarda tus picks por línea y CounterBro los tendrá en cuenta al recomendarte.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div class="pool-count">
+
+              <strong id="poolCount">
+                0
+              </strong>
+
+              <span>
+                HÉROES
+              </span>
+
+            </div>
 
           </div>
 
 
-          <div class="pool-count">
+          <div class="pool-lane-row">
 
-            <strong id="poolCount">
-              0
-            </strong>
-
-            <span>
-              HÉROES
+            <span class="pool-lane-label">
+              Editar pool de:
             </span>
+
+
+            <div
+              class="lane-selector compact"
+              role="group"
+              aria-label="Seleccionar línea para tu pool"
+            >
+
+              <button
+                type="button"
+                class="lane-option is-active"
+                data-lane-group="pool"
+                data-lane="exp"
+                onclick="seleccionarLinea('pool','exp')"
+              >
+                <span>⚔️</span>
+                <b>EXP</b>
+              </button>
+
+
+              <button
+                type="button"
+                class="lane-option"
+                data-lane-group="pool"
+                data-lane="mid"
+                onclick="seleccionarLinea('pool','mid')"
+              >
+                <span>🔮</span>
+                <b>MID</b>
+              </button>
+
+
+              <button
+                type="button"
+                class="lane-option"
+                data-lane-group="pool"
+                data-lane="gold"
+                onclick="seleccionarLinea('pool','gold')"
+              >
+                <span>🏹</span>
+                <b>GOLD</b>
+              </button>
+
+
+              <button
+                type="button"
+                class="lane-option"
+                data-lane-group="pool"
+                data-lane="jungle"
+                onclick="seleccionarLinea('pool','jungle')"
+              >
+                <span>🗡️</span>
+                <b>JUNGLE</b>
+              </button>
+
+
+              <button
+                type="button"
+                class="lane-option"
+                data-lane-group="pool"
+                data-lane="roam"
+                onclick="seleccionarLinea('pool','roam')"
+              >
+                <span>🛡️</span>
+                <b>ROAM</b>
+              </button>
+
+            </div>
 
           </div>
 
-        </div>
+
+          <select
+            id="poolLinea"
+            class="lane-native-select"
+            aria-hidden="true"
+            tabindex="-1"
+          >
+            <option value="exp">EXP Lane</option>
+            <option value="mid">MID Lane</option>
+            <option value="gold">GOLD Lane</option>
+            <option value="jungle">JUNGLE</option>
+            <option value="roam">ROAM</option>
+          </select>
 
 
-        <div class="pool-lane-row">
+          <div class="pool-add">
 
-          <span class="pool-lane-label">
-            Editar pool de:
-          </span>
+            <label
+              for="nuevoHeroePool"
+              id="t-addHero"
+            >
+              Agregar héroe a esta línea
+            </label>
+
+
+            <div class="pool-input-row">
+
+              <input
+                type="text"
+                id="nuevoHeroePool"
+                placeholder="Ej. Paquito, Chou..."
+                autocomplete="off"
+              >
+
+              <button
+                type="button"
+                onclick="agregarHeroePool()"
+                id="t-btnAdd"
+              >
+                Agregar
+              </button>
+
+            </div>
+
+          </div>
 
 
           <div
-            class="lane-selector compact"
-            role="group"
-            aria-label="Seleccionar línea para tu pool"
-          >
-
-            <button
-              type="button"
-              class="lane-option is-active"
-              data-lane-group="pool"
-              data-lane="exp"
-              onclick="seleccionarLinea('pool','exp')"
-            >
-              <span>⚔️</span>
-              <b>EXP</b>
-            </button>
-
-
-            <button
-              type="button"
-              class="lane-option"
-              data-lane-group="pool"
-              data-lane="mid"
-              onclick="seleccionarLinea('pool','mid')"
-            >
-              <span>🔮</span>
-              <b>MID</b>
-            </button>
-
-
-            <button
-              type="button"
-              class="lane-option"
-              data-lane-group="pool"
-              data-lane="gold"
-              onclick="seleccionarLinea('pool','gold')"
-            >
-              <span>🏹</span>
-              <b>GOLD</b>
-            </button>
-
-
-            <button
-              type="button"
-              class="lane-option"
-              data-lane-group="pool"
-              data-lane="jungle"
-              onclick="seleccionarLinea('pool','jungle')"
-            >
-              <span>🗡️</span>
-              <b>JUNGLE</b>
-            </button>
-
-
-            <button
-              type="button"
-              class="lane-option"
-              data-lane-group="pool"
-              data-lane="roam"
-              onclick="seleccionarLinea('pool','roam')"
-            >
-              <span>🛡️</span>
-              <b>ROAM</b>
-            </button>
-
-          </div>
+            class="hero-tags"
+            id="poolTags"
+          ></div>
 
         </div>
-
-
-        <select
-          id="poolLinea"
-          class="lane-native-select"
-          aria-hidden="true"
-          tabindex="-1"
-        >
-          <option value="exp">EXP Lane</option>
-          <option value="mid">MID Lane</option>
-          <option value="gold">GOLD Lane</option>
-          <option value="jungle">JUNGLE</option>
-          <option value="roam">ROAM</option>
-        </select>
-
-
-        <div class="pool-add">
-
-          <label
-            for="nuevoHeroePool"
-            id="t-addHero"
-          >
-            Agregar héroe a esta línea
-          </label>
-
-
-          <div class="pool-input-row">
-
-            <input
-              type="text"
-              id="nuevoHeroePool"
-              placeholder="Ej. Paquito, Chou..."
-              autocomplete="off"
-            >
-
-            <button
-              type="button"
-              onclick="agregarHeroePool()"
-              id="t-btnAdd"
-            >
-              Agregar
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="hero-tags"
-          id="poolTags"
-        ></div>
 
       </section>
 
