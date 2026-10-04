@@ -18,7 +18,7 @@ const CACHE_TTL_MS = 30 * 60 * 1000;
 
 function cleanName(value) {
   return String(value || '')
-    .replace(/\\s+/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
