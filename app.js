@@ -154,12 +154,15 @@ async function sincronizarHeroesEnVivo() {
   try {
 
     const res = await fetch(
-      \${VERCEL_URL}/?getHeroes=true\`,
+      `${VERCEL_URL}/?getHeroes=true`,
       { cache: "no-store" }
     );
 
     if (!res.ok) {
-      throw new Error(\`HTTP \${res.status}\`);
+      throw new Error(
+        `HTTP ${res.status}`
+      );
+
     }
 
     const data =
