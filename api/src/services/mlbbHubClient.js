@@ -22,9 +22,18 @@ function cleanName(value) {
 
 function normalizeHeroSlug(value) {
   let slug =
-    decodeURIComponent(
-      String(value || '')
-    )
+    String(value || '');
+
+  try {
+    slug =
+      decodeURIComponent(slug);
+  } catch (error) {
+    slug =
+      String(value || '');
+  }
+
+  slug =
+    slug
       .trim()
       .toLowerCase();
 
@@ -370,11 +379,16 @@ async function fetchHeroLanes(entry) {
         extractLaneKeys(html);
 
       if (lanes.length === 0) {
-        throw new Error(
-          'No se pudo detectar la línea de ' +
-          entry.name +
-          ' en su página de MLBBHub.'
-        );
+        lastError =
+          new Error(
+            'No se pudo detectar la línea de ' +
+            entry.name +
+            ' usando el slug ' +
+            slug +
+            '.'
+          );
+
+        continue;
       }
 
       return {
