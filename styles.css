@@ -2820,17 +2820,6 @@ body.startup-open {
 }
 
 
-.hero-reason {
-
-  padding: 11px 13px;
-  border-left: 2px solid rgba(0, 229, 255, .35);
-  border-radius: 0 10px 10px 0;
-  color: #a9bdd0;
-  background: rgba(0, 163, 255, .035);
-  font-size: .72rem;
-  line-height: 1.5;
-}
-
 
 .pool-recommendation {
   padding: 23px;
