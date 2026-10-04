@@ -14,7 +14,7 @@ const LANE_URLS = {
 let lastGoodData = null;
 let lastSyncAt = 0;
 
-const CACHE_TTL_MS = 30 * 60 * 1000;
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 
 function cleanName(value) {
   return String(value || '')
