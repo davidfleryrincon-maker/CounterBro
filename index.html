@@ -74,35 +74,93 @@
       </h3>
 
       <label
-        for="poolLinea"
         id="t-selectLane"
+        class="lane-section-label"
       >
         Seleccionar Línea:
       </label>
 
+      <div
+        class="lane-selector"
+        role="group"
+        aria-label="Seleccionar línea para tu pool"
+      >
+
+        <button
+          type="button"
+          class="lane-option is-active"
+          data-lane-group="pool"
+          data-lane="exp"
+          onclick="seleccionarLinea('pool', 'exp')"
+        >
+          <span class="lane-icon">⚔️</span>
+          <span class="lane-name">EXP</span>
+          <span class="lane-hint">Fighter</span>
+        </button>
+
+        <button
+          type="button"
+          class="lane-option"
+          data-lane-group="pool"
+          data-lane="mid"
+          onclick="seleccionarLinea('pool', 'mid')"
+        >
+          <span class="lane-icon">🔮</span>
+          <span class="lane-name">MID</span>
+          <span class="lane-hint">Mage</span>
+        </button>
+
+        <button
+          type="button"
+          class="lane-option"
+          data-lane-group="pool"
+          data-lane="gold"
+          onclick="seleccionarLinea('pool', 'gold')"
+        >
+          <span class="lane-icon">🏹</span>
+          <span class="lane-name">GOLD</span>
+          <span class="lane-hint">Marksman</span>
+        </button>
+
+        <button
+          type="button"
+          class="lane-option"
+          data-lane-group="pool"
+          data-lane="jungle"
+          onclick="seleccionarLinea('pool', 'jungle')"
+        >
+          <span class="lane-icon">🗡️</span>
+          <span class="lane-name">JUNGLE</span>
+          <span class="lane-hint">Assassin</span>
+        </button>
+
+        <button
+          type="button"
+          class="lane-option"
+          data-lane-group="pool"
+          data-lane="roam"
+          onclick="seleccionarLinea('pool', 'roam')"
+        >
+          <span class="lane-icon">🛡️</span>
+          <span class="lane-name">ROAM</span>
+          <span class="lane-hint">Support</span>
+        </button>
+
+      </div>
+
+      <!-- Selector interno conservado para mantener la lógica actual -->
       <select
         id="poolLinea"
+        class="lane-native-select"
         onchange="mostrarPoolActual()"
+        aria-hidden="true"
+        tabindex="-1"
       >
-        <option value="exp">
-          EXP Lane
-        </option>
-
-        <option value="mid">
-          MID Lane
-        </option>
-
-        <option value="gold">
-          GOLD Lane
-        </option>
-
-        <option value="jungle">
-          JUNGLE
-        </option>
-
-        <option value="roam">
-          ROAM
-        </option>
+        <option value="exp">EXP Lane</option>
+        <option value="mid">MID Lane</option>
+        <option value="gold">GOLD Lane</option>
+        <option value="jungle">JUNGLE</option>
+        <option value="roam">ROAM</option>
       </select>
 
 
@@ -147,34 +205,92 @@
 
 
       <label
-        for="partidaLinea"
         id="t-yourLane"
+        class="lane-section-label"
       >
         Línea que jugarás:
       </label>
 
-      <select id="partidaLinea">
+      <div
+        class="lane-selector"
+        role="group"
+        aria-label="Seleccionar línea para la partida"
+      >
 
-        <option value="exp">
-          EXP Lane
-        </option>
+        <button
+          type="button"
+          class="lane-option is-active"
+          data-lane-group="match"
+          data-lane="exp"
+          onclick="seleccionarLinea('match', 'exp')"
+        >
+          <span class="lane-icon">⚔️</span>
+          <span class="lane-name">EXP</span>
+          <span class="lane-hint">Fighter</span>
+        </button>
 
-        <option value="mid">
-          MID Lane
-        </option>
+        <button
+          type="button"
+          class="lane-option"
+          data-lane-group="match"
+          data-lane="mid"
+          onclick="seleccionarLinea('match', 'mid')"
+        >
+          <span class="lane-icon">🔮</span>
+          <span class="lane-name">MID</span>
+          <span class="lane-hint">Mage</span>
+        </button>
 
-        <option value="gold">
-          GOLD Lane
-        </option>
+        <button
+          type="button"
+          class="lane-option"
+          data-lane-group="match"
+          data-lane="gold"
+          onclick="seleccionarLinea('match', 'gold')"
+        >
+          <span class="lane-icon">🏹</span>
+          <span class="lane-name">GOLD</span>
+          <span class="lane-hint">Marksman</span>
+        </button>
 
-        <option value="jungle">
-          JUNGLE
-        </option>
+        <button
+          type="button"
+          class="lane-option"
+          data-lane-group="match"
+          data-lane="jungle"
+          onclick="seleccionarLinea('match', 'jungle')"
+        >
+          <span class="lane-icon">🗡️</span>
+          <span class="lane-name">JUNGLE</span>
+          <span class="lane-hint">Assassin</span>
+        </button>
 
-        <option value="roam">
-          ROAM
-        </option>
+        <button
+          type="button"
+          class="lane-option"
+          data-lane-group="match"
+          data-lane="roam"
+          onclick="seleccionarLinea('match', 'roam')"
+        >
+          <span class="lane-icon">🛡️</span>
+          <span class="lane-name">ROAM</span>
+          <span class="lane-hint">Support</span>
+        </button>
 
+      </div>
+
+      <!-- Selector interno conservado para mantener la lógica actual -->
+      <select
+        id="partidaLinea"
+        class="lane-native-select"
+        aria-hidden="true"
+        tabindex="-1"
+      >
+        <option value="exp">EXP Lane</option>
+        <option value="mid">MID Lane</option>
+        <option value="gold">GOLD Lane</option>
+        <option value="jungle">JUNGLE</option>
+        <option value="roam">ROAM</option>
       </select>
 
 
@@ -666,6 +782,7 @@
 
     }
 
+
     sincronizarHeroesEnVivo();
 
 
@@ -852,6 +969,83 @@
         'mlbb_user_pool',
         JSON.stringify(userPool)
       );
+
+    }
+
+
+    /* =======================================================
+       SELECTOR VISUAL DE LÍNEAS
+       ======================================================= */
+
+    function seleccionarLinea(grupo, linea) {
+
+      const selectId =
+        grupo === 'pool'
+          ? 'poolLinea'
+          : 'partidaLinea';
+
+      const select =
+        document.getElementById(selectId);
+
+      if (!select) {
+        return;
+      }
+
+      select.value = linea;
+
+      document
+        .querySelectorAll(
+          `.lane-option[data-lane-group="${grupo}"]`
+        )
+        .forEach(button => {
+
+          button.classList.toggle(
+            'is-active',
+            button.dataset.lane === linea
+          );
+
+        });
+
+      if (grupo === 'pool') {
+        mostrarPoolActual();
+      }
+
+    }
+
+
+    function sincronizarSelectoresDeLinea() {
+
+      const poolLinea =
+        document.getElementById('poolLinea')?.value || 'exp';
+
+      const partidaLinea =
+        document.getElementById('partidaLinea')?.value || 'exp';
+
+      document
+        .querySelectorAll(
+          '.lane-option[data-lane-group="pool"]'
+        )
+        .forEach(button => {
+
+          button.classList.toggle(
+            'is-active',
+            button.dataset.lane === poolLinea
+          );
+
+        });
+
+      document
+        .querySelectorAll(
+          '.lane-option[data-lane-group="match"]'
+        )
+        .forEach(button => {
+
+          button.classList.toggle(
+            'is-active',
+            button.dataset.lane === partidaLinea
+          );
+
+        });
 
     }
 
@@ -1618,6 +1812,7 @@
        INICIALIZACIÓN
        ======================================================= */
 
+    sincronizarSelectoresDeLinea();
     mostrarPoolActual();
 
   </script>
