@@ -185,7 +185,123 @@ function extractLaneKeysFromText(text) {
   return lanes;
 }
 
+function extractLaneKeysFromStructuredData(html) {
+  const $ = cheerio.load(html);
+  const candidates = [];
+
+  function addCandidate(value) {
+    if (typeof value === 'string') {
+      candidates.push(value);
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      value.forEach(addCandidate);
+    }
+  }
+
+  function inspectObject(value, depth = 0) {
+    if (
+      value === null ||
+      typeof value !== 'object' ||
+      depth > 6
+    ) {
+      return;
+    }
+
+    Object.entries(value).forEach(
+      ([key, child]) => {
+        const normalizedKey =
+          String(key || '').toLowerCase();
+
+        if (
+          normalizedKey === 'lane' ||
+          normalizedKey === 'lanes'
+        ) {
+          addCandidate(child);
+        }
+
+        if (
+          child &&
+          typeof child === 'object'
+        ) {
+          inspectObject(
+            child,
+            depth + 1
+          );
+        }
+      }
+    );
+  }
+
+  $('script').each(
+    (_, element) => {
+      const scriptText =
+        $(element).text();
+
+      if (!scriptText) {
+        return;
+      }
+
+      try {
+        const parsed =
+          JSON.parse(scriptText);
+
+        inspectObject(parsed);
+      } catch {
+        const matches =
+          scriptText.matchAll(
+            /"(?:lane|lanes)"\\s*:\\s*(?:"((?:\\\\.|[^"])*)"|\\[([^\\]]*)\\])/gi
+          );
+
+        for (const match of matches) {
+          if (match[1]) {
+            candidates.push(
+              match[1]
+                .replace(
+                  /\\\"/g,
+                  '"'
+                )
+                .replace(
+                  /\\\\/g,
+                  '\\'
+                )
+            );
+          }
+
+          if (match[2]) {
+            candidates.push(
+              match[2]
+            );
+          }
+        }
+      }
+    }
+  );
+
+  return Array.from(
+    new Set(
+      candidates
+        .flatMap(
+          candidate =>
+            extractLaneKeysFromText(
+              candidate
+            )
+        )
+    )
+  );
+}
+
 function extractLaneKeys(html) {
+  const structuredLanes =
+    extractLaneKeysFromStructuredData(
+      html
+    );
+
+  if (structuredLanes.length > 0) {
+    return structuredLanes;
+  }
+
   const $ = cheerio.load(html);
   const candidates = [];
 
