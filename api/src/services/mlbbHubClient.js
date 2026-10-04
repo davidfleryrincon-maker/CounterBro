@@ -76,7 +76,6 @@ function addHero(
   }
 
   const cleanHeroName =
-    cleanName(name) ||
     nameFromSlug(cleanSlug);
 
   if (
