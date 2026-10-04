@@ -895,8 +895,8 @@ async function inicializarBaseDeHeroes() {
       return false;
     }
 
-  } finally {
   }
+}
 
 function asegurarHeroesListos() {
   if (heroesReady) {
