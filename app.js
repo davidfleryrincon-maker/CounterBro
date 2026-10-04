@@ -292,7 +292,8 @@ const HERO_LANES_BASE = {
     "Karina",
     "Lukas",
     "Suyu",
-    "Suyou"
+    "Suyou",
+    "Hirara"
   ],
 
   roam: [
