@@ -15,6 +15,72 @@
 </head>
 
 <body>
+  <div
+    id="startupOverlay"
+    class="startup-overlay is-visible"
+    aria-hidden="false"
+  >
+    <div class="startup-grid"></div>
+
+    <div class="startup-panel">
+
+      <div class="startup-brand">
+        <img
+          src="logo.png"
+          alt="CounterBro"
+          class="startup-logo"
+          onerror="this.style.display='none'"
+        >
+      </div>
+
+      <div class="startup-kicker">
+        COUNTERBRO CORE · BOOT SEQUENCE
+      </div>
+
+      <h1>
+        Preparando el cerebro de CounterBro
+      </h1>
+
+      <p class="startup-subtitle">
+        Estoy reuniendo la información que necesito
+        antes de dejarte entrar al draft.
+      </p>
+
+      <div
+        class="startup-loader"
+        id="startupLoader"
+        aria-label="Cargando datos de héroes"
+      >
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <div class="startup-progress-label">
+        <span id="startupProgressText">SINCRONIZANDO DATOS</span>
+        <strong id="startupProgressDots">•••</strong>
+      </div>
+
+      <div
+        class="startup-thought"
+        id="startupThought"
+        aria-live="polite"
+      >
+        “Estoy calentando mis circuitos...”
+      </div>
+
+      <div
+        class="startup-status"
+        id="startupStatus"
+      >
+        <span></span>
+        Verificando la base de héroes
+      </div>
+
+    </div>
+  </div>
+
 
   <div class="app-shell">
 
@@ -631,7 +697,7 @@
        JAVASCRIPT
        ===================================================== -->
 
-  <script src="app.js?v=20261004-03"></script>
+  <script src="app.js?v=20261004-04"></script>
 
 </body>
 </html>

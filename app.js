@@ -337,21 +337,34 @@ const HERO_LANES_BASE = {
 
 
 
-let HERO_DATABASE = [...HERO_DATABASE_BASE];
+let HERO_DATABASE = [];
+let HERO_LANES = {
+  exp: [],
+  mid: [],
+  gold: [],
+  jungle: [],
+  roam: []
+};
 
-let HERO_LANES = Object.fromEntries(
-  Object.entries(HERO_LANES_BASE).map(
-    ([linea, heroes]) => [linea, [...heroes]]
-  )
-);
+let heroesReadyPromise = null;
+let heroesReady = false;
 
-
-/* =======================================================
-   SINCRONIZAR HÉROES Y LÍNEAS DESDE EL BACKEND
-   ======================================================= */
+const STARTUP_THOUGHTS = [
+  "Estoy calentando mis circuitos... no quiero recomendarte cualquier cosa.",
+  "Voy a revisar quién está jugando dónde. Un counter fuera de línea no me sirve.",
+  "Hmm... estoy ordenando mis notas del Land of Dawn.",
+  "Estoy comprobando mis fuentes antes de decirte “lock in”.",
+  "No quiero inventarte un counter. Prefiero tardar un poco y acertar.",
+  "Estoy afilando el análisis... ese pick enemigo no se me va a escapar.",
+  "Comparando héroes, líneas y matchups. Dame un segundo.",
+  "Mi cerebro digital está arrancando. Ya casi estoy listo.",
+  "Estoy revisando el draft como si estuviera en la pantalla de selección.",
+  "Un momento... estoy poniendo cada héroe en su sitio.",
+  "Estoy calentando motores. CounterBro no entra a una partida sin información.",
+  "Casi listo. Solo estoy revisando el último detalle."
+];
 
 function aplicarDatosDeHeroes(data) {
-
   const lanesValidas = [
     "exp",
     "mid",
@@ -363,53 +376,202 @@ function aplicarDatosDeHeroes(data) {
   const nuevasLanes = {};
 
   lanesValidas.forEach(linea => {
-
-    const heroesEnVivo =
-      Array.isArray(data.lanes?.[linea])
+    const heroesDeLinea =
+      Array.isArray(data?.lanes?.[linea])
         ? data.lanes[linea].filter(Boolean)
         : [];
 
-    nuevasLanes[linea] = Array.from(
-      new Set([
-        ...(HERO_LANES_BASE[linea] || []),
-        ...heroesEnVivo
-      ])
-    );
+    if (heroesDeLinea.length < 5) {
+      throw new Error(
+        "La base preparada no tiene suficientes héroes para " +
+        linea +
+        "."
+      );
+    }
 
+    nuevasLanes[linea] =
+      Array.from(new Set(heroesDeLinea));
   });
 
-  const heroesEnVivo =
-    Array.isArray(data.heroes)
+  const heroes =
+    Array.isArray(data?.heroes)
       ? data.heroes.filter(Boolean)
       : [];
 
-  const totalHeroes =
-    Array.from(
-      new Set([
-        ...HERO_DATABASE_BASE,
-        ...heroesEnVivo,
-        ...lanesValidas.flatMap(
-          linea => nuevasLanes[linea]
-        )
-      ])
-    );
-
-  if (totalHeroes.length < 50) {
+  if (heroes.length < 50) {
     throw new Error(
-      "La base de héroes recibida no es suficiente."
+      "La base preparada de héroes no es suficiente."
     );
   }
 
   HERO_LANES = nuevasLanes;
-  HERO_DATABASE = totalHeroes;
+  HERO_DATABASE =
+    Array.from(new Set([
+      ...heroes,
+      ...Object.values(nuevasLanes).flat()
+    ]));
 
+  heroesReady = true;
 }
 
+function actualizarFraseStartup() {
+  const thought =
+    document.getElementById("startupThought");
+
+  if (!thought) {
+    return;
+  }
+
+  const index =
+    Math.floor(
+      Math.random() *
+      STARTUP_THOUGHTS.length
+    );
+
+  thought.textContent =
+    "“" +
+    STARTUP_THOUGHTS[index] +
+    "”";
+}
+
+function iniciarAnimacionStartup() {
+  actualizarFraseStartup();
+
+  return setInterval(
+    actualizarFraseStartup,
+    1500
+  );
+}
+
+function actualizarEstadoStartup(
+  texto,
+  estado = "loading"
+) {
+  const overlay =
+    document.getElementById(
+      "startupOverlay"
+    );
+
+  const status =
+    document.getElementById(
+      "startupStatus"
+    );
+
+  const progressText =
+    document.getElementById(
+      "startupProgressText"
+    );
+
+  if (overlay) {
+    overlay.classList.toggle(
+      "is-error",
+      estado === "error"
+    );
+  }
+
+  if (status) {
+    status.innerHTML =
+      `<span></span>${escapeHtml(texto)}`;
+  }
+
+  if (progressText) {
+    progressText.textContent =
+      estado === "error"
+        ? "REINTENTO NECESARIO"
+        : "SINCRONIZANDO DATOS";
+  }
+}
+
+function mostrarStartupOverlay() {
+  const overlay =
+    document.getElementById(
+      "startupOverlay"
+    );
+
+  if (!overlay) {
+    return;
+  }
+
+  overlay.classList.add(
+    "is-visible"
+  );
+
+  overlay.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  document.body.classList.add(
+    "startup-open"
+  );
+}
+
+function ocultarStartupOverlay() {
+  const overlay =
+    document.getElementById(
+      "startupOverlay"
+    );
+
+  if (!overlay) {
+    return;
+  }
+
+  overlay.classList.remove(
+    "is-visible",
+    "is-error"
+  );
+
+  overlay.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  document.body.classList.remove(
+    "startup-open"
+  );
+}
+
+function mostrarErrorStartup() {
+  const overlay =
+    document.getElementById(
+      "startupOverlay"
+    );
+
+  if (!overlay) {
+    return;
+  }
+
+  actualizarEstadoStartup(
+    "No pude cargar la base preparada. Puedes recargar la página."
+  );
+
+  const thought =
+    document.getElementById(
+      "startupThought"
+    );
+
+  if (thought) {
+    thought.textContent =
+      "“Algo salió mal... dame otro intento y vuelvo a pensar.”";
+  }
+
+  overlay.classList.add(
+    "is-visible",
+    "is-error"
+  );
+
+  overlay.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  document.body.classList.add(
+    "startup-open"
+  );
+}
 
 async function cargarHeroesDesdeCache() {
-
   try {
-
     const raw =
       localStorage.getItem(
         HERO_CACHE_KEY
@@ -447,100 +609,217 @@ async function cargarHeroesDesdeCache() {
     );
 
     console.info(
-      "CounterBro: usando cache local de héroes.",
+      "CounterBro: usando la última base preparada guardada localmente.",
       {
-        heroes: HERO_DATABASE.length,
-        savedAt: cache.savedAt
+        heroes:
+          HERO_DATABASE.length,
+        savedAt:
+          cache.savedAt
       }
     );
 
     return true;
 
   } catch (error) {
-
     console.warn(
       "CounterBro: cache local inválida.",
       error
     );
 
     return false;
-
   }
-
 }
 
-
-async function sincronizarHeroesEnVivo() {
-
-  try {
-
-    const res = await fetch(
+async function cargarBasePreparada() {
+  const response =
+    await fetch(
       `${VERCEL_URL}/?getHeroes=true`,
-      { cache: "no-store" }
-    );
-
-    if (!res.ok) {
-      throw new Error(
-        `HTTP ${res.status}`
-      );
-
-    }
-
-    const data =
-      await res.json();
-
-    if (
-      !data ||
-      !Array.isArray(data.heroes) ||
-      !data.lanes
-    ) {
-      throw new Error(
-        "Respuesta de héroes inválida."
-      );
-    }
-
-    aplicarDatosDeHeroes(
-      data
-    );
-
-    localStorage.setItem(
-      HERO_CACHE_KEY,
-      JSON.stringify({
-        savedAt: Date.now(),
-        data
-      })
-    );
-
-    console.info(
-      "CounterBro: héroes sincronizados desde MLBBHub.",
       {
-        heroes: HERO_DATABASE.length,
-        lanes: {
-          exp: HERO_LANES.exp.length,
-          mid: HERO_LANES.mid.length,
-          gold: HERO_LANES.gold.length,
-          jungle: HERO_LANES.jungle.length,
-          roam: HERO_LANES.roam.length
-        },
-        partial: Boolean(data.partial),
-        syncedAt:
-          data.syncedAt || null
+        cache: "no-store"
       }
     );
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP ${response.status}`
+    );
+  }
+
+  const data =
+    await response.json();
+
+  if (
+    !data ||
+    !Array.isArray(data.heroes) ||
+    !data.lanes
+  ) {
+    throw new Error(
+      "Respuesta de base preparada inválida."
+    );
+  }
+
+  aplicarDatosDeHeroes(
+    data
+  );
+
+  localStorage.setItem(
+    HERO_CACHE_KEY,
+    JSON.stringify({
+      savedAt:
+        Date.now(),
+      data
+    })
+  );
+
+  console.info(
+    "CounterBro: base preparada recibida.",
+    {
+      heroes:
+        HERO_DATABASE.length,
+      lanes: {
+        exp:
+          HERO_LANES.exp.length,
+        mid:
+          HERO_LANES.mid.length,
+        gold:
+          HERO_LANES.gold.length,
+        jungle:
+          HERO_LANES.jungle.length,
+        roam:
+          HERO_LANES.roam.length
+      },
+      source:
+        data.source || null,
+      syncedAt:
+        data.syncedAt || null
+    }
+  );
+
+  return true;
+}
+
+async function inicializarBaseDeHeroes() {
+  mostrarStartupOverlay();
+
+  const stopThoughts =
+    iniciarAnimacionStartup();
+
+  actualizarEstadoStartup(
+    "Verificando la base de héroes"
+  );
+
+  const inicio =
+    performance.now();
+
+  try {
+    const cacheValida =
+      await cargarHeroesDesdeCache();
+
+    if (cacheValida) {
+      actualizarEstadoStartup(
+        "Base local encontrada. Confirmando datos preparados..."
+      );
+    }
+
+    await cargarBasePreparada();
+
+    const tiempo =
+      Math.round(
+        performance.now() -
+        inicio
+      );
+
+    const loader =
+      document.getElementById(
+        "startupLoader"
+      );
+
+    if (loader) {
+      loader.classList.add(
+        "is-ready"
+      );
+    }
+
+    actualizarEstadoStartup(
+      `Base lista · ${HERO_DATABASE.length} héroes disponibles`
+    );
+
+    const progressText =
+      document.getElementById(
+        "startupProgressText"
+      );
+
+    if (progressText) {
+      progressText.textContent =
+        `SISTEMA LISTO · ${tiempo} MS`;
+    }
+
+    await new Promise(
+      resolve =>
+        setTimeout(
+          resolve,
+          650
+        )
+    );
+
+    ocultarStartupOverlay();
 
     return true;
 
   } catch (error) {
-
-    console.warn(
-      "CounterBro: no fue posible sincronizar héroes.",
+    console.error(
+      "CounterBro: no fue posible cargar la base preparada.",
       error
     );
 
-    return HERO_DATABASE.length > 0;
+    if (
+      HERO_DATABASE.length > 0 &&
+      Object.values(HERO_LANES)
+        .every(
+          heroes =>
+            Array.isArray(heroes) &&
+            heroes.length >= 5
+        )
+    ) {
+      actualizarEstadoStartup(
+        "Usando la última base válida disponible..."
+      );
 
+      await new Promise(
+        resolve =>
+          setTimeout(
+            resolve,
+            450
+          )
+      );
+
+      ocultarStartupOverlay();
+
+      return true;
+    }
+
+    mostrarErrorStartup();
+
+    return false;
+
+  } finally {
+    clearInterval(
+      stopThoughts
+    );
+  }
+}
+
+function asegurarHeroesListos() {
+  if (heroesReady) {
+    return Promise.resolve(true);
   }
 
+  if (!heroesReadyPromise) {
+    heroesReadyPromise =
+      inicializarBaseDeHeroes();
+  }
+
+  return heroesReadyPromise;
 }
 
 
@@ -1344,7 +1623,7 @@ function mostrarPoolActual() {
    AGREGAR HÉROE AL POOL
    ======================================================= */
 
-function agregarHeroePool() {
+async function agregarHeroePool() {
 
   const select =
     document.getElementById(
@@ -1365,6 +1644,13 @@ function agregarHeroePool() {
 
     return;
 
+  }
+
+  const baseLista =
+    await asegurarHeroesListos();
+
+  if (!baseLista) {
+    return;
   }
 
 
@@ -1622,31 +1908,16 @@ async function buscarCounter() {
 
 
   /*
-     Si el usuario pulsa Analizar antes de que termine
-     la sincronización inicial, esperamos aquí.
+     La base central preparada debe estar lista
+     antes de reconocer o validar cualquier héroe.
+     Esto elimina la carrera entre carga e interacción.
   */
 
-  if (
-    HERO_DATABASE.length === 0
-  ) {
+  const baseLista =
+    await asegurarHeroesListos();
 
-    mostrarModalAnalisis();
-
-    const sincronizado =
-      await sincronizarHeroesEnVivo();
-
-    if (!sincronizado) {
-
-      ocultarModalAnalisis();
-
-      alert(
-        "CounterBro no pudo cargar la base de héroes. Inténtalo nuevamente en unos segundos."
-      );
-
-      return;
-
-    }
-
+  if (!baseLista) {
+    return;
   }
 
 
@@ -2463,21 +2734,13 @@ document.addEventListener(
 
     activarEnterEnInput();
 
-    /*
-      Usamos primero la última base válida guardada localmente.
-      Después la actualizamos en segundo plano desde MLBBHub.
-      Esto permite reconocer héroes inmediatamente tras una visita
-      previa y recibir héroes nuevos sin bloquear la interfaz.
-    */
-    await cargarHeroesDesdeCache();
+    const baseLista =
+      await asegurarHeroesListos();
 
-    sincronizarSelectoresDeLinea();
-
-    mostrarPoolActual();
-
-    await sincronizarHeroesEnVivo();
-
-    mostrarPoolActual();
+    if (baseLista) {
+      sincronizarSelectoresDeLinea();
+      mostrarPoolActual();
+    }
 
   }
 );
