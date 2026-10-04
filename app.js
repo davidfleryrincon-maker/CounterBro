@@ -1105,6 +1105,58 @@ function escapeHtml(text) {
 
 
 /* =======================================================
+   MODAL DE ANÁLISIS
+   ======================================================= */
+
+function mostrarModalAnalisis() {
+
+  const modal =
+    document.getElementById(
+      "analysisOverlay"
+    );
+
+
+  if (!modal) {
+    return;
+  }
+
+
+  modal.classList.add(
+    "is-visible"
+  );
+
+  document.body.classList.add(
+    "analysis-open"
+  );
+
+}
+
+
+function ocultarModalAnalisis() {
+
+  const modal =
+    document.getElementById(
+      "analysisOverlay"
+    );
+
+
+  if (modal) {
+
+    modal.classList.remove(
+      "is-visible"
+    );
+
+  }
+
+
+  document.body.classList.remove(
+    "analysis-open"
+  );
+
+}
+
+
+/* =======================================================
    BUSCAR COUNTER
    ======================================================= */
 
@@ -1147,6 +1199,35 @@ async function buscarCounter() {
     );
 
     return;
+
+  }
+
+
+  /*
+     Si el usuario pulsa Analizar antes de que termine
+     la sincronización inicial, esperamos aquí.
+  */
+
+  if (
+    HERO_DATABASE.length === 0
+  ) {
+
+    mostrarModalAnalisis();
+
+    const sincronizado =
+      await sincronizarHeroesEnVivo();
+
+    if (!sincronizado) {
+
+      ocultarModalAnalisis();
+
+      alert(
+        "CounterBro no pudo cargar la base de héroes. Inténtalo nuevamente en unos segundos."
+      );
+
+      return;
+
+    }
 
   }
 
@@ -1196,6 +1277,9 @@ async function buscarCounter() {
      =====================================================
   */
 
+  mostrarModalAnalisis();
+
+
   const analyzeButton =
     document.getElementById(
       "t-btnAnalyze"
@@ -1217,40 +1301,10 @@ async function buscarCounter() {
     analyzeButton.innerHTML =
       `
         <span class="analysis-spinner"></span>
-        Analizando matchup...
+        Analizando...
       `;
 
   }
-
-
-  poolResult.innerHTML =
-    `
-    <div class="analysis-state">
-      <div class="analysis-orb">
-        <span></span>
-      </div>
-
-      <div>
-        <strong>CounterBro está pensando</strong>
-        <p>Evaluando tu línea y buscando la mejor respuesta.</p>
-      </div>
-    </div>
-    `;
-
-
-  generalResult.innerHTML =
-    `
-    <div class="analysis-state analysis-state-secondary">
-      <div class="analysis-orb">
-        <span></span>
-      </div>
-
-      <div>
-        <strong>Analizando datos</strong>
-        <p>Consultando counters y verificando la línea.</p>
-      </div>
-    </div>
-    `;
 
 
   resultados.style.display =
@@ -1346,6 +1400,29 @@ async function buscarCounter() {
       )
         ? data.counters
         : [];
+
+
+    const resultsEnemy =
+      document.getElementById(
+        "resultsEnemy"
+      );
+
+    const resultsLane =
+      document.getElementById(
+        "resultsLane"
+      );
+
+
+    if (resultsEnemy) {
+      resultsEnemy.textContent =
+        enemigoFinal;
+    }
+
+
+    if (resultsLane) {
+      resultsLane.textContent =
+        linea.toUpperCase();
+    }
 
 
     /*
@@ -1827,6 +1904,9 @@ function finalizarEstadoAnalisis() {
 
   analyzeButton.disabled =
     false;
+
+  ocultarModalAnalisis();
+
 
   analyzeButton.classList.remove(
     "is-loading"
