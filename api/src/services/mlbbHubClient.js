@@ -434,7 +434,7 @@ async function fetchHeroLanes(entry) {
 
     const diagnosticTitle =
       diagnosticHtml.match(
-        /<title[^>]*>([\\s\\S]*?)<\\/title>/i
+        /<title[^>]*>([\s\S]*?)<\/title>/i
       );
 
     const hasLaneText =
