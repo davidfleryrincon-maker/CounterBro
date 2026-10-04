@@ -24,6 +24,19 @@ function cleanName(value) {
 }
 
 function nameFromSlug(slug) {
+
+  const especiales = {
+    "x-borg": "X.Borg",
+    "chang-e": "Chang'e",
+    "popol-and-kupa": "Popol and Kupa",
+    "yi-sun-shin": "Yi Sun-shin",
+    "luo-yi": "Luo Yi"
+  };
+
+  if (especiales[slug]) {
+    return especiales[slug];
+  }
+
   return slug
     .split('-')
     .filter(Boolean)
