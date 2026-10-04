@@ -54,6 +54,12 @@ function extraerRazonMatchup(
   let razon =
     limpiarNombre(texto);
 
+  razon =
+    razon.replace(
+      /^\d+\s+/,
+      ''
+    );
+
   const nombre =
     limpiarNombre(nombreHeroe);
 
