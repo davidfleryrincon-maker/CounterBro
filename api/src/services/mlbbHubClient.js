@@ -55,7 +55,7 @@ function addHero(
       String(slug || '')
     )
       .replace(
-        /^\\/+|\\/+$/g,
+        /^\/+|\/+$/g,
         ''
       )
       .trim()
@@ -98,7 +98,7 @@ function extractHeroEntries(html) {
 
       const match =
         href.match(
-          /\/heroes\/([^/?#"'< >]+)/i
+          /\/heroes\/([^/?#"'<>]+)/i
         );
 
       if (!match) {
@@ -117,7 +117,7 @@ function extractHeroEntries(html) {
 
   const rawMatches =
     String(html || '').matchAll(
-      /\/heroes\/([a-z0-9%._'-]+)(?=[/?#"'< >\\])/gi
+      /\/heroes\/([a-z0-9%._'-]+)(?=[/?#"'<>\\])/gi
     );
 
   for (const match of rawMatches) {
