@@ -20,6 +20,76 @@ function cleanName(value) {
     .trim();
 }
 
+function normalizeHeroSlug(value) {
+  let slug =
+    decodeURIComponent(
+      String(value || '')
+    )
+      .trim()
+      .toLowerCase();
+
+  slug =
+    slug.replace(
+      /^\/+|\/+$/g,
+      ''
+    );
+
+  slug =
+    slug.replace(
+      /[\s_]+/g,
+      '-'
+    );
+
+  slug =
+    slug.replace(
+      /-+/g,
+      '-'
+    );
+
+  slug =
+    slug.replace(
+      /^-+|-+$/g,
+      ''
+    );
+
+  return slug;
+}
+
+function slugFromHeroName(name) {
+  const normalizedName =
+    cleanName(name).toLowerCase();
+
+  const especiales = {
+    'x.borg': 'x-borg',
+    "chang'e": 'change',
+    'lapu-lapu': 'lapu-lapu',
+    'popol and kupa': 'popol-and-kupa',
+    'yi sun-shin': 'yi-sun-shin',
+    'luo yi': 'luo-yi'
+  };
+
+  if (
+    especiales[normalizedName]
+  ) {
+    return especiales[
+      normalizedName
+    ];
+  }
+
+  return normalizeHeroSlug(
+    normalizedName
+      .normalize('NFD')
+      .replace(
+        /[\u0300-\u036f]/g,
+        ''
+      )
+      .replace(
+        /[^a-z0-9]+/g,
+        '-'
+      )
+  );
+}
+
 function nameFromSlug(slug) {
   const compactSlug =
     slug.replace(
@@ -28,12 +98,12 @@ function nameFromSlug(slug) {
     );
 
   const especiales = {
-    xborg: "X.Borg",
+    xborg: 'X.Borg',
     change: "Chang'e",
-    lapulapu: "Lapu-Lapu",
-    popolandkupa: "Popol and Kupa",
-    yisunshin: "Yi Sun-shin",
-    luoyi: "Luo Yi"
+    lapulapu: 'Lapu-Lapu',
+    popolandkupa: 'Popol and Kupa',
+    yisunshin: 'Yi Sun-shin',
+    luoyi: 'Luo Yi'
   };
 
   if (especiales[compactSlug]) {
@@ -57,15 +127,7 @@ function addHero(
   name
 ) {
   const cleanSlug =
-    decodeURIComponent(
-      String(slug || '')
-    )
-      .replace(
-        /^\/+|\/+$/g,
-        ''
-      )
-      .trim()
-      .toLowerCase();
+    normalizeHeroSlug(slug);
 
   if (
     !cleanSlug ||
@@ -103,7 +165,7 @@ function extractHeroEntries(html) {
 
       const match =
         href.match(
-          /\/heroes\/([^/?#"'<>]+)/i
+          /\/heroes\/([^/?#"'<>\\]+?)(?=[/?#"'<>\\]|$)/i
         );
 
       if (!match) {
@@ -122,7 +184,7 @@ function extractHeroEntries(html) {
 
   const rawMatches =
     String(html || '').matchAll(
-      /\/heroes\/([a-z0-9%._'-]+)(?=[/?#"'<>\\])/gi
+      /\/heroes\/([^/?#"'<>\\]+?)(?=[/?#"'<>\\]|$)/gi
     );
 
   for (const match of rawMatches) {
@@ -275,26 +337,70 @@ function extractLaneKeys(html) {
 }
 
 async function fetchHeroLanes(entry) {
-  const html =
-    await fetchPage(
-      BASE_URL + '/' + entry.slug
+  const primarySlug =
+    normalizeHeroSlug(
+      entry.slug
     );
 
-  const lanes =
-    extractLaneKeys(html);
-
-  if (lanes.length === 0) {
-    throw new Error(
-      'No se pudo detectar la línea de ' +
-      entry.name +
-      ' en su página de MLBBHub.'
+  const fallbackSlug =
+    slugFromHeroName(
+      entry.name
     );
+
+  const candidateSlugs =
+    Array.from(
+      new Set(
+        [
+          primarySlug,
+          fallbackSlug
+        ].filter(Boolean)
+      )
+    );
+
+  let lastError = null;
+
+  for (const slug of candidateSlugs) {
+    try {
+      const html =
+        await fetchPage(
+          BASE_URL + '/' + slug
+        );
+
+      const lanes =
+        extractLaneKeys(html);
+
+      if (lanes.length === 0) {
+        throw new Error(
+          'No se pudo detectar la línea de ' +
+          entry.name +
+          ' en su página de MLBBHub.'
+        );
+      }
+
+      return {
+        ...entry,
+        slug,
+        lanes
+      };
+    } catch (error) {
+      lastError = error;
+
+      if (
+        error?.response?.status !== 404
+      ) {
+        throw error;
+      }
+    }
   }
 
-  return {
-    ...entry,
-    lanes
-  };
+  throw new Error(
+    'No se pudo abrir la página de ' +
+    entry.name +
+    ' en MLBBHub. Slugs probados: ' +
+    candidateSlugs.join(', ') +
+    '. Último error: ' +
+    (lastError?.message || 'desconocido')
+  );
 }
 
 async function mapWithConcurrency(
