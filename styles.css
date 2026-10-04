@@ -2527,6 +2527,77 @@ body.startup-open {
     startup-pulse 1s ease-in-out infinite;
 }
 
+.startup-enter-button {
+  width: min(100%, 390px);
+  min-height: 48px;
+  margin: 22px auto 0;
+  padding: 12px 18px;
+
+  border: 1px solid rgba(0, 229, 255, .16);
+  border-radius: 12px;
+
+  color: #526b82;
+  background: rgba(255, 255, 255, .025);
+
+  font:
+    800 .72rem/1
+    "Space Grotesk",
+    sans-serif;
+
+  letter-spacing: .08em;
+  text-transform: uppercase;
+
+  cursor: wait;
+  opacity: .62;
+
+  transition:
+    color .25s ease,
+    background .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease,
+    transform .25s ease,
+    opacity .25s ease;
+}
+
+.startup-enter-button:not(:disabled) {
+  color: #07111F;
+  background:
+    linear-gradient(
+      135deg,
+      var(--cyan),
+      #7dd3fc
+    );
+  border-color: rgba(0, 229, 255, .7);
+
+  cursor: pointer;
+  opacity: 1;
+
+  box-shadow:
+    0 0 28px
+    rgba(0, 229, 255, .2);
+}
+
+.startup-enter-button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 36px
+    rgba(0, 229, 255, .32);
+}
+
+.startup-enter-button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.startup-enter-button:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.startup-overlay.is-error .startup-enter-button {
+  display: none;
+}
+
+
 .startup-overlay.is-error .startup-loader span {
   animation: none;
 }
