@@ -46,54 +46,34 @@ function extraerDelta(texto) {
   );
 }
 
+function extraerRazonMatchup(texto, nombreHeroe) {
+  let razon = limpiarNombre(texto);
 
-function extraerRazonMatchup(
-  texto,
-  nombreHeroe
-) {
-  let razon =
-    limpiarNombre(texto);
+  razon = razon.replace(/^\d+\s+/, '');
 
-  razon =
-    razon.replace(
-      /^\d+\s+/,
-      ''
-    );
-
-  const nombre =
-    limpiarNombre(nombreHeroe);
+  const nombre = limpiarNombre(nombreHeroe);
 
   if (
     nombre &&
-    razon
-      .toLowerCase()
-      .startsWith(
-        nombre.toLowerCase()
-      )
+    razon.toLowerCase().startsWith(nombre.toLowerCase())
   ) {
-    razon =
-      razon
-        .slice(nombre.length)
-        .trim();
+    razon = razon.slice(nombre.length).trim();
   }
 
-  razon =
-    razon.replace(
-      /win rate edge of[\s\S]*$/i,
-      ''
-    );
+  razon = razon.replace(
+    /win rate edge of[\s\S]*$/i,
+    ''
+  );
 
-  razon =
-    razon.replace(
-      /[+-]\d+(?:[.,]\d+)?\s*pp\s*$/i,
-      ''
-    );
+  razon = razon.replace(
+    /[+-]\d+(?:[.,]\d+)?\s*pp\s*$/i,
+    ''
+  );
 
-  razon =
-    razon
-      .replace(/\s+/g, ' ')
-      .replace(/\s+([.,;:])/g, '$1')
-      .trim();
+  razon = razon
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([.,;:])/g, '$1')
+    .trim();
 
   return razon || null;
 }
@@ -110,41 +90,30 @@ function crearMapaHeroes() {
       : [];
 
   heroes.forEach(nombre => {
-    mapa.set(
-      slugifyHero(nombre),
-      nombre
-    );
+    mapa.set(slugifyHero(nombre), nombre);
   });
 
   return mapa;
 }
 
-const HEROES_POR_SLUG =
-  crearMapaHeroes();
+const HEROES_POR_SLUG = crearMapaHeroes();
 
 function nombreHeroeDesdeHref(href) {
-  const match =
-    String(href || '').match(
-      /\/heroes\/([^/?#]+)/i
-    );
+  const match = String(href || '').match(
+    /\/heroes\/([^/?#]+)/i
+  );
 
   if (!match) return null;
 
   let slug = match[1];
 
   try {
-    slug =
-      decodeURIComponent(slug);
-  } catch (_) {
-    // Conservamos el slug original si viene mal codificado.
-  }
+    slug = decodeURIComponent(slug);
+  } catch (_) {}
 
-  slug = String(slug)
-    .trim()
-    .toLowerCase();
+  slug = String(slug).trim().toLowerCase();
 
-  const nombreConocido =
-    HEROES_POR_SLUG.get(slug);
+  const nombreConocido = HEROES_POR_SLUG.get(slug);
 
   if (nombreConocido) {
     return nombreConocido;
@@ -152,79 +121,128 @@ function nombreHeroeDesdeHref(href) {
 
   return slug
     .replace(/[-_]+/g, ' ')
-    .replace(/\b\w/g, letra =>
-      letra.toUpperCase()
-    );
+    .replace(/\b\w/g, letra => letra.toUpperCase());
 }
 
-function obtenerBloqueCounter($, link) {
-  let nodo = $(link);
+function crearMapaHeroesPorLinea() {
+  const mapa = new Map();
+  const lanes = HERO_DATA && HERO_DATA.lanes
+    ? HERO_DATA.lanes
+    : {};
 
-  for (let nivel = 0; nivel < 8; nivel += 1) {
-    nodo = nodo.parent();
+  Object.entries(lanes).forEach(([lane, heroes]) => {
+    mapa.set(
+      lane.toLowerCase(),
+      new Set(
+        Array.isArray(heroes)
+          ? heroes.map(nombre => slugifyHero(nombre))
+          : []
+      )
+    );
+  });
 
-    if (!nodo || !nodo.length) {
+  return mapa;
+}
+
+const HEROES_POR_LINEA = crearMapaHeroesPorLinea();
+
+function perteneceALinea(nombre, lane) {
+  if (!lane) return true;
+
+  const key = String(lane).trim().toLowerCase();
+  const heroes = HEROES_POR_LINEA.get(key);
+
+  if (!heroes) return true;
+
+  return heroes.has(slugifyHero(nombre));
+}
+
+function buscarSeccionCountersPorLinea($) {
+  const headings = $('h2, h3').toArray();
+
+  const inicio = headings.findIndex(heading =>
+    /Counters for .* by Lane and Role/i.test(
+      limpiarNombre($(heading).text())
+    )
+  );
+
+  if (inicio === -1) return null;
+
+  const startHeading = headings[inicio];
+  const startIndex = $('body *').toArray().indexOf(startHeading);
+
+  let endIndex = $('body *').length;
+
+  for (let i = inicio + 1; i < headings.length; i += 1) {
+    const heading = headings[i];
+    const texto = limpiarNombre($(heading).text());
+
+    if (/^Game Phase Analysis\b/i.test(texto)) {
+      endIndex = $('body *').toArray().indexOf(heading);
       break;
-    }
-
-    const enlacesHeroe =
-      nodo.find(
-        'a[href*="/heroes/"]'
-      );
-
-    const texto =
-      limpiarNombre(nodo.text());
-
-    const tieneDelta =
-      /[+-]\d+(?:[.,]\d+)?\s*(?:pp|percentage points|%)/i
-        .test(texto);
-
-    if (
-      enlacesHeroe.length === 1 &&
-      tieneDelta
-    ) {
-      return texto;
     }
   }
 
-  return limpiarNombre(
-    $(link).parent().text()
-  );
+  return {
+    startIndex,
+    endIndex
+  };
 }
 
-function extraerCounters(html, enemigo) {
+function extraerCountersPorLinea(html, enemigo, lane) {
   const $ = cheerio.load(html);
   const counters = [];
   const vistos = new Set();
-  const enemigoKey =
-    limpiarNombre(enemigo).toLowerCase();
+  const elementos = $('body *').toArray();
+  const indices = new Map();
 
-  function agregarCounter(link) {
-    if (counters.length >= 12) return;
+  elementos.forEach((elemento, index) => {
+    indices.set(elemento, index);
+  });
 
-    const href =
-      $(link).attr('href') || '';
+  const seccion = buscarSeccionCountersPorLinea($);
 
-    const nombre =
-      nombreHeroeDesdeHref(href);
+  if (!seccion) {
+    throw new Error(
+      'MLBBHub no encontró la sección "Counters by Lane and Role".'
+    );
+  }
 
-    if (!nombre) return;
+  const enemigoKey = slugifyHero(enemigo);
 
-    const clave =
-      nombre.toLowerCase();
+  $('a[href*="/heroes/"]').each((_, link) => {
+    const indice = indices.get(link);
 
     if (
-      clave === enemigoKey ||
-      vistos.has(clave)
+      typeof indice !== 'number' ||
+      indice <= seccion.startIndex ||
+      indice >= seccion.endIndex
     ) {
       return;
     }
 
-    const textoBloque =
-      obtenerBloqueCounter($, link);
+    const nombre = nombreHeroeDesdeHref(
+      $(link).attr('href') || ''
+    );
 
-    const delta =
-      extraerDelta(textoBloque);
+    if (!nombre) return;
+
+    const clave = slugifyHero(nombre);
+
+    if (
+      clave === enemigoKey ||
+      vistos.has(clave) ||
+      !perteneceALinea(nombre, lane)
+    ) {
+      return;
+    }
+
+    const texto = limpiarNombre(
+      $(link).closest('li').text() ||
+      $(link).parent().text()
+    );
+
+    const delta = extraerDelta(texto);
 
     if (delta === null) return;
 
@@ -232,143 +250,11 @@ function extraerCounters(html, enemigo) {
 
     counters.push({
       name: nombre,
-      winRate:
-        '+' +
-        delta.toFixed(1) +
-        ' pp',
+      winRate: '+' + delta.toFixed(1) + ' pp',
       edge: delta,
-      reason:
-        extraerRazonMatchup(
-          textoBloque,
-          nombre
-        )
+      reason: extraerRazonMatchup(texto, nombre)
     });
-  }
-
-  /*
-    Buscamos los enlaces únicamente dentro del tramo
-    "Proven Counters" -> "Kit Matchups".
-
-    Esto evita confundir los counters medidos con:
-    - Kit Matchups
-    - Heroes Strong Against
-    - Counters por rol
-    - FAQ
-  */
-
-  const elementos =
-    $('body *').toArray();
-
-  const indices =
-    new Map();
-
-  elementos.forEach(
-    (elemento, index) => {
-      indices.set(
-        elemento,
-        index
-      );
-    }
-  );
-
-  const headings =
-    $('h2, h3').toArray();
-
-  for (const heading of headings) {
-    const textoHeading =
-      limpiarNombre(
-        $(heading).text()
-      );
-
-    if (
-      !/^Proven Counters\b/i.test(
-        textoHeading
-      )
-    ) {
-      continue;
-    }
-
-    const inicio =
-      indices.get(heading);
-
-    if (
-      typeof inicio !== 'number'
-    ) {
-      continue;
-    }
-
-    let fin =
-      elementos.length;
-
-    for (const posibleFin of headings) {
-      const indiceFin =
-        indices.get(posibleFin);
-
-      if (
-        typeof indiceFin !== 'number' ||
-        indiceFin <= inicio
-      ) {
-        continue;
-      }
-
-      const textoFin =
-        limpiarNombre(
-          $(posibleFin).text()
-        );
-
-      if (
-        /^Kit Matchups\b/i.test(
-          textoFin
-        )
-      ) {
-        fin = indiceFin;
-        break;
-      }
-    }
-
-    $('a[href*="/heroes/"]').each(
-      (_, link) => {
-        if (counters.length >= 12) {
-          return;
-        }
-
-        const indiceLink =
-          indices.get(link);
-
-        if (
-          typeof indiceLink !== 'number' ||
-          indiceLink <= inicio ||
-          indiceLink >= fin
-        ) {
-          return;
-        }
-
-        agregarCounter(link);
-      }
-    );
-
-    if (counters.length > 0) {
-      break;
-    }
-  }
-
-  /*
-    Fallback controlado para pequeños cambios de HTML.
-    No usa el texto visible del enlace como nombre: siempre
-    toma el slug canónico del href y lo cruza con heroes.json.
-  */
-
-  if (counters.length === 0) {
-    $('a[href*="/heroes/"]').each(
-      (_, link) => {
-        if (counters.length >= 12) {
-          return;
-        }
-
-        agregarCounter(link);
-      }
-    );
-  }
+  });
 
   return counters.slice(0, 12);
 }
@@ -393,15 +279,19 @@ async function getCounters(hero, lane) {
     }
   );
 
-  const counters = extraerCounters(
+  const counters = extraerCountersPorLinea(
     response.data,
-    hero
+    hero,
+    lane
   );
 
   if (counters.length === 0) {
     throw new Error(
-      'MLBBHub no devolvió counters para ' +
-      hero
+      'MLBBHub no devolvió counters utilizables para ' +
+      hero +
+      ' en la línea ' +
+      (lane || 'seleccionada') +
+      '.'
     );
   }
 
