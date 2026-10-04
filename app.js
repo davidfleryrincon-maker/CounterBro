@@ -137,242 +137,121 @@ let HERO_DATABASE = [
 
 
 /* =======================================================
-   HÉROES POR LÍNEA
+   HÉROES POR LÍNEA — DATOS EN VIVO
    ======================================================= */
 
-const HERO_LANES = {
-
-  exp: [
-
-    "Balmond",
-    "Freya",
-    "Chou",
-    "Sun",
-    "Alpha",
-    "Ruby",
-    "Zilong",
-    "Hilda",
-    "Lapu-Lapu",
-    "Argus",
-    "Leomord",
-    "Thamuz",
-    "Minsitthar",
-    "Badang",
-    "Esmeralda",
-    "Terizla",
-    "X.Borg",
-    "Dyrroth",
-    "Masha",
-    "Silvanna",
-    "Yu Zhong",
-    "Benedetta",
-    "Khaleed",
-    "Paquito",
-    "Gloo",
-    "Phoveus",
-    "Edith",
-    "Aulus",
-    "Julian",
-    "Fredrinn",
-    "Arlott",
-    "Cici",
-    "Lukas",
-    "Suyou",
-    "Martis",
-    "Gatotkaca",
-    "Hilda"
-
-  ],
-
-  mid: [
-
-    "Nana",
-    "Alice",
-    "Eudora",
-    "Gord",
-    "Kagura",
-    "Cyclops",
-    "Aurora",
-    "Vexana",
-    "Odette",
-    "Zhask",
-    "Pharsa",
-    "Gusion",
-    "Valir",
-    "Harley",
-    "Vale",
-    "Lunox",
-    "Kimmy",
-    "Harith",
-    "Lylia",
-    "Cecilion",
-    "Luo Yi",
-    "Yve",
-    "Valentina",
-    "Novaria",
-    "Zhuxin",
-    "Kadita",
-    "Selena",
-    "Julian",
-    "Faramis",
-    "Kagura",
-    "Xavier"
-
-  ],
-
-  gold: [
-
-    "Miya",
-    "Bruno",
-    "Clint",
-    "Layla",
-    "Irithel",
-    "Moskov",
-    "Moscov",
-    "Lesley",
-    "Hanabi",
-    "Claude",
-    "Wanwan",
-    "Popol and Kupa",
-    "Brody",
-    "Natan",
-    "Beatrix",
-    "Melissa",
-    "Ixia",
-    "Karrie",
-    "Granger",
-    "Kimmy",
-    "Harith",
-    "Moskov",
-    "Obsidia"
-
-  ],
-
-  jungle: [
-
-    "Saber",
-    "Alucard",
-    "Fanny",
-    "Hayabusa",
-    "Freya",
-    "Yi Sun-shin",
-    "Harley",
-    "Lancelot",
-    "Helcurt",
-    "Gusion",
-    "Hanzo",
-    "Ling",
-    "Baxia",
-    "Aamon",
-    "Nolan",
-    "Barats",
-    "Martis",
-    "Alpha",
-    "Julian",
-    "Balmond",
-    "Bane",
-    "Jawhead",
-    "Paquito",
-    "Fredrinn",
-    "Dyrroth",
-    "Gloo",
-    "Chou",
-    "Popol and Kupa",
-    "Karina",
-    "Lukas",
-    "Suyu",
-    "Suyou"
-
-  ],
-
-  roam: [
-
-    "Tigreal",
-    "Akai",
-    "Franco",
-    "Rafaela",
-    "Minotauro",
-    "Minotaur",
-    "Lolita",
-    "Natalia",
-    "Johnson",
-    "Estes",
-    "Grock",
-    "Diggie",
-    "Hylos",
-    "Angela",
-    "Kaja",
-    "Selena",
-    "Belerick",
-    "Khufra",
-    "Carmilla",
-    "Atlas",
-    "Mathilda",
-    "Chip",
-    "Chou",
-    "Jawhead",
-    "Edith",
-    "Minsitthar",
-    "Hilda",
-    "Valir",
-    "Gatotkaca",
-    "Kadita",
-    "Marcel",
-    "Faramis",
-    "Floryn",
-    "Kalea"
-
-  ]
-
+let HERO_LANES = {
+  exp: [],
+  mid: [],
+  gold: [],
+  jungle: [],
+  roam: []
 };
+
+let HERO_DATABASE = [];
 
 
 /* =======================================================
-   SINCRONIZACIÓN DE HÉROES
+   SINCRONIZAR HÉROES Y LÍNEAS DESDE EL BACKEND
    ======================================================= */
 
 async function sincronizarHeroesEnVivo() {
 
   try {
 
-    const res =
-      await fetch(
-        `${VERCEL_URL}/?getHeroes=true`
-      );
+    const res = await fetch(
+      `${VERCEL_URL}/?getHeroes=true`,
+      { cache: "no-store" }
+    );
 
-    const data =
-      await res.json();
-
-    if (
-      data.heroes &&
-      Array.isArray(data.heroes) &&
-      data.heroes.length > 0
-    ) {
-
-      const setUnico =
-        new Set([
-          ...HERO_DATABASE,
-          ...data.heroes
-        ]);
-
-      HERO_DATABASE =
-        Array.from(setUnico);
-
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
     }
 
-  } catch (e) {
+    const data = await res.json();
+
+    if (
+      !data ||
+      !Array.isArray(data.heroes) ||
+      !data.lanes
+    ) {
+      throw new Error("Respuesta de héroes inválida.");
+    }
+
+    const lanesValidas = [
+      "exp",
+      "mid",
+      "gold",
+      "jungle",
+      "roam"
+    ];
+
+    const nuevasLanes = {};
+
+    lanesValidas.forEach(linea => {
+
+      nuevasLanes[linea] =
+        Array.isArray(data.lanes[linea])
+          ? data.lanes[linea].filter(Boolean)
+          : [];
+
+    });
+
+    const totalHeroes =
+      new Set(
+        lanesValidas.flatMap(
+          linea => nuevasLanes[linea]
+        )
+      );
+
+    if (
+      totalHeroes.size < 50 ||
+      lanesValidas.some(
+        linea => nuevasLanes[linea].length < 5
+      )
+    ) {
+      throw new Error(
+        "Los datos de líneas recibidos no son suficientes."
+      );
+    }
+
+    HERO_LANES =
+      nuevasLanes;
+
+    HERO_DATABASE =
+      Array.from(totalHeroes);
+
+    console.info(
+      "CounterBro: héroes sincronizados desde MLBBHub.",
+      {
+        heroes: HERO_DATABASE.length,
+        lanes: Object.fromEntries(
+          lanesValidas.map(
+            linea => [
+              linea,
+              HERO_LANES[linea].length
+            ]
+          )
+        ),
+        syncedAt:
+          data.syncedAt || null
+      }
+    );
+
+    return true;
+
+  } catch (error) {
 
     console.warn(
-      "Usando base de datos local de reserva."
+      "CounterBro: no fue posible sincronizar héroes.",
+      error
     );
+
+    return false;
 
   }
 
 }
-
-sincronizarHeroesEnVivo();
-
-
 /* =======================================================
    IDIOMAS
    ======================================================= */
