@@ -98,39 +98,133 @@ function extraerRazonMatchup(
   return razon || null;
 }
 
+const HERO_DATA = require('../../data/heroes.json');
+
+function crearMapaHeroes() {
+  const mapa = new Map();
+
+  const heroes =
+    HERO_DATA &&
+    Array.isArray(HERO_DATA.heroes)
+      ? HERO_DATA.heroes
+      : [];
+
+  heroes.forEach(nombre => {
+    mapa.set(
+      slugifyHero(nombre),
+      nombre
+    );
+  });
+
+  return mapa;
+}
+
+const HEROES_POR_SLUG =
+  crearMapaHeroes();
+
+function nombreHeroeDesdeHref(href) {
+  const match =
+    String(href || '').match(
+      /\/heroes\/([^/?#]+)/i
+    );
+
+  if (!match) return null;
+
+  let slug = match[1];
+
+  try {
+    slug =
+      decodeURIComponent(slug);
+  } catch (_) {
+    // Conservamos el slug original si viene mal codificado.
+  }
+
+  slug = String(slug)
+    .trim()
+    .toLowerCase();
+
+  const nombreConocido =
+    HEROES_POR_SLUG.get(slug);
+
+  if (nombreConocido) {
+    return nombreConocido;
+  }
+
+  return slug
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, letra =>
+      letra.toUpperCase()
+    );
+}
+
+function obtenerBloqueCounter(link) {
+  let nodo = $(link);
+
+  for (let nivel = 0; nivel < 8; nivel += 1) {
+    nodo = nodo.parent();
+
+    if (!nodo || !nodo.length) {
+      break;
+    }
+
+    const enlacesHeroe =
+      nodo.find(
+        'a[href*="/heroes/"]'
+      );
+
+    const texto =
+      limpiarNombre(nodo.text());
+
+    const tieneDelta =
+      /[+-]\d+(?:[.,]\d+)?\s*(?:pp|percentage points|%)/i
+        .test(texto);
+
+    if (
+      enlacesHeroe.length === 1 &&
+      tieneDelta
+    ) {
+      return texto;
+    }
+  }
+
+  return limpiarNombre(
+    $(link).parent().text()
+  );
+}
+
 function extraerCounters(html, enemigo) {
   const $ = cheerio.load(html);
   const counters = [];
   const vistos = new Set();
-  const enemigoKey = limpiarNombre(enemigo).toLowerCase();
+  const enemigoKey =
+    limpiarNombre(enemigo).toLowerCase();
 
   function agregarCounter(link) {
     if (counters.length >= 12) return;
 
-    const href = $(link).attr('href') || '';
-    const match = href.match(/\/heroes\/([^/?#]+)/i);
+    const href =
+      $(link).attr('href') || '';
 
-    if (!match) return;
+    const nombre =
+      nombreHeroeDesdeHref(href);
 
-    const nombre = limpiarNombre($(link).text());
     if (!nombre) return;
 
-    const clave = nombre.toLowerCase();
+    const clave =
+      nombre.toLowerCase();
 
-    if (clave === enemigoKey || vistos.has(clave)) return;
+    if (
+      clave === enemigoKey ||
+      vistos.has(clave)
+    ) {
+      return;
+    }
 
-    const contenedor =
-      $(link).closest('li').length
-        ? $(link).closest('li')
-        : $(link).closest('article').length
-          ? $(link).closest('article')
-          : $(link).parent();
+    const textoBloque =
+      obtenerBloqueCounter(link);
 
-    const textoBloque = limpiarNombre(
-      contenedor.text()
-    );
-
-    const delta = extraerDelta(textoBloque);
+    const delta =
+      extraerDelta(textoBloque);
 
     if (delta === null) return;
 
@@ -138,42 +232,120 @@ function extraerCounters(html, enemigo) {
 
     counters.push({
       name: nombre,
-      winRate: '+' + delta.toFixed(1) + ' pp',
+      winRate:
+        '+' +
+        delta.toFixed(1) +
+        ' pp',
       edge: delta,
-      reason: extraerRazonMatchup(
-        textoBloque,
-        nombre
-      )
+      reason:
+        extraerRazonMatchup(
+          textoBloque,
+          nombre
+        )
     });
   }
 
   /*
-    MLBBHub cambia ocasionalmente los wrappers HTML de las
-    tarjetas de counters. En vez de depender de que cada
-    tarjeta sea un hermano directo del heading, buscamos la
-    sección semántica que contiene "Proven Counters".
+    Buscamos los enlaces únicamente dentro del tramo
+    "Proven Counters" -> "Kit Matchups".
+
+    Esto evita confundir los counters medidos con:
+    - Kit Matchups
+    - Heroes Strong Against
+    - Counters por rol
+    - FAQ
   */
 
-  const headings = $('h2, h3').toArray();
+  const elementos =
+    $('body *').toArray();
+
+  const indices =
+    new Map();
+
+  elementos.forEach(
+    (elemento, index) => {
+      indices.set(
+        elemento,
+        index
+      );
+    }
+  );
+
+  const headings =
+    $('h2, h3').toArray();
 
   for (const heading of headings) {
     const textoHeading =
-      limpiarNombre($(heading).text());
+      limpiarNombre(
+        $(heading).text()
+      );
 
-    if (!/^Proven Counters$/i.test(textoHeading)) {
+    if (
+      !/^Proven Counters\b/i.test(
+        textoHeading
+      )
+    ) {
       continue;
     }
 
-    const seccion =
-      $(heading).closest('section').length
-        ? $(heading).closest('section')
-        : $(heading).parent();
+    const inicio =
+      indices.get(heading);
 
-    seccion
-      .find('a[href*="/heroes/"]')
-      .each((_, link) => {
+    if (
+      typeof inicio !== 'number'
+    ) {
+      continue;
+    }
+
+    let fin =
+      elementos.length;
+
+    for (const posibleFin of headings) {
+      const indiceFin =
+        indices.get(posibleFin);
+
+      if (
+        typeof indiceFin !== 'number' ||
+        indiceFin <= inicio
+      ) {
+        continue;
+      }
+
+      const textoFin =
+        limpiarNombre(
+          $(posibleFin).text()
+        );
+
+      if (
+        /^Kit Matchups\b/i.test(
+          textoFin
+        )
+      ) {
+        fin = indiceFin;
+        break;
+      }
+    }
+
+    $('a[href*="/heroes/"]').each(
+      (_, link) => {
+        if (counters.length >= 12) {
+          return;
+        }
+
+        const indiceLink =
+          indices.get(link);
+
+        if (
+          typeof indiceLink !== 'number' ||
+          indiceLink <= inicio ||
+          indiceLink >= fin
+        ) {
+          return;
+        }
+
         agregarCounter(link);
-      });
+      }
+    );
 
     if (counters.length > 0) {
       break;
@@ -181,44 +353,21 @@ function extraerCounters(html, enemigo) {
   }
 
   /*
-    Fallback adicional: buscamos tarjetas individuales que
-    contengan un enlace de héroe y una ventaja estadística.
-    Esto permite sobrevivir a cambios de layout sin mezclar
-    la lista de "Strong Against" cuando la sección principal
-    sí fue encontrada.
+    Fallback controlado para pequeños cambios de HTML.
+    No usa el texto visible del enlace como nombre: siempre
+    toma el slug canónico del href y lo cruza con heroes.json.
   */
 
   if (counters.length === 0) {
-    $('li, article, div').each((_, bloque) => {
-      if (counters.length >= 12) return false;
+    $('a[href*="/heroes/"]').each(
+      (_, link) => {
+        if (counters.length >= 12) {
+          return;
+        }
 
-      const nodo = $(bloque);
-      const texto = limpiarNombre(nodo.text());
-
-      if (
-        !/[+-]\d+(?:[.,]\d+)?\s*(?:pp|percentage points|%)/i.test(texto)
-      ) {
-        return;
+        agregarCounter(link);
       }
-
-      nodo
-        .find('a[href*="/heroes/"]')
-        .each((_, link) => {
-          agregarCounter(link);
-        });
-    });
-  }
-
-  /*
-    Último fallback: enlaces de héroes con delta en su contenedor
-    inmediato. Conservamos el límite para evitar ruido del resto
-    de la página.
-  */
-
-  if (counters.length === 0) {
-    $('a[href*="/heroes/"]').each((_, link) => {
-      agregarCounter(link);
-    });
+    );
   }
 
   return counters.slice(0, 12);
