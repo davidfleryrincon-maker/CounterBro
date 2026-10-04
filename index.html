@@ -73,14 +73,188 @@
         </span>
 
         <h1>
-          Encuentra tu <span>mejor counter.</span>
+          Encuentra al <span>Mejor Counter</span>
         </h1>
 
         <p>
-          Elige tu línea, dime qué héroe apareció y CounterBro hará el resto.
+          Elige la línea en la que jugarás, dime cuál es el pick enemigo para esa línea y CounterBro te dirá la mejor opción para llevar.
         </p>
 
       </section>
+
+
+      <!-- ===================================================
+           POOL PERSONAL
+           =================================================== -->
+
+      <section class="pool-manager">
+
+        <div class="pool-manager-header">
+
+          <div>
+
+            <span class="section-kicker">
+              TU POOL
+            </span>
+
+            <h2>
+              Héroes que sabes jugar
+            </h2>
+
+            <p>
+              CounterBro priorizará tus héroes cuando encuentre una buena respuesta.
+            </p>
+
+          </div>
+
+
+          <div class="pool-count">
+
+            <strong id="poolCount">
+              0
+            </strong>
+
+            <span>
+              HÉROES
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="pool-lane-row">
+
+          <span class="pool-lane-label">
+            Editar pool de:
+          </span>
+
+
+          <div
+            class="lane-selector compact"
+            role="group"
+            aria-label="Seleccionar línea para tu pool"
+          >
+
+            <button
+              type="button"
+              class="lane-option is-active"
+              data-lane-group="pool"
+              data-lane="exp"
+              onclick="seleccionarLinea('pool','exp')"
+            >
+              <span>⚔️</span>
+              <b>EXP</b>
+            </button>
+
+
+            <button
+              type="button"
+              class="lane-option"
+              data-lane-group="pool"
+              data-lane="mid"
+              onclick="seleccionarLinea('pool','mid')"
+            >
+              <span>🔮</span>
+              <b>MID</b>
+            </button>
+
+
+            <button
+              type="button"
+              class="lane-option"
+              data-lane-group="pool"
+              data-lane="gold"
+              onclick="seleccionarLinea('pool','gold')"
+            >
+              <span>🏹</span>
+              <b>GOLD</b>
+            </button>
+
+
+            <button
+              type="button"
+              class="lane-option"
+              data-lane-group="pool"
+              data-lane="jungle"
+              onclick="seleccionarLinea('pool','jungle')"
+            >
+              <span>🗡️</span>
+              <b>JUNGLE</b>
+            </button>
+
+
+            <button
+              type="button"
+              class="lane-option"
+              data-lane-group="pool"
+              data-lane="roam"
+              onclick="seleccionarLinea('pool','roam')"
+            >
+              <span>🛡️</span>
+              <b>ROAM</b>
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <select
+          id="poolLinea"
+          class="lane-native-select"
+          aria-hidden="true"
+          tabindex="-1"
+        >
+          <option value="exp">EXP Lane</option>
+          <option value="mid">MID Lane</option>
+          <option value="gold">GOLD Lane</option>
+          <option value="jungle">JUNGLE</option>
+          <option value="roam">ROAM</option>
+        </select>
+
+
+        <div class="pool-add">
+
+          <label
+            for="nuevoHeroePool"
+            id="t-addHero"
+          >
+            Agregar héroe a esta línea
+          </label>
+
+
+          <div class="pool-input-row">
+
+            <input
+              type="text"
+              id="nuevoHeroePool"
+              placeholder="Ej. Paquito, Chou..."
+              autocomplete="off"
+            >
+
+            <button
+              type="button"
+              onclick="agregarHeroePool()"
+              id="t-btnAdd"
+            >
+              Agregar
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="hero-tags"
+          id="poolTags"
+        ></div>
+
+      </section>
+
+
+
 
 
       <!-- ===================================================
@@ -280,177 +454,6 @@
 
 
       <!-- ===================================================
-           POOL PERSONAL
-           =================================================== -->
-
-      <section class="pool-manager">
-
-        <div class="pool-manager-header">
-
-          <div>
-
-            <span class="section-kicker">
-              TU POOL
-            </span>
-
-            <h2>
-              Héroes que sabes jugar
-            </h2>
-
-            <p>
-              CounterBro priorizará tus héroes cuando encuentre una buena respuesta.
-            </p>
-
-          </div>
-
-
-          <div class="pool-count">
-
-            <strong id="poolCount">
-              0
-            </strong>
-
-            <span>
-              HÉROES
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div class="pool-lane-row">
-
-          <span class="pool-lane-label">
-            Editar pool de:
-          </span>
-
-
-          <div
-            class="lane-selector compact"
-            role="group"
-            aria-label="Seleccionar línea para tu pool"
-          >
-
-            <button
-              type="button"
-              class="lane-option is-active"
-              data-lane-group="pool"
-              data-lane="exp"
-              onclick="seleccionarLinea('pool','exp')"
-            >
-              <span>⚔️</span>
-              <b>EXP</b>
-            </button>
-
-
-            <button
-              type="button"
-              class="lane-option"
-              data-lane-group="pool"
-              data-lane="mid"
-              onclick="seleccionarLinea('pool','mid')"
-            >
-              <span>🔮</span>
-              <b>MID</b>
-            </button>
-
-
-            <button
-              type="button"
-              class="lane-option"
-              data-lane-group="pool"
-              data-lane="gold"
-              onclick="seleccionarLinea('pool','gold')"
-            >
-              <span>🏹</span>
-              <b>GOLD</b>
-            </button>
-
-
-            <button
-              type="button"
-              class="lane-option"
-              data-lane-group="pool"
-              data-lane="jungle"
-              onclick="seleccionarLinea('pool','jungle')"
-            >
-              <span>🗡️</span>
-              <b>JUNGLE</b>
-            </button>
-
-
-            <button
-              type="button"
-              class="lane-option"
-              data-lane-group="pool"
-              data-lane="roam"
-              onclick="seleccionarLinea('pool','roam')"
-            >
-              <span>🛡️</span>
-              <b>ROAM</b>
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <select
-          id="poolLinea"
-          class="lane-native-select"
-          aria-hidden="true"
-          tabindex="-1"
-        >
-          <option value="exp">EXP Lane</option>
-          <option value="mid">MID Lane</option>
-          <option value="gold">GOLD Lane</option>
-          <option value="jungle">JUNGLE</option>
-          <option value="roam">ROAM</option>
-        </select>
-
-
-        <div class="pool-add">
-
-          <label
-            for="nuevoHeroePool"
-            id="t-addHero"
-          >
-            Agregar héroe a esta línea
-          </label>
-
-
-          <div class="pool-input-row">
-
-            <input
-              type="text"
-              id="nuevoHeroePool"
-              placeholder="Ej. Paquito, Chou..."
-              autocomplete="off"
-            >
-
-            <button
-              type="button"
-              onclick="agregarHeroePool()"
-              id="t-btnAdd"
-            >
-              Agregar
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="hero-tags"
-          id="poolTags"
-        ></div>
-
-      </section>
-
-
-      <!-- ===================================================
            RESULTADOS
            =================================================== -->
 
@@ -628,7 +631,7 @@
        JAVASCRIPT
        ===================================================== -->
 
-  <script src="app.js?v=20261004-02"></script>
+  <script src="app.js?v=20261004-03"></script>
 
 </body>
 </html>
