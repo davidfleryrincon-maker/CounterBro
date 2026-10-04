@@ -21,18 +21,23 @@ function cleanName(value) {
 }
 
 function nameFromSlug(slug) {
+  const compactSlug =
+    slug.replace(
+      /[^a-z0-9]/g,
+      ''
+    );
+
   const especiales = {
-    "x-borg": "X.Borg",
-    "chang-e": "Chang'e",
-    "change": "Chang'e",
-    "lapu-lapu": "Lapu-Lapu",
-    "popol-and-kupa": "Popol and Kupa",
-    "yi-sun-shin": "Yi Sun-shin",
-    "luo-yi": "Luo Yi"
+    xborg: "X.Borg",
+    change: "Chang'e",
+    lapulapu: "Lapu-Lapu",
+    popolandkupa: "Popol and Kupa",
+    yisunshin: "Yi Sun-shin",
+    luoyi: "Luo Yi"
   };
 
-  if (especiales[slug]) {
-    return especiales[slug];
+  if (especiales[compactSlug]) {
+    return especiales[compactSlug];
   }
 
   return slug
