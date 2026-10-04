@@ -1953,6 +1953,28 @@ function ocultarModalAnalisis() {
    BUSCAR COUNTER
    ======================================================= */
 
+async function esperarMinimoAnalisis(
+  inicio
+) {
+  const minimo = 2500;
+
+  const transcurrido =
+    performance.now() - inicio;
+
+  if (transcurrido >= minimo) {
+    return;
+  }
+
+  await new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        minimo - transcurrido
+      )
+  );
+}
+
+
 async function buscarCounter() {
 
   const partidaSelect =
@@ -2057,6 +2079,9 @@ async function buscarCounter() {
 
   mostrarModalAnalisis();
 
+  const analysisStartedAt =
+    performance.now();
+
 
   const analyzeButton =
     document.getElementById(
@@ -2121,7 +2146,9 @@ async function buscarCounter() {
 
     if (!heroReconocido) {
 
-      finalizarEstadoAnalisis();
+      await finalizarEstadoAnalisis(
+        analysisStartedAt
+      );
 
       generalResult.innerHTML =
         `
@@ -2658,7 +2685,9 @@ async function buscarCounter() {
 
   }
 
-  finalizarEstadoAnalisis();
+  await finalizarEstadoAnalisis(
+    analysisStartedAt
+  );
 
 }
 
@@ -2667,7 +2696,13 @@ async function buscarCounter() {
    FINALIZAR ESTADO DE ANÁLISIS
    ======================================================= */
 
-function finalizarEstadoAnalisis() {
+async function finalizarEstadoAnalisis(
+  analysisStartedAt
+) {
+
+  await esperarMinimoAnalisis(
+    analysisStartedAt
+  );
 
   const analyzeButton =
     document.getElementById(
