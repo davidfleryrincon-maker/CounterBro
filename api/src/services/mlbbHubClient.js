@@ -398,6 +398,18 @@ async function fetchFreshHeroesFromMLBBHub() {
     }
   );
 
+  const heroes =
+    Array.from(
+      new Set(
+        entries.map(
+          entry => entry.name
+        )
+      )
+    ).sort(
+      (a, b) =>
+        a.localeCompare(b)
+    );
+
   Object.keys(
     lanes
   ).forEach(
@@ -436,18 +448,6 @@ async function fetchFreshHeroesFromMLBBHub() {
       }
     }
   );
-
-  const heroes =
-    Array.from(
-      new Set(
-        entries.map(
-          entry => entry.name
-        )
-      )
-    ).sort(
-      (a, b) =>
-        a.localeCompare(b)
-    );
 
   if (heroes.length < 50) {
     throw new Error(
