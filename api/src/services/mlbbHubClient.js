@@ -419,6 +419,17 @@ async function fetchFreshHeroesFromMLBBHub() {
           ' héroes.'
         );
       }
+
+      if (
+        lanes[lane].length >=
+        heroes.length * 0.8
+      ) {
+        throw new Error(
+          'Sincronización inválida para ' +
+          lane +
+          ': proporción anormal de héroes.'
+        );
+      }
     }
   );
 
