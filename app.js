@@ -1,6 +1,12 @@
 const VERCEL_URL =
   "https://mlbb-counter-api-five.vercel.app";
 
+const HERO_CACHE_KEY =
+  "counterbro_live_heroes";
+
+const HERO_CACHE_TTL_MS =
+  6 * 60 * 60 * 1000;
+
 
 /* =======================================================
    BASE DE DATOS DE HÉROES
@@ -29,84 +35,170 @@ let HERO_LANES = {
    SINCRONIZAR HÉROES Y LÍNEAS DESDE EL BACKEND
    ======================================================= */
 
+function aplicarDatosDeHeroes(data) {
+
+  const lanesValidas = [
+    "exp",
+    "mid",
+    "gold",
+    "jungle",
+    "roam"
+  ];
+
+  const nuevasLanes = {};
+
+  lanesValidas.forEach(linea => {
+
+    nuevasLanes[linea] =
+      Array.isArray(data.lanes?.[linea])
+        ? data.lanes[linea].filter(Boolean)
+        : [];
+
+  });
+
+  const totalHeroes =
+    Array.from(
+      new Set(
+        [
+          ...(Array.isArray(data.heroes)
+            ? data.heroes
+            : []),
+          ...lanesValidas.flatMap(
+            linea => nuevasLanes[linea]
+          )
+        ]
+      )
+    );
+
+  if (totalHeroes.length < 50) {
+    throw new Error(
+      "La base de héroes recibida no es suficiente."
+    );
+  }
+
+  HERO_LANES =
+    nuevasLanes;
+
+  HERO_DATABASE =
+    totalHeroes;
+
+}
+
+
+async function cargarHeroesDesdeCache() {
+
+  try {
+
+    const raw =
+      localStorage.getItem(
+        HERO_CACHE_KEY
+      );
+
+    if (!raw) {
+      return false;
+    }
+
+    const cache =
+      JSON.parse(raw);
+
+    if (
+      !cache ||
+      !cache.savedAt ||
+      !cache.data
+    ) {
+      return false;
+    }
+
+    if (
+      Date.now() -
+      cache.savedAt >
+      HERO_CACHE_TTL_MS
+    ) {
+      localStorage.removeItem(
+        HERO_CACHE_KEY
+      );
+
+      return false;
+    }
+
+    aplicarDatosDeHeroes(
+      cache.data
+    );
+
+    console.info(
+      "CounterBro: usando cache local de héroes.",
+      {
+        heroes: HERO_DATABASE.length,
+        savedAt: cache.savedAt
+      }
+    );
+
+    return true;
+
+  } catch (error) {
+
+    console.warn(
+      "CounterBro: cache local inválida.",
+      error
+    );
+
+    return false;
+
+  }
+
+}
+
+
 async function sincronizarHeroesEnVivo() {
 
   try {
 
     const res = await fetch(
-      `${VERCEL_URL}/?getHeroes=true`,
+      \${VERCEL_URL}/?getHeroes=true\`,
       { cache: "no-store" }
     );
 
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
+      throw new Error(\`HTTP \${res.status}\`);
     }
 
-    const data = await res.json();
+    const data =
+      await res.json();
 
     if (
       !data ||
       !Array.isArray(data.heroes) ||
       !data.lanes
     ) {
-      throw new Error("Respuesta de héroes inválida.");
-    }
-
-    const lanesValidas = [
-      "exp",
-      "mid",
-      "gold",
-      "jungle",
-      "roam"
-    ];
-
-    const nuevasLanes = {};
-
-    lanesValidas.forEach(linea => {
-
-      nuevasLanes[linea] =
-        Array.isArray(data.lanes[linea])
-          ? data.lanes[linea].filter(Boolean)
-          : [];
-
-    });
-
-    const totalHeroes =
-      new Set(
-        lanesValidas.flatMap(
-          linea => nuevasLanes[linea]
-        )
-      );
-
-    if (
-      totalHeroes.size < 50 ||
-      lanesValidas.some(
-        linea => nuevasLanes[linea].length < 5
-      )
-    ) {
       throw new Error(
-        "Los datos de líneas recibidos no son suficientes."
+        "Respuesta de héroes inválida."
       );
     }
 
-    HERO_LANES =
-      nuevasLanes;
+    aplicarDatosDeHeroes(
+      data
+    );
 
-    HERO_DATABASE =
-      Array.from(totalHeroes);
+    localStorage.setItem(
+      HERO_CACHE_KEY,
+      JSON.stringify({
+        savedAt: Date.now(),
+        data
+      })
+    );
 
     console.info(
       "CounterBro: héroes sincronizados desde MLBBHub.",
       {
         heroes: HERO_DATABASE.length,
-        lanes: Object.fromEntries(
-          lanesValidas.map(
-            linea => [
-              linea,
-              HERO_LANES[linea].length
-            ]
-          )
-        ),
+        lanes: {
+          exp: HERO_LANES.exp.length,
+          mid: HERO_LANES.mid.length,
+          gold: HERO_LANES.gold.length,
+          jungle: HERO_LANES.jungle.length,
+          roam: HERO_LANES.roam.length
+        },
+        partial: Boolean(data.partial),
         syncedAt:
           data.syncedAt || null
       }
@@ -121,11 +213,13 @@ async function sincronizarHeroesEnVivo() {
       error
     );
 
-    return false;
+    return HERO_DATABASE.length > 0;
 
   }
 
 }
+
+
 /* =======================================================
    IDIOMAS
    ======================================================= */
@@ -2046,12 +2140,17 @@ document.addEventListener(
     activarEnterEnInput();
 
     /*
-       La lista de héroes y sus líneas llega desde
-       MLBBHub a través del backend.
-
-       Esperamos la sincronización antes de permitir
-       acciones que dependan de la validación de línea.
+      Usamos primero la última base válida guardada localmente.
+      Después la actualizamos en segundo plano desde MLBBHub.
+      Esto permite reconocer héroes inmediatamente tras una visita
+      previa y recibir héroes nuevos sin bloquear la interfaz.
     */
+    await cargarHeroesDesdeCache();
+
+    sincronizarSelectoresDeLinea();
+
+    mostrarPoolActual();
+
     await sincronizarHeroesEnVivo();
 
     mostrarPoolActual();
