@@ -405,7 +405,369 @@ label {
 
 
 /* =========================================================
-   INPUTS / SELECTS
+   LABELS DE SELECCION DE LINEA
+   ========================================================= */
+
+.lane-section-label {
+
+  margin-top: 0;
+
+  margin-bottom: 10px;
+
+  color: var(--text);
+
+  font-size: 0.78rem;
+
+  font-weight: 750;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+}
+
+
+/* =========================================================
+   SELECTOR DE LINEAS — CONTROLES GAMING
+   ========================================================= */
+
+.lane-selector {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin-bottom: 10px;
+
+  position: relative;
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   BOTON INDIVIDUAL DE LINEA
+   ========================================================= */
+
+.lane-option {
+
+  appearance: none;
+
+  width: 100%;
+
+  min-width: 0;
+
+  min-height: 82px;
+
+  margin: 0;
+
+  padding: 10px 6px;
+
+  border-radius: 12px;
+
+  border:
+    1px solid
+    rgba(148, 163, 184, 0.15);
+
+  background:
+    linear-gradient(
+      160deg,
+      rgba(19, 36, 58, 0.92),
+      rgba(8, 20, 35, 0.94)
+    );
+
+  color: var(--muted);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 4px;
+
+  cursor: pointer;
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.025),
+    0 5px 14px
+    rgba(0, 0, 0, 0.16);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  overflow: hidden;
+
+  position: relative;
+}
+
+
+/*
+   Eliminamos el brillo global de los botones normales
+   para crear uno propio en los botones de línea.
+*/
+
+.lane-option::before {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 229, 255, 0.10),
+      transparent 55%
+    );
+
+  opacity: 0;
+
+  transition:
+    opacity 0.2s ease;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   ICONO DE LINEA
+   ========================================================= */
+
+.lane-icon {
+
+  font-size: 1.35rem;
+
+  line-height: 1;
+
+  filter:
+    grayscale(0.35);
+
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+
+/* =========================================================
+   NOMBRE DE LINEA
+   ========================================================= */
+
+.lane-name {
+
+  font-size: 0.72rem;
+
+  font-weight: 850;
+
+  letter-spacing: 0.6px;
+
+  line-height: 1.1;
+
+  color: inherit;
+}
+
+
+/* =========================================================
+   DESCRIPCION DE ROL
+   ========================================================= */
+
+.lane-hint {
+
+  font-size: 0.58rem;
+
+  line-height: 1;
+
+  color:
+    rgba(148, 163, 184, 0.68);
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+.lane-option:hover {
+
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(0, 163, 255, 0.42);
+
+  color:
+    var(--text);
+
+  background:
+    linear-gradient(
+      160deg,
+      rgba(19, 45, 70, 0.96),
+      rgba(9, 25, 43, 0.96)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.04),
+    0 9px 22px
+    rgba(0, 163, 255, 0.10);
+}
+
+.lane-option:hover::before {
+
+  opacity: 1;
+}
+
+.lane-option:hover .lane-icon {
+
+  transform:
+    translateY(-1px)
+    scale(1.06);
+
+  filter:
+    grayscale(0);
+}
+
+
+/* =========================================================
+   ESTADO ACTIVO
+   ========================================================= */
+
+.lane-option.is-active {
+
+  color: var(--text);
+
+  border-color:
+    var(--accent);
+
+  background:
+    linear-gradient(
+      155deg,
+      rgba(0, 163, 255, 0.18),
+      rgba(8, 35, 58, 0.96)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(0, 229, 255, 0.16),
+    0 0 0 1px
+    rgba(0, 163, 255, 0.10),
+    0 8px 24px
+    rgba(0, 163, 255, 0.18);
+}
+
+.lane-option.is-active::before {
+
+  opacity: 1;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 229, 255, 0.15),
+      transparent 60%
+    );
+}
+
+.lane-option.is-active .lane-icon {
+
+  filter:
+    grayscale(0);
+
+  transform:
+    scale(1.06);
+
+  filter:
+    drop-shadow(
+      0 0 8px
+      rgba(0, 229, 255, 0.25)
+    );
+}
+
+.lane-option.is-active .lane-name {
+
+  color:
+    var(--accent-light);
+}
+
+.lane-option.is-active .lane-hint {
+
+  color:
+    rgba(234, 244, 255, 0.68);
+}
+
+
+/* =========================================================
+   INDICADOR INFERIOR DEL ESTADO ACTIVO
+   ========================================================= */
+
+.lane-option.is-active::after {
+
+  content: "";
+
+  position: absolute;
+
+  left: 20%;
+
+  right: 20%;
+
+  bottom: 5px;
+
+  height: 2px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--accent-light),
+      transparent
+    );
+
+  box-shadow:
+    0 0 8px
+    rgba(0, 229, 255, 0.50);
+}
+
+
+/* =========================================================
+   SELECT NATIVO OCULTO
+   =========================================================
+
+   Lo mantenemos en el HTML porque el JavaScript actual
+   utiliza #poolLinea y #partidaLinea.
+
+   El usuario interactúa únicamente con los botones visuales.
+   ========================================================= */
+
+.lane-native-select {
+
+  display: none !important;
+
+  position: absolute;
+
+  width: 1px;
+
+  height: 1px;
+
+  opacity: 0;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   INPUTS / SELECTS / BOTONES
    ========================================================= */
 
 input,
@@ -1010,6 +1372,32 @@ button:active {
     padding:
       17px;
   }
+
+
+  /* ---------------------------------------------
+     Selector de líneas en tablet
+     --------------------------------------------- */
+
+  .lane-selector {
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .lane-option {
+
+    min-height:
+      78px;
+  }
+
+  .lane-hint {
+
+    font-size:
+      0.56rem;
+  }
+
 }
 
 
@@ -1113,6 +1501,65 @@ button:active {
     font-size:
       0.85rem;
   }
+
+
+  /* ---------------------------------------------
+     Selector de líneas en móvil
+     --------------------------------------------- */
+
+  .lane-selector {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .lane-option {
+
+    min-height:
+      74px;
+
+    padding:
+      9px 5px;
+  }
+
+  .lane-icon {
+
+    font-size:
+      1.2rem;
+  }
+
+  .lane-name {
+
+    font-size:
+      0.68rem;
+  }
+
+  .lane-hint {
+
+    font-size:
+      0.55rem;
+  }
+
+
+  /*
+     El último botón ocupa el ancho disponible
+     cuando hay cinco roles en una cuadrícula 2x3.
+  */
+
+  .lane-option:last-child {
+
+    grid-column:
+      1 / -1;
+
+    width:
+      calc(50% - 4px);
+
+    justify-self:
+      center;
+  }
+
 }
 
 
