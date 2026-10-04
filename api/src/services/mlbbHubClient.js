@@ -251,7 +251,7 @@ function extractLaneKeysFromStructuredData(html) {
       } catch {
         const matches =
           scriptText.matchAll(
-            /"(?:lane|lanes)"\\s*:\\s*(?:"((?:\\\\.|[^"])*)"|\\[([^\\]]*)\\])/gi
+            /"(?:lane|lanes)"\s*:\s*(?:"((?:\\.|[^"])*)"|\[([^\]]*)\])/gi
           );
 
         for (const match of matches) {
