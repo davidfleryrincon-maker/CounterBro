@@ -348,6 +348,7 @@ let HERO_LANES = {
 
 let heroesReadyPromise = null;
 let heroesReady = false;
+let startupThoughtTimer = null;
 
 const STARTUP_THOUGHTS = [
   "Despertando a Nana de su quinta siesta",
@@ -449,10 +450,19 @@ function actualizarFraseStartup() {
 function iniciarAnimacionStartup() {
   actualizarFraseStartup();
 
-  return setInterval(
-    actualizarFraseStartup,
-    1500
-  );
+  if (startupThoughtTimer) {
+    clearInterval(
+      startupThoughtTimer
+    );
+  }
+
+  startupThoughtTimer =
+    setInterval(
+      actualizarFraseStartup,
+      1500
+    );
+
+  return startupThoughtTimer;
 }
 
 function actualizarEstadoStartup(
@@ -561,6 +571,14 @@ function entrarACounterBro() {
     startupButton.disabled
   ) {
     return;
+  }
+
+  if (startupThoughtTimer) {
+    clearInterval(
+      startupThoughtTimer
+    );
+
+    startupThoughtTimer = null;
   }
 
   ocultarStartupOverlay();
@@ -763,8 +781,7 @@ async function cargarBasePreparada() {
 async function inicializarBaseDeHeroes() {
   mostrarStartupOverlay();
 
-  const stopThoughts =
-    iniciarAnimacionStartup();
+  iniciarAnimacionStartup();
 
   actualizarEstadoStartup(
     "Verificando la base de héroes"
@@ -879,11 +896,7 @@ async function inicializarBaseDeHeroes() {
     }
 
   } finally {
-    clearInterval(
-      stopThoughts
-    );
   }
-}
 
 function asegurarHeroesListos() {
   if (heroesReady) {
