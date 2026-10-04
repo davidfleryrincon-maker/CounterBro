@@ -24,6 +24,7 @@ function nameFromSlug(slug) {
   const especiales = {
     "x-borg": "X.Borg",
     "chang-e": "Chang'e",
+    "change": "Chang'e",
     "lapu-lapu": "Lapu-Lapu",
     "popol-and-kupa": "Popol and Kupa",
     "yi-sun-shin": "Yi Sun-shin",
