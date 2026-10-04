@@ -518,6 +518,55 @@ function mostrarStartupOverlay() {
   );
 }
 
+async function activarBotonEntradaStartup() {
+  const startupButton =
+    document.getElementById(
+      "startupEnterButton"
+    );
+
+  if (startupButton) {
+    startupButton.disabled = true;
+    startupButton.textContent =
+      "CARGANDO DATOS";
+  }
+
+  await new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        5000
+      )
+  );
+
+  if (startupButton) {
+    startupButton.disabled = false;
+    startupButton.textContent =
+      "TODO LISTO. COMENCEMOS.";
+  }
+
+  actualizarEstadoStartup(
+    "Bases de datos cargadas. CounterBro está listo."
+  );
+}
+
+
+function entrarACounterBro() {
+  const startupButton =
+    document.getElementById(
+      "startupEnterButton"
+    );
+
+  if (
+    startupButton &&
+    startupButton.disabled
+  ) {
+    return;
+  }
+
+  ocultarStartupOverlay();
+}
+
+
 function ocultarStartupOverlay() {
   const overlay =
     document.getElementById(
@@ -767,15 +816,7 @@ async function inicializarBaseDeHeroes() {
         `SISTEMA LISTO · ${tiempo} MS`;
     }
 
-    await new Promise(
-      resolve =>
-        setTimeout(
-          resolve,
-          650
-        )
-    );
-
-    ocultarStartupOverlay();
+    await activarBotonEntradaStartup();
 
     return true;
 
@@ -798,15 +839,7 @@ async function inicializarBaseDeHeroes() {
         "Usando la última base válida disponible..."
       );
 
-      await new Promise(
-        resolve =>
-          setTimeout(
-            resolve,
-            450
-          )
-      );
-
-      ocultarStartupOverlay();
+      await activarBotonEntradaStartup();
 
       return true;
     }
@@ -830,15 +863,7 @@ async function inicializarBaseDeHeroes() {
         "Usando la base de respaldo integrada..."
       );
 
-      await new Promise(
-        resolve =>
-          setTimeout(
-            resolve,
-            450
-          )
-      );
-
-      ocultarStartupOverlay();
+      await activarBotonEntradaStartup();
 
       return true;
 
