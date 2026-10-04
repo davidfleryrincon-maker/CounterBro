@@ -6,15 +6,15 @@ const BASE_URL =
 
 const LANE_URLS = {
   gold:
-    BASE_URL + '?lane=Gold',
+    'https://mlbbhub.com/tier-list-maker?lane=Gold',
   exp:
-    BASE_URL + '?lane=EXP',
+    'https://mlbbhub.com/tier-list-maker?lane=EXP',
   mid:
-    BASE_URL + '?lane=Mid',
+    'https://mlbbhub.com/tier-list-maker?lane=Mid',
   jungle:
-    BASE_URL + '?lane=Jungle',
+    'https://mlbbhub.com/tier-list-maker?lane=Jungle',
   roam:
-    BASE_URL + '?lane=Roam'
+    'https://mlbbhub.com/tier-list-maker?lane=Roam'
 };
 
 function cleanName(value) {
@@ -27,6 +27,7 @@ function nameFromSlug(slug) {
   const especiales = {
     "x-borg": "X.Borg",
     "chang-e": "Chang'e",
+    "lapu-lapu": "Lapu-Lapu",
     "popol-and-kupa": "Popol and Kupa",
     "yi-sun-shin": "Yi Sun-shin",
     "luo-yi": "Luo Yi"
@@ -65,7 +66,8 @@ function addHero(
 
   if (
     !cleanSlug ||
-    cleanSlug === 'heroes'
+    cleanSlug === 'heroes' ||
+    /^opengraph-image/i.test(cleanSlug)
   ) {
     return;
   }
@@ -234,6 +236,21 @@ async function fetchFreshHeroesFromMLBBHub() {
           (a, b) =>
             a.localeCompare(b)
         );
+
+      if (
+        lanes[lane].length >=
+        allHeroes.length * 0.8
+      ) {
+        throw new Error(
+          'MLBBHub no aplicó correctamente el filtro de línea para ' +
+          lane +
+          '. Se detectaron ' +
+          lanes[lane].length +
+          ' héroes frente a ' +
+          allHeroes.length +
+          ' en el roster general.'
+        );
+      }
     }
   );
 
