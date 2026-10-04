@@ -131,7 +131,12 @@
     "Kadita",
     "Faramis",
     "Floryn",
-    "Hirara"
+    "Hirara",
+    "Kalea",
+    "Karrie",
+    "Roger",
+    "Obsidia",
+    "Zetian"
   ],
   "lanes": {
     "exp": [
@@ -208,7 +213,8 @@
       "Julian",
       "Zhask",
       "Kadita",
-      "Faramis"
+      "Faramis",
+      "Zetian"
     ],
     "gold": [
       "Miya",
@@ -232,7 +238,9 @@
       "Harith",
       "Lunox",
       "Alice",
-      "Beatrix"
+      "Beatrix",
+      "Karrie",
+      "Obsidia"
     ],
     "jungle": [
       "Saber",
@@ -267,7 +275,8 @@
       "Lukas",
       "Suyu",
       "Suyou",
-      "Hirara"
+      "Hirara",
+      "Roger"
     ],
     "roam": [
       "Tigreal",
@@ -302,10 +311,12 @@
       "Kadita",
       "Marcel",
       "Faramis",
-      "Floryn"
+      "Floryn",
+      "Kalea"
     ]
   },
-  "source": "CounterBro fallback seed",
+  "source": "CounterBro fallback seed + verified current additions",
   "syncedAt": null,
-  "partial": false
+  "partial": false,
+  "seedUpdatedAt": "2026-10-04T00:00:00.000Z"
 }
