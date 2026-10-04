@@ -46,6 +46,52 @@ function extraerDelta(texto) {
   );
 }
 
+
+function extraerRazonMatchup(
+  texto,
+  nombreHeroe
+) {
+  let razon =
+    limpiarNombre(texto);
+
+  const nombre =
+    limpiarNombre(nombreHeroe);
+
+  if (
+    nombre &&
+    razon
+      .toLowerCase()
+      .startsWith(
+        nombre.toLowerCase()
+      )
+  ) {
+    razon =
+      razon
+        .slice(nombre.length)
+        .trim();
+  }
+
+  razon =
+    razon.replace(
+      /win rate edge of[\s\S]*$/i,
+      ''
+    );
+
+  razon =
+    razon.replace(
+      /[+-]\d+(?:[.,]\d+)?\s*pp\s*$/i,
+      ''
+    );
+
+  razon =
+    razon
+      .replace(/\s+/g, ' ')
+      .replace(/\s+([.,;:])/g, '$1')
+      .trim();
+
+  return razon || null;
+}
+
 function extraerCounters(html, enemigo) {
   const $ = cheerio.load(html);
   const counters = [];
@@ -133,11 +179,17 @@ function extraerCounters(html, enemigo) {
 
         counters.push({
           name: nombre,
-          winRate: '+' + delta.toFixed(1) + ' pp',
-          reason:
-            'Ventaja estadística de ' +
+          winRate:
+            '+' +
             delta.toFixed(1) +
-            ' puntos porcentuales según MLBBHub.'
+            ' pp',
+          edge:
+            delta,
+          reason:
+            extraerRazonMatchup(
+              textoBloque,
+              nombre
+            )
         });
       });
 
@@ -182,8 +234,13 @@ function extraerCounters(html, enemigo) {
         ? $(link).closest('li')
         : $(link).parent();
 
+      const textoBloque =
+        limpiarNombre(
+          contenedor.text()
+        );
+
       const delta = extraerDelta(
-        contenedor.text()
+        textoBloque
       );
 
       if (delta === null) return;
@@ -192,11 +249,17 @@ function extraerCounters(html, enemigo) {
 
       counters.push({
         name: nombre,
-        winRate: '+' + delta.toFixed(1) + ' pp',
-        reason:
-          'Ventaja estadística de ' +
+        winRate:
+          '+' +
           delta.toFixed(1) +
-          ' puntos porcentuales según MLBBHub.'
+          ' pp',
+        edge:
+          delta,
+        reason:
+          extraerRazonMatchup(
+            textoBloque,
+            nombre
+          )
       });
     });
   }
