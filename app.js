@@ -1426,20 +1426,8 @@ async function agregarHeroePool() {
   }
 
 
-  if (
-    !esHeroeDeLinea(
-      nombreIdentificado,
-      linea
-    )
-  ) {
-
-    alert(
-      `${nombreIdentificado} no está registrado como héroe de la línea ${linea.toUpperCase()}.`
-    );
-
-    return;
-
-  }
+  // El pool personal es independiente de la clasificación automática
+  // de MLBBHub. Si sabes jugar un héroe en esta línea, puedes agregarlo.
 
 
   const yaExiste =
@@ -2058,31 +2046,23 @@ async function buscarCounter() {
 
 
       /*
-         Solo buscamos dentro de:
-         1. Los héroes que el usuario tiene en su pool.
-         2. Los counters devueltos por la API.
-         3. Los counters que pasaron el filtro
-            obligatorio de línea.
+         El pool personal es una lista de héroes que el usuario
+         sabe jugar en esta línea. Por eso puede incluir héroes
+         que MLBBHub clasifica actualmente en otra posición.
+         
+         El bloque general sigue usando el filtro estricto de
+         línea. Aquí, en cambio, buscamos en todos los counters
+         devueltos por la API para respetar el pool personal.
       */
 
       pool.forEach(
         miHeroe => {
 
-          if (
-            !esHeroeDeLinea(
-              miHeroe,
-              linea
-            )
-          ) {
-
-            return;
-
-          }
-
-
           const coincidencia =
-            countersFiltradosPorLinea.find(
+            apiCounters.find(
               counter =>
+                counter &&
+                counter.name &&
                 limpiarTexto(
                   counter.name
                 ) ===
