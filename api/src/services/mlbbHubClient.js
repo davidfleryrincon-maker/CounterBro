@@ -4,17 +4,14 @@ const cheerio = require('cheerio');
 const BASE_URL =
   'https://mlbbhub.com/heroes';
 
-const LANE_URLS = {
-  gold:
-    'https://mlbbhub.com/tier-list-maker?lane=Gold',
-  exp:
-    'https://mlbbhub.com/tier-list-maker?lane=EXP',
-  mid:
-    'https://mlbbhub.com/tier-list-maker?lane=Mid',
-  jungle:
-    'https://mlbbhub.com/tier-list-maker?lane=Jungle',
-  roam:
-    'https://mlbbhub.com/tier-list-maker?lane=Roam'
+const HERO_PAGE_CONCURRENCY = 8;
+
+const LANE_KEYS = {
+  gold: /\bGold(?:\s+Lane)?\b/i,
+  exp: /\bEXP(?:\s+Lane)?\b/i,
+  mid: /\bMid(?:\s+Lane)?\b/i,
+  jungle: /\b(?:Jungle|Jungler)\b/i,
+  roam: /\b(?:Roam|Roamer)\b/i
 };
 
 function cleanName(value) {
@@ -58,7 +55,7 @@ function addHero(
       String(slug || '')
     )
       .replace(
-        /^\/+|\/+$/g,
+        /^\\/+|\\/+$/g,
         ''
       )
       .trim()
@@ -90,7 +87,7 @@ function addHero(
   }
 }
 
-function extractHeroes(html) {
+function extractHeroEntries(html) {
   const $ = cheerio.load(html);
   const heroes = new Map();
 
@@ -101,7 +98,7 @@ function extractHeroes(html) {
 
       const match =
         href.match(
-          /\/heroes\/([^/?#"'<>]+)/i
+          /\/heroes\/([^/?#"'< >]+)/i
         );
 
       if (!match) {
@@ -120,7 +117,7 @@ function extractHeroes(html) {
 
   const rawMatches =
     String(html || '').matchAll(
-      /\/heroes\/([a-z0-9%._'-]+)(?=[/?#"'<>\\])/gi
+      /\/heroes\/([a-z0-9%._'-]+)(?=[/?#"'< >\\])/gi
     );
 
   for (const match of rawMatches) {
@@ -132,7 +129,18 @@ function extractHeroes(html) {
   }
 
   return Array.from(
-    heroes.values()
+    heroes.entries()
+  ).map(
+    ([slug, name]) => ({
+      slug,
+      name
+    })
+  );
+}
+
+function extractHeroes(html) {
+  return extractHeroEntries(html).map(
+    entry => entry.name
   );
 }
 
@@ -154,25 +162,214 @@ async function fetchPage(url) {
   return response.data;
 }
 
-async function fetchLane(lane) {
-  const html =
-    await fetchPage(
-      LANE_URLS[lane]
-    );
+function extractLaneKeysFromText(text) {
+  const normalized =
+    cleanName(text);
 
-  const heroes =
-    extractHeroes(html);
+  if (!normalized) {
+    return [];
+  }
 
-  if (heroes.length < 5) {
-    throw new Error(
-      'MLBBHub devolvió muy pocos héroes para ' +
-      lane +
-      ': ' +
-      heroes.length
+  const lanes = [];
+
+  Object.entries(
+    LANE_KEYS
+  ).forEach(
+    ([lane, pattern]) => {
+      if (pattern.test(normalized)) {
+        lanes.push(lane);
+      }
+    }
+  );
+
+  return lanes;
+}
+
+function extractLaneKeys(html) {
+  const $ = cheerio.load(html);
+  const candidates = [];
+
+  $('body *').each(
+    (_, element) => {
+      const label =
+        cleanName(
+          $(element).clone()
+            .children()
+            .remove()
+            .end()
+            .text()
+        );
+
+      if (!/^Lane$/i.test(label)) {
+        return;
+      }
+
+      const parent =
+        $(element).parent();
+
+      const siblingText =
+        parent
+          .children()
+          .map(
+            (_, child) =>
+              cleanName(
+                $(child).text()
+              )
+          )
+          .get()
+          .filter(Boolean)
+          .join(' ');
+
+      const parentText =
+        cleanName(
+          parent.text()
+        );
+
+      const grandParentText =
+        cleanName(
+          parent.parent().text()
+        );
+
+      [
+        siblingText,
+        parentText,
+        grandParentText
+      ].forEach(
+        candidate => {
+          if (
+            candidate &&
+            candidate.length <= 180
+          ) {
+            candidates.push(
+              candidate
+            );
+          }
+        }
+      );
+    }
+  );
+
+  const directLaneCandidates =
+    candidates
+      .map(
+        candidate => ({
+          candidate,
+          lanes:
+            extractLaneKeysFromText(
+              candidate
+            )
+        })
+      )
+      .filter(
+        item =>
+          item.lanes.length > 0
+      )
+      .sort(
+        (a, b) =>
+          a.candidate.length -
+          b.candidate.length
+      );
+
+  if (
+    directLaneCandidates.length > 0
+  ) {
+    return Array.from(
+      new Set(
+        directLaneCandidates[0].lanes
+      )
     );
   }
 
-  return heroes;
+  const bodyText =
+    cleanName(
+      $('body').text()
+    );
+
+  const laneFieldMatch =
+    bodyText.match(
+      /\bLane\b([^]{0,140})/i
+    );
+
+  if (laneFieldMatch) {
+    return Array.from(
+      new Set(
+        extractLaneKeysFromText(
+          laneFieldMatch[1]
+        )
+      )
+    );
+  }
+
+  return [];
+}
+
+async function fetchHeroLanes(entry) {
+  const html =
+    await fetchPage(
+      `${BASE_URL}/${entry.slug}`
+    );
+
+  const lanes =
+    extractLaneKeys(html);
+
+  if (lanes.length === 0) {
+    throw new Error(
+      'No se pudo detectar la línea de ' +
+      entry.name +
+      ' en su página de MLBBHub.'
+    );
+  }
+
+  return {
+    ...entry,
+    lanes
+  };
+}
+
+async function mapWithConcurrency(
+  items,
+  limit,
+  worker
+) {
+  const results =
+    new Array(items.length);
+  let nextIndex = 0;
+
+  async function runWorker() {
+    while (true) {
+      const index =
+        nextIndex++;
+
+      if (
+        index >= items.length
+      ) {
+        return;
+      }
+
+      results[index] =
+        await worker(
+          items[index],
+          index
+        );
+    }
+  }
+
+  const workerCount =
+    Math.min(
+      limit,
+      items.length
+    );
+
+  await Promise.all(
+    Array.from(
+      {
+        length: workerCount
+      },
+      () => runWorker()
+    )
+  );
+
+  return results;
 }
 
 async function fetchAllHeroes() {
@@ -181,74 +378,78 @@ async function fetchAllHeroes() {
       BASE_URL
     );
 
-  const heroes =
-    extractHeroes(html);
+  const entries =
+    extractHeroEntries(html);
 
-  if (heroes.length < 50) {
+  if (entries.length < 50) {
     throw new Error(
       'MLBBHub devolvió muy pocos héroes en la lista general: ' +
-      heroes.length
+      entries.length
     );
   }
 
-  return heroes;
+  return entries;
 }
 
 async function fetchFreshHeroesFromMLBBHub() {
-  const [
-    allHeroes,
-    ...laneResults
-  ] =
-    await Promise.all([
-      fetchAllHeroes(),
-      ...Object.keys(
-        LANE_URLS
-      ).map(
-        lane =>
-          fetchLane(lane)
-      )
-    ]);
+  const entries =
+    await fetchAllHeroes();
 
-  const lanes = {};
+  const laneEntries =
+    await mapWithConcurrency(
+      entries,
+      HERO_PAGE_CONCURRENCY,
+      entry =>
+        fetchHeroLanes(entry)
+    );
+
+  const lanes = {
+    gold: [],
+    exp: [],
+    mid: [],
+    jungle: [],
+    roam: []
+  };
+
+  laneEntries.forEach(
+    entry => {
+      entry.lanes.forEach(
+        lane => {
+          if (
+            lanes[lane]
+          ) {
+            lanes[lane].push(
+              entry.name
+            );
+          }
+        }
+      );
+    }
+  );
 
   Object.keys(
-    LANE_URLS
+    lanes
   ).forEach(
-    (lane, index) => {
-      const heroes =
-        laneResults[index];
-
-      if (
-        !Array.isArray(heroes) ||
-        heroes.length < 5
-      ) {
-        throw new Error(
-          'Sincronización incompleta para ' +
-          lane +
-          '.'
-        );
-      }
-
+    lane => {
       lanes[lane] =
         Array.from(
-          new Set(heroes)
+          new Set(
+            lanes[lane]
+          )
         ).sort(
           (a, b) =>
             a.localeCompare(b)
         );
 
       if (
-        lanes[lane].length >=
-        allHeroes.length * 0.8
+        lanes[lane].length < 5
       ) {
         throw new Error(
-          'MLBBHub no aplicó correctamente el filtro de línea para ' +
+          'Sincronización incompleta para ' +
           lane +
-          '. Se detectaron ' +
+          ': solo se detectaron ' +
           lanes[lane].length +
-          ' héroes frente a ' +
-          allHeroes.length +
-          ' en el roster general.'
+          ' héroes.'
         );
       }
     }
@@ -256,12 +457,11 @@ async function fetchFreshHeroesFromMLBBHub() {
 
   const heroes =
     Array.from(
-      new Set([
-        ...allHeroes,
-        ...Object.values(
-          lanes
-        ).flat()
-      ])
+      new Set(
+        entries.map(
+          entry => entry.name
+        )
+      )
     ).sort(
       (a, b) =>
         a.localeCompare(b)
