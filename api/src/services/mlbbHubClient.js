@@ -429,10 +429,47 @@ async function fetchHeroLanes(entry) {
     extractLaneKeys(html);
 
   if (lanes.length === 0) {
+    const diagnosticHtml =
+      String(html || '');
+
+    const diagnosticTitle =
+      diagnosticHtml.match(
+        /<title[^>]*>([\\s\\S]*?)<\\/title>/i
+      );
+
+    const hasLaneText =
+      /\\bLane\\b/i.test(
+        diagnosticHtml
+      );
+
+    const hasJunglerText =
+      /Jungler/i.test(
+        diagnosticHtml
+      );
+
+    const hasExpLaneText =
+      /EXP\\s+Lane/i.test(
+        diagnosticHtml
+      );
+
     throw new Error(
       'No se pudo detectar la línea de ' +
       entry.name +
-      ' en su página de MLBBHub.'
+      ' en su página de MLBBHub. ' +
+      'Diagnóstico: html=' +
+      diagnosticHtml.length +
+      ', title=' +
+      (diagnosticTitle
+        ? cleanName(
+            diagnosticTitle[1]
+          )
+        : '(sin title)') +
+      ', Lane=' +
+      hasLaneText +
+      ', Jungler=' +
+      hasJunglerText +
+      ', EXP Lane=' +
+      hasExpLaneText
     );
   }
 
