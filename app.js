@@ -2398,3 +2398,118 @@ function reiniciarBusqueda() {
 
 
   const resultados =
+    document.getElementById(
+      "resultadosCounter"
+    );
+
+
+  if (enemigo) {
+
+    enemigo.value =
+      "";
+
+  }
+
+
+  if (resultados) {
+
+    resultados.style.display =
+      "none";
+
+  }
+
+}
+
+
+/* =======================================================
+   ENTER PARA ANALIZAR
+   ======================================================= */
+
+function activarEnterEnInput() {
+
+  const enemigo =
+    document.getElementById(
+      "enemigoPick"
+    );
+
+
+  const nuevoHeroe =
+    document.getElementById(
+      "nuevoHeroePool"
+    );
+
+
+  if (enemigo) {
+
+    enemigo.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key ===
+          "Enter"
+        ) {
+
+          event.preventDefault();
+
+          buscarCounter();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (nuevoHeroe) {
+
+    nuevoHeroe.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key ===
+          "Enter"
+        ) {
+
+          event.preventDefault();
+
+          agregarHeroePool();
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =======================================================
+   INICIALIZACIÓN
+   ======================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    aplicarIdioma();
+
+    sincronizarSelectoresDeLinea();
+
+    mostrarPoolActual();
+
+    activarEnterEnInput();
+
+    const baseLista =
+      await asegurarHeroesListos();
+
+    if (baseLista) {
+      sincronizarSelectoresDeLinea();
+      mostrarPoolActual();
+    }
+
+  }
+);
