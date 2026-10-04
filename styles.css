@@ -3,64 +3,36 @@
    ========================================================= */
 
 :root {
-
-  /* =======================================================
-     COLORES PRINCIPALES
-     ======================================================= */
-
   --bg: #07111F;
-
   --card: #0F1B2D;
-
   --card-inner: #13243A;
-
   --input-bg: #091525;
 
-  /* Identidad CounterBro */
   --accent: #00A3FF;
-
   --accent-light: #00E5FF;
-
   --accent-dark: #0878C9;
 
   --purple: #8B5CF6;
-
-  /* Estados */
   --gold: #F5B942;
 
   --danger: #EF4444;
-
   --success: #22C55E;
 
-  /* Texto */
   --text: #EAF4FF;
-
   --muted: #94A3B8;
 
-  /* Bordes */
   --border: rgba(148, 163, 184, 0.14);
-
   --border-strong: rgba(148, 163, 184, 0.22);
-
   --border-accent: rgba(0, 163, 255, 0.25);
 
-  /* Sombras */
-  --shadow:
-    0 20px 50px rgba(0, 0, 0, 0.35);
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.22);
 
-  --shadow-soft:
-    0 10px 30px rgba(0, 0, 0, 0.22);
+  --glow: 0 0 30px rgba(0, 163, 255, 0.16);
 
-  --glow:
-    0 0 30px rgba(0, 163, 255, 0.16);
-
-  /* Radios */
   --radius-sm: 8px;
-
   --radius-md: 12px;
-
   --radius-lg: 16px;
-
   --radius-xl: 22px;
 }
 
@@ -71,17 +43,9 @@
 
 * {
   box-sizing: border-box;
-
   margin: 0;
-
   padding: 0;
-
-  font-family:
-    'Segoe UI',
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 
@@ -90,7 +54,6 @@
    ========================================================= */
 
 body {
-
   background:
     radial-gradient(
       circle at 50% -10%,
@@ -107,7 +70,6 @@ body {
   color: var(--text);
 
   display: flex;
-
   justify-content: center;
 
   padding: 24px 16px;
@@ -117,11 +79,10 @@ body {
 
 
 /* =========================================================
-   CONTENEDOR PRINCIPAL
+   MAIN CONTAINER
    ========================================================= */
 
 .container {
-
   background:
     linear-gradient(
       180deg,
@@ -134,7 +95,6 @@ body {
   border-radius: var(--radius-xl);
 
   max-width: 620px;
-
   width: 100%;
 
   box-shadow: var(--shadow);
@@ -146,23 +106,15 @@ body {
   overflow: hidden;
 }
 
-
-/*
-   Iluminación ambiental superior.
-*/
-
 .container::before {
-
   content: "";
 
   position: absolute;
 
   top: -180px;
-
   left: 50%;
 
   width: 420px;
-
   height: 420px;
 
   transform: translateX(-50%);
@@ -179,11 +131,10 @@ body {
 
 
 /* =========================================================
-   HEADER
+   HEADER / LOGO
    ========================================================= */
 
 .header {
-
   text-align: center;
 
   margin-bottom: 30px;
@@ -191,19 +142,11 @@ body {
   padding: 4px 0 8px;
 
   position: relative;
-
   z-index: 1;
 }
 
-
-/* =========================================================
-   LOGO
-   ========================================================= */
-
 .app-logo {
-
   width: 250px;
-
   height: auto;
 
   max-width: 85%;
@@ -215,20 +158,13 @@ body {
   object-fit: contain;
 
   border: none;
-
   border-radius: 0;
 
   background: transparent;
 
   filter:
-    drop-shadow(
-      0 0 18px
-      rgba(0, 163, 255, 0.18)
-    )
-    drop-shadow(
-      0 0 35px
-      rgba(139, 92, 246, 0.08)
-    );
+    drop-shadow(0 0 18px rgba(0, 163, 255, 0.18))
+    drop-shadow(0 0 35px rgba(139, 92, 246, 0.08));
 
   transition:
     transform 0.25s ease,
@@ -236,27 +172,14 @@ body {
 }
 
 .app-logo:hover {
-
   transform: translateY(-2px);
 
   filter:
-    drop-shadow(
-      0 0 22px
-      rgba(0, 163, 255, 0.24)
-    )
-    drop-shadow(
-      0 0 40px
-      rgba(139, 92, 246, 0.10)
-    );
+    drop-shadow(0 0 22px rgba(0, 163, 255, 0.24))
+    drop-shadow(0 0 40px rgba(139, 92, 246, 0.10));
 }
 
-
-/* =========================================================
-   TITULO PRINCIPAL
-   ========================================================= */
-
 h2 {
-
   color: var(--text);
 
   margin-top: 4px;
@@ -268,13 +191,7 @@ h2 {
   letter-spacing: -0.5px;
 }
 
-
-/* =========================================================
-   SUBTITULO
-   ========================================================= */
-
 .app-subtitle {
-
   color: var(--muted);
 
   font-size: 0.88rem;
@@ -286,11 +203,10 @@ h2 {
 
 
 /* =========================================================
-   TITULOS DE SECCION
+   TITLES
    ========================================================= */
 
 h3 {
-
   color: var(--text);
 
   margin-bottom: 18px;
@@ -308,13 +224,7 @@ h3 {
   gap: 9px;
 }
 
-
-/*
-   Línea decorativa debajo del título.
-*/
-
 h3::after {
-
   content: "";
 
   height: 2px;
@@ -337,11 +247,10 @@ h3::after {
 
 
 /* =========================================================
-   TARJETAS / SECCIONES
+   STEP CARDS
    ========================================================= */
 
 .step-card {
-
   background:
     linear-gradient(
       145deg,
@@ -358,8 +267,7 @@ h3::after {
   border: 1px solid var(--border);
 
   box-shadow:
-    inset 0 1px 0
-    rgba(255, 255, 255, 0.025),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025),
     var(--shadow-soft);
 
   position: relative;
@@ -370,15 +278,11 @@ h3::after {
 }
 
 .step-card:hover {
-
-  border-color:
-    rgba(0, 163, 255, 0.18);
+  border-color: rgba(0, 163, 255, 0.18);
 
   box-shadow:
-    inset 0 1px 0
-    rgba(255, 255, 255, 0.025),
-    0 14px 35px
-    rgba(0, 0, 0, 0.20);
+    inset 0 1px 0 rgba(255, 255, 255, 0.025),
+    0 14px 35px rgba(0, 0, 0, 0.20);
 }
 
 
@@ -387,13 +291,11 @@ h3::after {
    ========================================================= */
 
 label {
-
   font-weight: 650;
 
   display: block;
 
   margin-top: 14px;
-
   margin-bottom: 7px;
 
   color: var(--muted);
@@ -405,13 +307,11 @@ label {
 
 
 /* =========================================================
-   LABELS DE SELECCION DE LINEA
+   LANE SELECTOR
    ========================================================= */
 
 .lane-section-label {
-
   margin-top: 0;
-
   margin-bottom: 10px;
 
   color: var(--text);
@@ -425,13 +325,7 @@ label {
   letter-spacing: 0.8px;
 }
 
-
-/* =========================================================
-   SELECTOR DE LINEAS — CONTROLES GAMING
-   ========================================================= */
-
 .lane-selector {
-
   display: grid;
 
   grid-template-columns:
@@ -446,13 +340,7 @@ label {
   z-index: 2;
 }
 
-
-/* =========================================================
-   BOTON INDIVIDUAL DE LINEA
-   ========================================================= */
-
 .lane-option {
-
   appearance: none;
 
   width: 100%;
@@ -467,9 +355,7 @@ label {
 
   border-radius: 12px;
 
-  border:
-    1px solid
-    rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.15);
 
   background:
     linear-gradient(
@@ -493,10 +379,8 @@ label {
   cursor: pointer;
 
   box-shadow:
-    inset 0 1px 0
-    rgba(255, 255, 255, 0.025),
-    0 5px 14px
-    rgba(0, 0, 0, 0.16);
+    inset 0 1px 0 rgba(255, 255, 255, 0.025),
+    0 5px 14px rgba(0, 0, 0, 0.16);
 
   transition:
     transform 0.2s ease,
@@ -510,14 +394,7 @@ label {
   position: relative;
 }
 
-
-/*
-   Eliminamos el brillo global de los botones normales
-   para crear uno propio en los botones de línea.
-*/
-
 .lane-option::before {
-
   content: "";
 
   position: absolute;
@@ -533,38 +410,24 @@ label {
 
   opacity: 0;
 
-  transition:
-    opacity 0.2s ease;
+  transition: opacity 0.2s ease;
 
   pointer-events: none;
 }
 
-
-/* =========================================================
-   ICONO DE LINEA
-   ========================================================= */
-
 .lane-icon {
-
   font-size: 1.35rem;
 
   line-height: 1;
 
-  filter:
-    grayscale(0.35);
+  filter: grayscale(0.35);
 
   transition:
     transform 0.2s ease,
     filter 0.2s ease;
 }
 
-
-/* =========================================================
-   NOMBRE DE LINEA
-   ========================================================= */
-
 .lane-name {
-
   font-size: 0.72rem;
 
   font-weight: 850;
@@ -572,42 +435,24 @@ label {
   letter-spacing: 0.6px;
 
   line-height: 1.1;
-
-  color: inherit;
 }
 
-
-/* =========================================================
-   DESCRIPCION DE ROL
-   ========================================================= */
-
 .lane-hint {
-
   font-size: 0.58rem;
 
   line-height: 1;
 
-  color:
-    rgba(148, 163, 184, 0.68);
+  color: rgba(148, 163, 184, 0.68);
 
   white-space: nowrap;
 }
 
-
-/* =========================================================
-   HOVER
-   ========================================================= */
-
 .lane-option:hover {
+  transform: translateY(-2px);
 
-  transform:
-    translateY(-2px);
+  border-color: rgba(0, 163, 255, 0.42);
 
-  border-color:
-    rgba(0, 163, 255, 0.42);
-
-  color:
-    var(--text);
+  color: var(--text);
 
   background:
     linear-gradient(
@@ -617,38 +462,24 @@ label {
     );
 
   box-shadow:
-    inset 0 1px 0
-    rgba(255, 255, 255, 0.04),
-    0 9px 22px
-    rgba(0, 163, 255, 0.10);
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 9px 22px rgba(0, 163, 255, 0.10);
 }
 
 .lane-option:hover::before {
-
   opacity: 1;
 }
 
 .lane-option:hover .lane-icon {
+  transform: translateY(-1px) scale(1.06);
 
-  transform:
-    translateY(-1px)
-    scale(1.06);
-
-  filter:
-    grayscale(0);
+  filter: grayscale(0);
 }
 
-
-/* =========================================================
-   ESTADO ACTIVO
-   ========================================================= */
-
 .lane-option.is-active {
-
   color: var(--text);
 
-  border-color:
-    var(--accent);
+  border-color: var(--accent);
 
   background:
     linear-gradient(
@@ -658,16 +489,12 @@ label {
     );
 
   box-shadow:
-    inset 0 1px 0
-    rgba(0, 229, 255, 0.16),
-    0 0 0 1px
-    rgba(0, 163, 255, 0.10),
-    0 8px 24px
-    rgba(0, 163, 255, 0.18);
+    inset 0 1px 0 rgba(0, 229, 255, 0.16),
+    0 0 0 1px rgba(0, 163, 255, 0.10),
+    0 8px 24px rgba(0, 163, 255, 0.18);
 }
 
 .lane-option.is-active::before {
-
   opacity: 1;
 
   background:
@@ -679,45 +506,26 @@ label {
 }
 
 .lane-option.is-active .lane-icon {
+  transform: scale(1.06);
 
   filter:
-    grayscale(0);
-
-  transform:
-    scale(1.06);
-
-  filter:
-    drop-shadow(
-      0 0 8px
-      rgba(0, 229, 255, 0.25)
-    );
+    drop-shadow(0 0 8px rgba(0, 229, 255, 0.25));
 }
 
 .lane-option.is-active .lane-name {
-
-  color:
-    var(--accent-light);
+  color: var(--accent-light);
 }
 
 .lane-option.is-active .lane-hint {
-
-  color:
-    rgba(234, 244, 255, 0.68);
+  color: rgba(234, 244, 255, 0.68);
 }
 
-
-/* =========================================================
-   INDICADOR INFERIOR DEL ESTADO ACTIVO
-   ========================================================= */
-
 .lane-option.is-active::after {
-
   content: "";
 
   position: absolute;
 
   left: 20%;
-
   right: 20%;
 
   bottom: 5px;
@@ -735,29 +543,15 @@ label {
     );
 
   box-shadow:
-    0 0 8px
-    rgba(0, 229, 255, 0.50);
+    0 0 8px rgba(0, 229, 255, 0.50);
 }
 
-
-/* =========================================================
-   SELECT NATIVO OCULTO
-   =========================================================
-
-   Lo mantenemos en el HTML porque el JavaScript actual
-   utiliza #poolLinea y #partidaLinea.
-
-   El usuario interactúa únicamente con los botones visuales.
-   ========================================================= */
-
 .lane-native-select {
-
   display: none !important;
 
   position: absolute;
 
   width: 1px;
-
   height: 1px;
 
   opacity: 0;
@@ -767,13 +561,12 @@ label {
 
 
 /* =========================================================
-   INPUTS / SELECTS / BOTONES
+   INPUTS / SELECTS
    ========================================================= */
 
 input,
 select,
 button {
-
   width: 100%;
 
   padding: 13px 14px;
@@ -782,8 +575,7 @@ button {
 
   border: 1px solid var(--border-strong);
 
-  background:
-    rgba(9, 21, 37, 0.92);
+  background: rgba(9, 21, 37, 0.92);
 
   color: var(--text);
 
@@ -798,36 +590,20 @@ button {
     transform 0.2s ease;
 }
 
-
-/* =========================================================
-   INPUT
-   ========================================================= */
-
 input {
-
   box-shadow:
-    inset 0 1px 2px
-    rgba(0, 0, 0, 0.18);
+    inset 0 1px 2px rgba(0, 0, 0, 0.18);
 }
 
 input::placeholder {
-
   color: #64748B;
 }
 
 input:hover {
-
-  border-color:
-    rgba(148, 163, 184, 0.32);
+  border-color: rgba(148, 163, 184, 0.32);
 }
 
-
-/* =========================================================
-   SELECT
-   ========================================================= */
-
 select {
-
   cursor: pointer;
 
   appearance: auto;
@@ -843,45 +619,32 @@ select {
 }
 
 select:hover {
-
-  border-color:
-    rgba(0, 163, 255, 0.30);
+  border-color: rgba(0, 163, 255, 0.30);
 }
-
-
-/* =========================================================
-   FOCUS
-   ========================================================= */
 
 input:focus,
 select:focus {
-
   border-color: var(--accent);
 
-  background:
-    rgba(9, 25, 43, 0.98);
+  background: rgba(9, 25, 43, 0.98);
 
   box-shadow:
-    0 0 0 3px
-    rgba(0, 163, 255, 0.10),
-    0 0 18px
-    rgba(0, 163, 255, 0.08);
+    0 0 0 3px rgba(0, 163, 255, 0.10),
+    0 0 18px rgba(0, 163, 255, 0.08);
 }
 
 
 /* =========================================================
-   GRUPO INPUT + BOTON
+   INPUT GROUP
    ========================================================= */
 
 .input-group {
-
   display: flex;
 
   gap: 8px;
 }
 
 .input-group button {
-
   width: 35%;
 
   margin: 0;
@@ -889,11 +652,10 @@ select:focus {
 
 
 /* =========================================================
-   BOTONES
+   BUTTONS
    ========================================================= */
 
 button {
-
   background:
     linear-gradient(
       135deg,
@@ -905,40 +667,29 @@ button {
 
   cursor: pointer;
 
-  border:
-    1px solid
-    rgba(0, 229, 255, 0.20);
+  border: 1px solid rgba(0, 229, 255, 0.20);
 
   margin-top: 12px;
 
-  color: #ffffff;
+  color: #fff;
 
   box-shadow:
-    0 8px 20px
-    rgba(0, 163, 255, 0.16);
+    0 8px 20px rgba(0, 163, 255, 0.16);
 
   position: relative;
 
   overflow: hidden;
 }
 
-
-/*
-   Brillo que cruza el botón.
-*/
-
 button::before {
-
   content: "";
 
   position: absolute;
 
   top: 0;
-
   left: -120%;
 
   width: 80%;
-
   height: 100%;
 
   background:
@@ -951,44 +702,32 @@ button::before {
 
   transform: skewX(-20deg);
 
-  transition:
-    left 0.45s ease;
+  transition: left 0.45s ease;
 
   pointer-events: none;
 }
 
 button:hover::before {
-
   left: 140%;
 }
 
 button:hover {
-
   transform: translateY(-1px);
 
   box-shadow:
-    0 10px 28px
-    rgba(0, 163, 255, 0.24);
+    0 10px 28px rgba(0, 163, 255, 0.24);
 
   filter: brightness(1.08);
 }
 
 button:active {
-
   transform: translateY(0);
 
   box-shadow:
-    0 5px 14px
-    rgba(0, 163, 255, 0.16);
+    0 5px 14px rgba(0, 163, 255, 0.16);
 }
 
-
-/* =========================================================
-   BOTON PRINCIPAL DE ANALISIS
-   ========================================================= */
-
 #t-btnAnalyze {
-
   min-height: 50px;
 
   margin-top: 18px;
@@ -1006,24 +745,15 @@ button:active {
     );
 
   box-shadow:
-    0 10px 28px
-    rgba(0, 163, 255, 0.20);
+    0 10px 28px rgba(0, 163, 255, 0.20);
 }
 
 #t-btnAnalyze:hover {
-
   box-shadow:
-    0 14px 35px
-    rgba(0, 163, 255, 0.30);
+    0 14px 35px rgba(0, 163, 255, 0.30);
 }
 
-
-/* =========================================================
-   BOTON AGREGAR
-   ========================================================= */
-
 #t-btnAdd {
-
   background:
     linear-gradient(
       135deg,
@@ -1032,17 +762,10 @@ button:active {
     );
 
   box-shadow:
-    0 6px 15px
-    rgba(0, 163, 255, 0.12);
+    0 6px 15px rgba(0, 163, 255, 0.12);
 }
 
-
-/* =========================================================
-   BOTON RESET
-   ========================================================= */
-
 .btn-reset {
-
   background:
     linear-gradient(
       135deg,
@@ -1052,28 +775,23 @@ button:active {
 
   margin-top: 15px;
 
-  border-color:
-    rgba(148, 163, 184, 0.16);
+  border-color: rgba(148, 163, 184, 0.16);
 
   box-shadow:
-    0 8px 20px
-    rgba(0, 0, 0, 0.20);
+    0 8px 20px rgba(0, 0, 0, 0.20);
 }
 
 .btn-reset:hover {
-
   box-shadow:
-    0 10px 25px
-    rgba(0, 0, 0, 0.28);
+    0 10px 25px rgba(0, 0, 0, 0.28);
 }
 
 
 /* =========================================================
-   HERO TAGS
+   HERO POOL TAGS
    ========================================================= */
 
 .hero-tags {
-
   display: flex;
 
   flex-wrap: wrap;
@@ -1085,13 +803,7 @@ button:active {
   min-height: 28px;
 }
 
-
-/* =========================================================
-   TAG DE HEROE
-   ========================================================= */
-
 .tag {
-
   background:
     linear-gradient(
       135deg,
@@ -1099,9 +811,7 @@ button:active {
       rgba(0, 163, 255, 0.045)
     );
 
-  border:
-    1px solid
-    rgba(0, 163, 255, 0.32);
+  border: 1px solid rgba(0, 163, 255, 0.32);
 
   color: var(--accent-light);
 
@@ -1118,8 +828,7 @@ button:active {
   gap: 7px;
 
   box-shadow:
-    inset 0 1px 0
-    rgba(255, 255, 255, 0.025);
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
 
   transition:
     background 0.2s ease,
@@ -1129,28 +838,17 @@ button:active {
 }
 
 .tag:hover {
+  background: rgba(0, 163, 255, 0.13);
 
-  background:
-    rgba(0, 163, 255, 0.13);
+  border-color: rgba(0, 229, 255, 0.55);
 
-  border-color:
-    rgba(0, 229, 255, 0.55);
-
-  transform:
-    translateY(-1px);
+  transform: translateY(-1px);
 
   box-shadow:
-    0 5px 14px
-    rgba(0, 163, 255, 0.10);
+    0 5px 14px rgba(0, 163, 255, 0.10);
 }
 
-
-/* =========================================================
-   X PARA ELIMINAR HEROE
-   ========================================================= */
-
 .tag span {
-
   cursor: pointer;
 
   color: var(--danger);
@@ -1165,7 +863,6 @@ button:active {
 }
 
 .tag span:hover {
-
   transform: scale(1.15);
 
   color: #FF6B6B;
@@ -1173,11 +870,25 @@ button:active {
 
 
 /* =========================================================
-   TITULOS DE RESULTADOS
+   RESULTADOS — ESTRUCTURA GENERAL
+   ========================================================= */
+
+#resultadosCounter {
+  position: relative;
+
+  margin-top: 6px;
+}
+
+#resultadosCounter .step-card {
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   RESULTADO — TITULOS
    ========================================================= */
 
 .block-title {
-
   font-weight: 800;
 
   color: var(--gold);
@@ -1189,10 +900,15 @@ button:active {
   font-size: 0.88rem;
 
   letter-spacing: 0.7px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
 }
 
 .block-subtitle {
-
   color: var(--muted);
 
   font-size: 0.82rem;
@@ -1204,105 +920,215 @@ button:active {
 
 
 /* =========================================================
-   RESULTADOS / COUNTERS
+   TU MEJOR OPCIÓN — CARD DESTACADA
    ========================================================= */
 
-.item-badge {
-
-  background:
-    rgba(7, 17, 31, 0.68);
-
-  border-left:
-    3px solid var(--accent);
-
-  padding: 12px;
-
-  margin: 7px 0;
-
-  border-radius: var(--radius-sm);
-
-  font-size: 0.9rem;
-
-  border-top:
-    1px solid
-    rgba(148, 163, 184, 0.06);
-
-  border-right:
-    1px solid
-    rgba(148, 163, 184, 0.06);
-
-  border-bottom:
-    1px solid
-    rgba(148, 163, 184, 0.06);
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    border-color 0.2s ease;
+#poolResult {
+  position: relative;
 }
 
-.item-badge:hover {
-
+#poolResult .item-badge {
   background:
-    rgba(19, 36, 58, 0.78);
+    linear-gradient(
+      135deg,
+      rgba(19, 50, 57, 0.96),
+      rgba(10, 31, 42, 0.96)
+    );
 
-  transform:
-    translateX(2px);
+  border: 1px solid rgba(34, 197, 94, 0.18);
+
+  border-left: 3px solid var(--success);
+
+  padding: 15px 15px 14px;
+
+  margin: 9px 0;
+
+  border-radius: 12px;
+
+  font-size: 0.92rem;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.025),
+    0 8px 22px rgba(0, 0, 0, 0.18);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#poolResult .item-badge:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(34, 197, 94, 0.38);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 12px 28px rgba(0, 0, 0, 0.24);
+}
+
+
+/* Primer resultado de tu pool */
+#poolResult .item-badge[style*="success"] {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 163, 255, 0.14),
+      rgba(19, 50, 57, 0.96) 55%,
+      rgba(10, 31, 42, 0.98)
+    );
+
+  border-color: rgba(0, 229, 255, 0.30);
+
+  border-left: 4px solid var(--accent-light);
+
+  padding: 18px 16px;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 0 1px rgba(0, 163, 255, 0.05),
+    0 12px 32px rgba(0, 163, 255, 0.12);
+}
+
+#poolResult .item-badge[style*="success"] strong {
+  color: var(--accent-light);
+
+  font-size: 1.08rem;
 }
 
 
 /* =========================================================
-   EXPLICACION DEL COUNTER
+   RAZÓN DEL COUNTER
    ========================================================= */
 
 .hero-reason {
-
   font-size: 0.82rem;
 
   color: var(--muted);
 
-  margin-top: 6px;
+  margin-top: 8px;
 
-  line-height: 1.4;
+  line-height: 1.45;
 
-  padding-left: 2px;
+  padding: 8px 10px;
+
+  border-radius: 8px;
+
+  background: rgba(7, 17, 31, 0.42);
+
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+#poolResult .hero-reason {
+  border-left: 2px solid rgba(0, 229, 255, 0.35);
 }
 
 
 /* =========================================================
-   AVISO DE CORRECCION DE NOMBRE
+   MENSAJE DE RECOMENDACIÓN
+   ========================================================= */
+
+#poolResult > p[style*="success"] {
+  margin-top: 12px !important;
+
+  padding: 11px 12px;
+
+  border-radius: 9px;
+
+  background: rgba(34, 197, 94, 0.06);
+
+  border: 1px solid rgba(34, 197, 94, 0.15);
+
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   OPCIÓN GENERAL / META
+   ========================================================= */
+
+#generalResult .item-badge {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(19, 36, 58, 0.92),
+      rgba(8, 20, 35, 0.94)
+    );
+
+  border-left: 3px solid var(--accent);
+
+  border-top: 1px solid rgba(148, 163, 184, 0.07);
+
+  border-right: 1px solid rgba(148, 163, 184, 0.07);
+
+  border-bottom: 1px solid rgba(148, 163, 184, 0.07);
+
+  padding: 13px 14px;
+
+  margin: 7px 0;
+
+  border-radius: 10px;
+
+  font-size: 0.88rem;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+#generalResult .item-badge:hover {
+  transform: translateX(3px);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(19, 45, 70, 0.95),
+      rgba(9, 25, 43, 0.96)
+    );
+
+  border-left-color: var(--accent-light);
+}
+
+#generalResult .item-badge strong {
+  color: var(--text);
+}
+
+
+/* =========================================================
+   AVISO DE CORRECCIÓN DE NOMBRE
    ========================================================= */
 
 .fuzzy-notice {
-
   font-size: 0.8rem;
 
   color: var(--gold);
 
   margin-top: 5px;
 
-  margin-bottom: 7px;
+  margin-bottom: 9px;
 
   font-style: italic;
 
-  padding: 7px 9px;
+  padding: 8px 10px;
 
   background:
     rgba(245, 185, 66, 0.06);
 
-  border-left:
-    2px solid var(--gold);
+  border-left: 2px solid var(--gold);
 
-  border-radius: 5px;
+  border-radius: 6px;
 }
 
 
 /* =========================================================
-   MENSAJES VACIOS
+   MENSAJES VACÍOS
    ========================================================= */
 
 .empty-msg {
-
   color: var(--muted);
 
   font-size: 0.85rem;
@@ -1314,72 +1140,72 @@ button:active {
 
 
 /* =========================================================
+   ESTADO DE CARGA
+   ========================================================= */
+
+#poolResult > p[style*="muted"],
+#generalResult > p[style*="accent"] {
+  padding: 14px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(0, 163, 255, 0.045);
+
+  border: 1px solid rgba(0, 163, 255, 0.12);
+
+  line-height: 1.45;
+}
+
+
+/* =========================================================
    SCROLLBAR
    ========================================================= */
 
 ::-webkit-scrollbar {
-
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-
   background: var(--bg);
 }
 
 ::-webkit-scrollbar-thumb {
-
   background: #1E3A56;
 
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-
   background: var(--accent-dark);
 }
 
 
 /* =========================================================
-   RESPONSIVE — TABLETS
+   RESPONSIVE — TABLET
    ========================================================= */
 
 @media (max-width: 700px) {
 
   body {
-
-    padding:
-      16px 10px;
+    padding: 16px 10px;
   }
 
   .container {
+    padding: 22px 16px;
 
-    padding:
-      22px 16px;
-
-    border-radius:
-      18px;
+    border-radius: 18px;
   }
 
   .app-logo {
-
-    width:
-      220px;
+    width: 220px;
   }
 
   .step-card {
-
-    padding:
-      17px;
+    padding: 17px;
   }
 
-
-  /* ---------------------------------------------
-     Selector de líneas en tablet
-     --------------------------------------------- */
-
   .lane-selector {
-
     grid-template-columns:
       repeat(3, minmax(0, 1fr));
 
@@ -1387,128 +1213,95 @@ button:active {
   }
 
   .lane-option {
-
-    min-height:
-      78px;
+    min-height: 78px;
   }
 
   .lane-hint {
-
-    font-size:
-      0.56rem;
+    font-size: 0.56rem;
   }
 
 }
 
 
 /* =========================================================
-   RESPONSIVE — MOVILES
+   RESPONSIVE — MOBILE
    ========================================================= */
 
 @media (max-width: 480px) {
 
   body {
-
-    padding:
-      10px 8px;
+    padding: 10px 8px;
   }
 
   .container {
+    padding: 18px 13px;
 
-    padding:
-      18px 13px;
-
-    border-radius:
-      16px;
+    border-radius: 16px;
   }
 
   .header {
-
-    margin-bottom:
-      22px;
+    margin-bottom: 22px;
   }
 
   .app-logo {
+    width: 200px;
 
-    width:
-      200px;
-
-    max-width:
-      90%;
+    max-width: 90%;
   }
 
   h2 {
-
-    font-size:
-      1.35rem;
+    font-size: 1.35rem;
   }
 
   h3 {
-
-    font-size:
-      1rem;
+    font-size: 1rem;
   }
 
   h3::after {
-
-    max-width:
-      35px;
+    max-width: 35px;
   }
 
   .app-subtitle {
-
-    font-size:
-      0.82rem;
+    font-size: 0.82rem;
   }
 
   .step-card {
+    padding: 15px;
 
-    padding:
-      15px;
-
-    border-radius:
-      14px;
+    border-radius: 14px;
   }
 
   .input-group {
-
-    flex-direction:
-      column;
+    flex-direction: column;
   }
 
   .input-group button {
-
-    width:
-      100%;
+    width: 100%;
   }
 
   input,
   select,
   button {
-
-    padding:
-      12px;
+    padding: 12px;
   }
 
   #t-btnAnalyze {
-
-    min-height:
-      48px;
+    min-height: 48px;
   }
 
   .item-badge {
-
-    font-size:
-      0.85rem;
+    font-size: 0.85rem;
   }
 
+  #poolResult .item-badge[style*="success"] {
+    padding: 16px 13px;
+  }
 
-  /* ---------------------------------------------
-     Selector de líneas en móvil
-     --------------------------------------------- */
+  #poolResult .item-badge[style*="success"] strong {
+    font-size: 1rem;
+  }
 
   .lane-selector {
-
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
 
@@ -1516,55 +1309,36 @@ button:active {
   }
 
   .lane-option {
+    min-height: 74px;
 
-    min-height:
-      74px;
-
-    padding:
-      9px 5px;
+    padding: 9px 5px;
   }
 
   .lane-icon {
-
-    font-size:
-      1.2rem;
+    font-size: 1.2rem;
   }
 
   .lane-name {
-
-    font-size:
-      0.68rem;
+    font-size: 0.68rem;
   }
 
   .lane-hint {
-
-    font-size:
-      0.55rem;
+    font-size: 0.55rem;
   }
 
-
-  /*
-     El último botón ocupa el ancho disponible
-     cuando hay cinco roles en una cuadrícula 2x3.
-  */
-
   .lane-option:last-child {
+    grid-column: 1 / -1;
 
-    grid-column:
-      1 / -1;
+    width: calc(50% - 4px);
 
-    width:
-      calc(50% - 4px);
-
-    justify-self:
-      center;
+    justify-self: center;
   }
 
 }
 
 
 /* =========================================================
-   REDUCCION DE MOVIMIENTO
+   REDUCED MOTION
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1572,14 +1346,11 @@ button:active {
   *,
   *::before,
   *::after {
+    scroll-behavior: auto !important;
 
-    scroll-behavior:
-      auto !important;
+    transition: none !important;
 
-    transition:
-      none !important;
-
-    animation:
-      none !important;
+    animation: none !important;
   }
+
 }
