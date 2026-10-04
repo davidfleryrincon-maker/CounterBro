@@ -1778,3 +1778,145 @@ button {
   }
 
 }
+
+
+/* =========================================================
+   ANALYSIS STATE
+   ========================================================= */
+
+.analysis-state {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 118px;
+  padding: 20px;
+  border: 1px solid rgba(0, 229, 255, .12);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 163, 255, .07),
+      rgba(139, 92, 246, .045)
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025);
+  animation: analysisAppear .25s ease-out;
+}
+
+.analysis-state-secondary {
+  border-color: rgba(139, 92, 246, .12);
+}
+
+.analysis-state strong {
+  display: block;
+  color: var(--text);
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.analysis-state p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: .68rem;
+  line-height: 1.45;
+}
+
+.analysis-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(0, 229, 255, .25);
+  border-radius: 50%;
+  background: rgba(0, 163, 255, .06);
+  box-shadow: 0 0 22px rgba(0, 163, 255, .12);
+  animation: analysisOrb 1.25s ease-in-out infinite;
+}
+
+.analysis-orb::before,
+.analysis-orb::after,
+.analysis-orb span {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.analysis-orb::before {
+  inset: 6px;
+  border: 1px solid rgba(139, 92, 246, .45);
+  animation: analysisRing 1.4s linear infinite;
+}
+
+.analysis-orb::after {
+  inset: 13px;
+  background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan);
+}
+
+.analysis-orb span {
+  inset: -5px;
+  border: 1px solid rgba(0, 229, 255, .08);
+  animation: analysisPulse 1.25s ease-out infinite;
+}
+
+.analysis-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 8px;
+  vertical-align: -3px;
+  border: 2px solid rgba(255,255,255,.25);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: analysisSpin .75s linear infinite;
+}
+
+.analyze-button:disabled {
+  cursor: wait;
+  opacity: .9;
+}
+
+.analyze-button.is-loading {
+  box-shadow: 0 0 24px rgba(0, 229, 255, .12);
+}
+
+.hero-not-found {
+  border-left: 2px solid var(--gold);
+  padding-left: 12px;
+}
+
+@keyframes analysisSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes analysisOrb {
+  50% { transform: scale(1.06); }
+}
+
+@keyframes analysisRing {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes analysisPulse {
+  0%, 100% {
+    transform: scale(.85);
+    opacity: .15;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: .55;
+  }
+}
+
+@keyframes analysisAppear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
