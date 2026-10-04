@@ -9,26 +9,340 @@ const HERO_CACHE_TTL_MS =
 
 
 /* =======================================================
-   BASE DE DATOS DE HÉROES
+   BASE DE HÉROES DE RESPALDO
+   =======================================================
+   Esta lista conserva el comportamiento estable de CounterBro.
+   La sincronización en vivo puede agregar/actualizar datos, pero
+   nunca deja la aplicación sin una base funcional si MLBBHub
+   falla temporalmente.
    ======================================================= */
 
-let HERO_DATABASE = [];
+const HERO_DATABASE_BASE = [
+  "Miya",
+  "Balmond",
+  "Saber",
+  "Alice",
+  "Nana",
+  "Tigreal",
+  "Alucard",
+  "Akai",
+  "Franco",
+  "Bane",
+  "Bruno",
+  "Clint",
+  "Rafaela",
+  "Eudora",
+  "Zilong",
+  "Fanny",
+  "Layla",
+  "Minotauro",
+  "Minotaur",
+  "Lolita",
+  "Hayabusa",
+  "Freya",
+  "Gord",
+  "Natalia",
+  "Kagura",
+  "Chou",
+  "Sun",
+  "Alpha",
+  "Ruby",
+  "Yi Sun-shin",
+  "Moskov",
+  "Moscov",
+  "Johnson",
+  "Cyclops",
+  "Estes",
+  "Hilda",
+  "Aurora",
+  "Lapu-Lapu",
+  "Vexana",
+  "Harley",
+  "Irithel",
+  "Grock",
+  "Argus",
+  "Odette",
+  "Lancelot",
+  "Diggie",
+  "Hylos",
+  "Zhask",
+  "Helcurt",
+  "Pharsa",
+  "Lesley",
+  "Jawhead",
+  "Angela",
+  "Gusion",
+  "Valir",
+  "Martis",
+  "Uranus",
+  "Hanabi",
+  "Chang'e",
+  "Kaja",
+  "Selena",
+  "Aldous",
+  "Claude",
+  "Vale",
+  "Leomord",
+  "Lunox",
+  "Hanzo",
+  "Belerick",
+  "Kimmy",
+  "Thamuz",
+  "Harith",
+  "Minsitthar",
+  "Badang",
+  "Khufra",
+  "Granger",
+  "Guinevere",
+  "Esmeralda",
+  "Terizla",
+  "X.Borg",
+  "Ling",
+  "Dyrroth",
+  "Lylia",
+  "Baxia",
+  "Masha",
+  "Wanwan",
+  "Silvanna",
+  "Cecilion",
+  "Carmilla",
+  "Atlas",
+  "Popol and Kupa",
+  "Yu Zhong",
+  "Luo Yi",
+  "Benedetta",
+  "Khaleed",
+  "Barats",
+  "Brody",
+  "Yve",
+  "Mathilda",
+  "Paquito",
+  "Gloo",
+  "Phoveus",
+  "Natan",
+  "Aulus",
+  "Aamon",
+  "Valentina",
+  "Edith",
+  "Yin",
+  "Melissa",
+  "Xavier",
+  "Julian",
+  "Fredrinn",
+  "Joy",
+  "Novaria",
+  "Arlott",
+  "Ixia",
+  "Nolan",
+  "Cici",
+  "Chip",
+  "Zhuxin",
+  "Lukas",
+  "Suyu",
+  "Suyou",
+  "Kaela",
+  "Calea",
+  "Gatotkaca",
+  "Beatrix",
+  "Karina",
+  "Marcel",
+  "Kadita",
+  "Faramis",
+  "Floryn",
+  "Hirara"
+];
 
 
 
 
-/* =======================================================
-   HÉROES POR LÍNEA — DATOS EN VIVO
-   ======================================================= */
+const HERO_LANES_BASE = {
 
-let HERO_LANES = {
-  exp: [],
-  mid: [],
-  gold: [],
-  jungle: [],
-  roam: []
+  exp: [
+    "Balmond",
+    "Zilong",
+    "Chou",
+    "Sun",
+    "Alpha",
+    "Ruby",
+    "Hilda",
+    "Lapu-Lapu",
+    "Argus",
+    "Jawhead",
+    "Martis",
+    "Uranus",
+    "Aldous",
+    "Leomord",
+    "Thamuz",
+    "Minsitthar",
+    "Badang",
+    "Guinevere",
+    "Esmeralda",
+    "Terizla",
+    "X.Borg",
+    "Dyrroth",
+    "Masha",
+    "Silvanna",
+    "Yu Zhong",
+    "Benedetta",
+    "Khaleed",
+    "Barats",
+    "Paquito",
+    "Gloo",
+    "Phoveus",
+    "Aulus",
+    "Edith",
+    "Yin",
+    "Julian",
+    "Fredrinn",
+    "Joy",
+    "Arlott",
+    "Cici",
+    "Lukas",
+    "Suyu",
+    "Suyou",
+    "Alice",
+    "Bane",
+    "Gatotkaca"
+  ],
+
+  mid: [
+    "Alice",
+    "Nana",
+    "Eudora",
+    "Gord",
+    "Kagura",
+    "Cyclops",
+    "Aurora",
+    "Vexana",
+    "Odette",
+    "Pharsa",
+    "Valir",
+    "Chang'e",
+    "Vale",
+    "Lunox",
+    "Harith",
+    "Lylia",
+    "Cecilion",
+    "Luo Yi",
+    "Yve",
+    "Valentina",
+    "Xavier",
+    "Novaria",
+    "Zhuxin",
+    "Julian",
+    "Zhask",
+    "Kadita",
+    "Faramis"
+  ],
+
+  gold: [
+    "Miya",
+    "Bruno",
+    "Clint",
+    "Layla",
+    "Moskov",
+    "Moscov",
+    "Irithel",
+    "Lesley",
+    "Hanabi",
+    "Claude",
+    "Kimmy",
+    "Granger",
+    "Wanwan",
+    "Brody",
+    "Natan",
+    "Melissa",
+    "Ixia",
+    "Popol and Kupa",
+    "Harith",
+    "Lunox",
+    "Alice",
+    "Beatrix"
+  ],
+
+  jungle: [
+    "Saber",
+    "Alucard",
+    "Fanny",
+    "Hayabusa",
+    "Freya",
+    "Yi Sun-shin",
+    "Harley",
+    "Lancelot",
+    "Helcurt",
+    "Gusion",
+    "Hanzo",
+    "Ling",
+    "Baxia",
+    "Aamon",
+    "Nolan",
+    "Barats",
+    "Martis",
+    "Alpha",
+    "Julian",
+    "Balmond",
+    "Bane",
+    "Jawhead",
+    "Paquito",
+    "Fredrinn",
+    "Dyrroth",
+    "Gloo",
+    "Chou",
+    "Popol and Kupa",
+    "Karina",
+    "Lukas",
+    "Suyu",
+    "Suyou"
+  ],
+
+  roam: [
+    "Tigreal",
+    "Akai",
+    "Franco",
+    "Rafaela",
+    "Minotauro",
+    "Minotaur",
+    "Lolita",
+    "Natalia",
+    "Johnson",
+    "Estes",
+    "Grock",
+    "Diggie",
+    "Hylos",
+    "Angela",
+    "Kaja",
+    "Selena",
+    "Belerick",
+    "Khufra",
+    "Carmilla",
+    "Atlas",
+    "Mathilda",
+    "Chip",
+    "Chou",
+    "Jawhead",
+    "Edith",
+    "Minsitthar",
+    "Hilda",
+    "Valir",
+    "Gatotkaca",
+    "Kadita",
+    "Marcel",
+    "Faramis",
+    "Floryn"
+  ]
+
 };
 
+
+
+
+let HERO_DATABASE = [...HERO_DATABASE_BASE];
+
+let HERO_LANES = Object.fromEntries(
+  Object.entries(HERO_LANES_BASE).map(
+    ([linea, heroes]) => [linea, [...heroes]]
+  )
+);
 
 
 /* =======================================================
@@ -49,25 +363,34 @@ function aplicarDatosDeHeroes(data) {
 
   lanesValidas.forEach(linea => {
 
-    nuevasLanes[linea] =
+    const heroesEnVivo =
       Array.isArray(data.lanes?.[linea])
         ? data.lanes[linea].filter(Boolean)
         : [];
 
+    nuevasLanes[linea] = Array.from(
+      new Set([
+        ...(HERO_LANES_BASE[linea] || []),
+        ...heroesEnVivo
+      ])
+    );
+
   });
+
+  const heroesEnVivo =
+    Array.isArray(data.heroes)
+      ? data.heroes.filter(Boolean)
+      : [];
 
   const totalHeroes =
     Array.from(
-      new Set(
-        [
-          ...(Array.isArray(data.heroes)
-            ? data.heroes
-            : []),
-          ...lanesValidas.flatMap(
-            linea => nuevasLanes[linea]
-          )
-        ]
-      )
+      new Set([
+        ...HERO_DATABASE_BASE,
+        ...heroesEnVivo,
+        ...lanesValidas.flatMap(
+          linea => nuevasLanes[linea]
+        )
+      ])
     );
 
   if (totalHeroes.length < 50) {
@@ -76,11 +399,8 @@ function aplicarDatosDeHeroes(data) {
     );
   }
 
-  HERO_LANES =
-    nuevasLanes;
-
-  HERO_DATABASE =
-    totalHeroes;
+  HERO_LANES = nuevasLanes;
+  HERO_DATABASE = totalHeroes;
 
 }
 
