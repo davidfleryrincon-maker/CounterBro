@@ -350,19 +350,31 @@ let heroesReadyPromise = null;
 let heroesReady = false;
 
 const STARTUP_THOUGHTS = [
-  "Estoy calentando mis circuitos... no quiero recomendarte cualquier cosa.",
-  "Voy a revisar quién está jugando dónde. Un counter fuera de línea no me sirve.",
-  "Hmm... estoy ordenando mis notas del Land of Dawn.",
-  "Estoy comprobando mis fuentes antes de decirte “lock in”.",
-  "No quiero inventarte un counter. Prefiero tardar un poco y acertar.",
-  "Estoy afilando el análisis... ese pick enemigo no se me va a escapar.",
-  "Comparando héroes, líneas y matchups. Dame un segundo.",
-  "Mi cerebro digital está arrancando. Ya casi estoy listo.",
-  "Estoy revisando el draft como si estuviera en la pantalla de selección.",
-  "Un momento... estoy poniendo cada héroe en su sitio.",
-  "Estoy calentando motores. CounterBro no entra a una partida sin información.",
-  "Casi listo. Solo estoy revisando el último detalle."
-];
+  "Despertando a Nana de su quinta siesta",
+  "Contratando al primer Lord de esta partida",
+  "Haciendo inventario de Minions",
+  "Buscando a Eudora entre los arbustos",
+  "Revisando por qué alguien eligió Hanabi",
+  "Contando cuántas veces murió Yin",
+  "Alimentando a la Tortuga",
+  "Preguntándole a Johnson dónde va",
+  "Revisando el arbusto sospechoso",
+  "Ajustando la puntería de Franco",
+  "Contando torres destruidas",
+  "Buscando el oro de las torres",
+  "Revisando quién se robó el buff rojo",
+  "Enseñándole nuevos trucos a Helcurt",
+  "Diseñando nuevos Backeos",
+  "Revisando si Tigreal sigue campeando",
+  "Buscando una partida sin trolls",
+  "Contando hasta diez antes de iniciar",
+  "Revisando mis archivos secretos",
+  "Fingiendo que todo está bajo control",
+  "Consultando al departamento de estrategia",
+  "Ignorando temporalmente mis problemas",
+  "Ordenando mis pensamientos digitales",
+  "Recordando por qué estoy aquí"
+]
 
 function aplicarDatosDeHeroes(data) {
   const lanesValidas = [
