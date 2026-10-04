@@ -1920,3 +1920,222 @@ button {
     transform: translateY(0);
   }
 }
+
+
+/* =========================================================
+   GLOBAL ANALYSIS OVERLAY
+   ========================================================= */
+
+body.analysis-open {
+  overflow: hidden;
+}
+
+.analysis-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(2, 8, 18, .62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity .22s ease,
+    visibility .22s ease;
+}
+
+.analysis-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.analysis-modal {
+  position: relative;
+  width: min(440px, 100%);
+  padding: 34px 30px 30px;
+  overflow: hidden;
+  text-align: center;
+  border: 1px solid rgba(0, 229, 255, .2);
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(0, 229, 255, .1),
+      transparent 55%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(15, 35, 57, .98),
+      rgba(6, 15, 28, .99)
+    );
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, .55),
+    0 0 50px rgba(0, 163, 255, .1);
+  transform: translateY(10px) scale(.98);
+  transition: transform .25s ease;
+}
+
+.analysis-overlay.is-visible .analysis-modal {
+  transform: translateY(0) scale(1);
+}
+
+.analysis-modal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--cyan),
+      var(--purple),
+      transparent
+    );
+}
+
+.analysis-modal-orb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+  border: 1px solid rgba(0, 229, 255, .3);
+  border-radius: 50%;
+  background: rgba(0, 163, 255, .06);
+  box-shadow:
+    0 0 35px rgba(0, 229, 255, .14);
+  animation: analysisOrb 1.25s ease-in-out infinite;
+}
+
+.analysis-modal-orb::before,
+.analysis-modal-orb::after,
+.analysis-modal-orb span {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.analysis-modal-orb::before {
+  inset: 10px;
+  border: 1px solid rgba(139, 92, 246, .55);
+  animation: analysisRing 1.4s linear infinite;
+}
+
+.analysis-modal-orb::after {
+  inset: 25px;
+  background: var(--cyan);
+  box-shadow:
+    0 0 18px var(--cyan);
+}
+
+.analysis-modal-orb span {
+  inset: -8px;
+  border: 1px solid rgba(0, 229, 255, .12);
+  animation: analysisPulse 1.25s ease-out infinite;
+}
+
+.analysis-modal-kicker {
+  color: var(--cyan);
+  font-size: .58rem;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.analysis-modal h2 {
+  margin: 9px 0 8px;
+  color: var(--text);
+  font:
+    700 1.55rem/1.1
+    "Space Grotesk",
+    sans-serif;
+}
+
+.analysis-modal p {
+  max-width: 330px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: .75rem;
+  line-height: 1.55;
+}
+
+.analysis-progress {
+  width: 100%;
+  height: 3px;
+  margin: 25px 0 16px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255,255,255,.06);
+}
+
+.analysis-progress span {
+  display: block;
+  width: 38%;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      var(--cyan),
+      var(--purple)
+    );
+  box-shadow:
+    0 0 15px rgba(0, 229, 255, .5);
+  animation: analysisProgress 1.25s ease-in-out infinite;
+}
+
+.analysis-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #91a9bd;
+  font-size: .63rem;
+  font-weight: 800;
+}
+
+.analysis-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  animation: analysisStatusPulse 1s ease-in-out infinite;
+}
+
+@keyframes analysisProgress {
+  0% {
+    transform: translateX(-140%);
+  }
+  50% {
+    transform: translateX(155%);
+  }
+  100% {
+    transform: translateX(280%);
+  }
+}
+
+@keyframes analysisStatusPulse {
+  50% {
+    opacity: .35;
+    transform: scale(.7);
+  }
+}
+
+@media (max-width: 520px) {
+  .analysis-modal {
+    padding: 29px 22px 25px;
+    border-radius: 20px;
+  }
+
+  .analysis-modal h2 {
+    font-size: 1.35rem;
+  }
+}
