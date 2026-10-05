@@ -1,14 +1,14 @@
-const VERCEL_URL =
-  "/api";
+const LOCAL_HERO_DATA_URL = "/data/heroes.json";
+const RONE_API_BASE = "https://arena.rone.dev/api";
 
-const HERO_CACHE_KEY =
-  "counterbro_live_heroes";
+const HERO_CACHE_KEY = "counterbro_local_heroes_v2";
+const HERO_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
-const HERO_CACHE_TTL_MS =
-  6 * 60 * 60 * 1000;
-
+const RONE_REQUEST_TIMEOUT_MS = 12000;
+const RONE_RETRIES = 2;
 
 let HERO_DATABASE = [];
+let HERO_CATALOG = [];
 let HERO_LANES = {
   exp: [],
   mid: [],
@@ -20,6 +20,705 @@ let HERO_LANES = {
 let heroesReadyPromise = null;
 let heroesReady = false;
 let startupThoughtTimer = null;
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function normalizarNombreHeroe(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function extraerLanesRone(record) {
+  const roadsort = record?.data?.hero?.data?.roadsort;
+
+  if (!Array.isArray(roadsort)) {
+    return [];
+  }
+
+  const lanes = new Set();
+
+  roadsort.forEach(item => {
+    const data = item?.data || {};
+
+    [
+      data.road_sort_title,
+      item?.caption,
+      data.road_sort_id
+    ].forEach(value => {
+      const text = String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+      if (text.includes("jungle") || text.includes("jungler")) {
+        lanes.add("jungle");
+      } else if (text.includes("roam") || text.includes("roamer")) {
+        lanes.add("roam");
+      } else if (text.includes("gold") || text.includes("goldlane")) {
+        lanes.add("gold");
+      } else if (
+        text === "mid" ||
+        text.includes("midlane") ||
+        text.includes("middle")
+      ) {
+        lanes.add("mid");
+      } else if (
+        text.includes("exp") ||
+        text.includes("explane")
+      ) {
+        lanes.add("exp");
+      }
+    });
+  });
+
+  return Array.from(lanes);
+}
+
+function transformarCatalogoRone(payload) {
+  if (
+    payload?.code !== undefined &&
+    Number(payload.code) !== 0
+  ) {
+    throw new Error(
+      "Rone Arena respondió con código " +
+      payload.code +
+      ": " +
+      (payload.message || "error desconocido")
+    );
+  }
+
+  const records = Array.isArray(payload?.data?.records)
+    ? payload.data.records
+    : [];
+
+  const byId = new Map();
+
+  records.forEach(record => {
+    const id = Number(record?.data?.hero_id);
+    const name = String(
+      record?.data?.hero?.data?.name || ""
+    ).trim();
+
+    if (!Number.isFinite(id) || !name) {
+      return;
+    }
+
+    byId.set(id, {
+      id,
+      name,
+      lanes: extraerLanesRone(record)
+    });
+  });
+
+  const heroes = Array.from(byId.values());
+
+  if (heroes.length < 50) {
+    throw new Error(
+      "Rone Arena devolvió solo " +
+      heroes.length +
+      " héroes en /heroes/positions."
+    );
+  }
+
+  const lanes = {
+    exp: [],
+    mid: [],
+    gold: [],
+    jungle: [],
+    roam: []
+  };
+
+  heroes.forEach(hero => {
+    hero.lanes.forEach(lane => {
+      if (lanes[lane]) {
+        lanes[lane].push(hero.name);
+      }
+    });
+  });
+
+  Object.keys(lanes).forEach(lane => {
+    lanes[lane] = Array.from(
+      new Set(lanes[lane])
+    ).sort((a, b) => a.localeCompare(b));
+  });
+
+  return {
+    schemaVersion: 2,
+    heroes,
+    lanes,
+    source: "Rone Arena",
+    syncedAt: new Date().toISOString()
+  };
+}
+
+function normalizarBaseLocal(data) {
+  const rawHeroes = Array.isArray(data?.heroes)
+    ? data.heroes
+    : [];
+
+  const heroes = rawHeroes
+    .map(item => {
+      if (typeof item === "string") {
+        return {
+          id: null,
+          name: item.trim(),
+          lanes: []
+        };
+      }
+
+      const id = Number(item?.id);
+
+      return {
+        id: Number.isFinite(id) ? id : null,
+        name: String(item?.name || "").trim(),
+        lanes: Array.isArray(item?.lanes)
+          ? item.lanes.filter(Boolean)
+          : []
+      };
+    })
+    .filter(hero => hero.name);
+
+  const lanes = {
+    exp: [],
+    mid: [],
+    gold: [],
+    jungle: [],
+    roam: []
+  };
+
+  Object.keys(lanes).forEach(lane => {
+    if (Array.isArray(data?.lanes?.[lane])) {
+      lanes[lane] = Array.from(
+        new Set(
+          data.lanes[lane]
+            .filter(Boolean)
+            .map(String)
+        )
+      );
+    }
+  });
+
+  heroes.forEach(hero => {
+    hero.lanes.forEach(lane => {
+      if (lanes[lane] && !lanes[lane].includes(hero.name)) {
+        lanes[lane].push(hero.name);
+      }
+    });
+  });
+
+  return {
+    schemaVersion: 2,
+    heroes,
+    lanes,
+    source: data?.source || "CounterBro local snapshot",
+    syncedAt: data?.syncedAt || null
+  };
+}
+
+function aplicarDatosDeHeroes(data) {
+  const base = normalizarBaseLocal(data);
+
+  if (base.heroes.length < 50) {
+    throw new Error(
+      "La base de héroes no es suficiente."
+    );
+  }
+
+  const catalogByName = new Map();
+
+  base.heroes.forEach(hero => {
+    const key = normalizarNombreHeroe(hero.name);
+
+    if (!key) {
+      return;
+    }
+
+    const previous = catalogByName.get(key);
+
+    if (!previous || (!previous.id && hero.id)) {
+      catalogByName.set(key, hero);
+    }
+  });
+
+  HERO_CATALOG = Array.from(
+    catalogByName.values()
+  );
+
+  HERO_DATABASE = HERO_CATALOG
+    .map(hero => hero.name)
+    .sort((a, b) => a.localeCompare(b));
+
+  Object.keys(HERO_LANES).forEach(lane => {
+    HERO_LANES[lane] = [];
+  });
+
+  Object.keys(HERO_LANES).forEach(lane => {
+    HERO_LANES[lane] = Array.from(
+      new Set(
+        (base.lanes[lane] || []).filter(Boolean)
+      )
+    );
+  });
+
+  HERO_CATALOG.forEach(hero => {
+    (hero.lanes || []).forEach(lane => {
+      if (
+        HERO_LANES[lane] &&
+        !HERO_LANES[lane].includes(hero.name)
+      ) {
+        HERO_LANES[lane].push(hero.name);
+      }
+    });
+  });
+
+  Object.keys(HERO_LANES).forEach(lane => {
+    HERO_LANES[lane].sort(
+      (a, b) => a.localeCompare(b)
+    );
+  });
+
+  const missingLane = Object.keys(HERO_LANES).find(
+    lane => HERO_LANES[lane].length < 5
+  );
+
+  if (missingLane) {
+    throw new Error(
+      "La base no tiene suficientes héroes para " +
+      missingLane +
+      "."
+    );
+  }
+
+  heroesReady = true;
+}
+
+async function fetchJsonWithRetry(url, label) {
+  let lastError = null;
+
+  for (
+    let attempt = 1;
+    attempt <= RONE_RETRIES;
+    attempt += 1
+  ) {
+    const controller = new AbortController();
+
+    const timeout = setTimeout(
+      () => controller.abort(),
+      RONE_REQUEST_TIMEOUT_MS
+    );
+
+    try {
+      const response = await fetch(
+        url,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json"
+          },
+          cache: "no-store",
+          signal: controller.signal
+        }
+      );
+
+      const text = await response.text();
+
+      let data = null;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(
+          label +
+          ": Rone Arena no devolvió JSON válido (HTTP " +
+          response.status +
+          ")."
+        );
+      }
+
+      if (!response.ok) {
+        const message =
+          data?.message ||
+          data?.error ||
+          "HTTP " + response.status;
+
+        const error = new Error(
+          label + ": " + message
+        );
+
+        error.status = response.status;
+
+        throw error;
+      }
+
+      if (
+        data?.code !== undefined &&
+        Number(data.code) !== 0
+      ) {
+        const error = new Error(
+          label +
+          ": código Rone " +
+          data.code +
+          " - " +
+          (data.message || "error desconocido")
+        );
+
+        error.roneCode = data.code;
+
+        throw error;
+      }
+
+      return data;
+
+    } catch (error) {
+      lastError = error;
+
+      const status = error?.status;
+
+      const retryable =
+        !status ||
+        status === 408 ||
+        status === 425 ||
+        status === 429 ||
+        status >= 500;
+
+      if (
+        attempt >= RONE_RETRIES ||
+        !retryable
+      ) {
+        break;
+      }
+
+      await sleep(900 * attempt);
+
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  throw lastError;
+}
+
+async function cargarHeroesDesdeCache() {
+  try {
+    const raw = localStorage.getItem(
+      HERO_CACHE_KEY
+    );
+
+    if (!raw) {
+      return false;
+    }
+
+    const cache = JSON.parse(raw);
+
+    if (
+      !cache ||
+      !cache.savedAt ||
+      !cache.data
+    ) {
+      return false;
+    }
+
+    if (
+      Date.now() - cache.savedAt >
+      HERO_CACHE_TTL_MS
+    ) {
+      return false;
+    }
+
+    aplicarDatosDeHeroes(cache.data);
+
+    console.info(
+      "CounterBro: usando catálogo local cacheado.",
+      {
+        heroes: HERO_DATABASE.length,
+        source: cache.data.source || null
+      }
+    );
+
+    return true;
+
+  } catch (error) {
+    console.warn(
+      "CounterBro: cache local inválida.",
+      error
+    );
+
+    return false;
+  }
+}
+
+async function cargarBaseLocal() {
+  const response = await fetch(
+    LOCAL_HERO_DATA_URL,
+    {
+      cache: "no-store"
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "No se pudo cargar " +
+      LOCAL_HERO_DATA_URL +
+      " (HTTP " +
+      response.status +
+      ")."
+    );
+  }
+
+  const data = await response.json();
+
+  aplicarDatosDeHeroes(data);
+
+  localStorage.setItem(
+    HERO_CACHE_KEY,
+    JSON.stringify({
+      savedAt: Date.now(),
+      data
+    })
+  );
+
+  return true;
+}
+
+async function sincronizarCatalogoRone() {
+  const url =
+    RONE_API_BASE +
+    "/heroes/positions?size=200&index=1&order=asc&lang=en";
+
+  const payload =
+    await fetchJsonWithRetry(
+      url,
+      "Catálogo de héroes"
+    );
+
+  const data =
+    transformarCatalogoRone(payload);
+
+  aplicarDatosDeHeroes(data);
+
+  localStorage.setItem(
+    HERO_CACHE_KEY,
+    JSON.stringify({
+      savedAt: Date.now(),
+      data
+    })
+  );
+
+  console.info(
+    "CounterBro: catálogo Rone sincronizado.",
+    {
+      heroes: HERO_DATABASE.length,
+      source: data.source,
+      syncedAt: data.syncedAt
+    }
+  );
+
+  return true;
+}
+
+async function cargarBasePreparada() {
+  let baseDisponible = false;
+
+  try {
+    baseDisponible =
+      await cargarHeroesDesdeCache();
+  } catch (error) {
+    console.warn(
+      "CounterBro: no pudo usar la caché local.",
+      error
+    );
+  }
+
+  if (!baseDisponible) {
+    try {
+      baseDisponible =
+        await cargarBaseLocal();
+    } catch (error) {
+      console.error(
+        "CounterBro: falló la base local.",
+        error
+      );
+    }
+  }
+
+  if (!baseDisponible) {
+    throw new Error(
+      "No existe una base local válida de héroes."
+    );
+  }
+
+  try {
+    await sincronizarCatalogoRone();
+  } catch (error) {
+    console.warn(
+      "CounterBro: no se pudo refrescar el catálogo Rone; se conserva la base local.",
+      error
+    );
+  }
+
+  return true;
+}
+
+async function consultarCountersRone(heroName) {
+  const normalized =
+    normalizarNombreHeroe(heroName);
+
+  const catalogHero =
+    HERO_CATALOG.find(
+      hero =>
+        normalizarNombreHeroe(hero.name) ===
+        normalized
+    );
+
+  const identifier =
+    catalogHero?.id ||
+    heroName;
+
+  const url =
+    RONE_API_BASE +
+    "/heroes/" +
+    encodeURIComponent(identifier) +
+    "/counters?days=7&rank=all&size=200&index=1&lang=en";
+
+  const payload =
+    await fetchJsonWithRetry(
+      url,
+      "Counters de " + heroName
+    );
+
+  const records =
+    Array.isArray(payload?.data?.records)
+      ? payload.data.records
+      : [];
+
+  if (records.length === 0) {
+    throw new Error(
+      "Rone Arena no devolvió counters para " +
+      heroName +
+      "."
+    );
+  }
+
+  const namesById =
+    new Map(
+      HERO_CATALOG
+        .filter(hero => Number.isFinite(hero.id))
+        .map(hero => [
+          Number(hero.id),
+          hero.name
+        ])
+    );
+
+  const rows = [];
+
+  records.forEach(record => {
+    const subHeroes =
+      Array.isArray(record?.data?.sub_hero)
+        ? record.data.sub_hero
+        : [];
+
+    subHeroes.forEach(counter => {
+      const heroId =
+        Number(counter?.heroid);
+
+      const edge =
+        Number(counter?.increase_win_rate);
+
+      const heroWinRate =
+        Number(counter?.hero_win_rate);
+
+      if (
+        !Number.isFinite(heroId) ||
+        !Number.isFinite(edge)
+      ) {
+        return;
+      }
+
+      const name =
+        namesById.get(heroId);
+
+      if (!name) {
+        return;
+      }
+
+      rows.push({
+        id: heroId,
+        name,
+        edge,
+        heroWinRate:
+          Number.isFinite(heroWinRate)
+            ? heroWinRate
+            : null
+      });
+    });
+  });
+
+  const unique = new Map();
+
+  rows.forEach(row => {
+    const previous =
+      unique.get(row.id);
+
+    if (
+      !previous ||
+      row.edge > previous.edge
+    ) {
+      unique.set(row.id, row);
+    }
+  });
+
+  const counters =
+    Array.from(
+      unique.values()
+    )
+      .sort(
+        (a, b) =>
+          b.edge - a.edge
+      )
+      .slice(0, 20)
+      .map(row => ({
+        name: row.name,
+        winRate:
+          (row.edge >= 0 ? "+" : "") +
+          (row.edge * 100).toFixed(1) +
+          " pp",
+        edge:
+          row.edge * 100,
+        heroWinRate:
+          row.heroWinRate,
+        reason:
+          "Ventaja estadística del matchup según Rone Arena."
+      }));
+
+  if (counters.length === 0) {
+    throw new Error(
+      "Rone Arena respondió, pero CounterBro no pudo asociar los IDs de sus counters con el catálogo de héroes."
+    );
+  }
+
+  const targetName =
+    records
+      .map(
+        record =>
+          String(
+            record?.data?.main_hero?.data?.name ||
+            ""
+          ).trim()
+      )
+      .find(Boolean) ||
+    heroName;
+
+  return {
+    hero: targetName,
+    source: "Rone Arena",
+    counters
+  };
+}
 
 const STARTUP_THOUGHTS = [
   "Despertando a Nana de su quinta siesta",
@@ -46,516 +745,7 @@ const STARTUP_THOUGHTS = [
   "Ignorando temporalmente mis problemas",
   "Ordenando mis pensamientos digitales",
   "Recordando por qué estoy aquí"
-]
-
-function aplicarDatosDeHeroes(data) {
-  const lanesValidas = [
-    "exp",
-    "mid",
-    "gold",
-    "jungle",
-    "roam"
-  ];
-
-  const nuevasLanes = {};
-
-  lanesValidas.forEach(linea => {
-    const heroesDeLinea =
-      Array.isArray(data?.lanes?.[linea])
-        ? data.lanes[linea].filter(Boolean)
-        : [];
-
-    if (heroesDeLinea.length < 5) {
-      throw new Error(
-        "La base preparada no tiene suficientes héroes para " +
-        linea +
-        "."
-      );
-    }
-
-    nuevasLanes[linea] =
-      Array.from(new Set(heroesDeLinea));
-  });
-
-  const heroes =
-    Array.isArray(data?.heroes)
-      ? data.heroes.filter(Boolean)
-      : [];
-
-  if (heroes.length < 50) {
-    throw new Error(
-      "La base preparada de héroes no es suficiente."
-    );
-  }
-
-  HERO_LANES = nuevasLanes;
-  HERO_DATABASE =
-    Array.from(new Set([
-      ...heroes,
-      ...Object.values(nuevasLanes).flat()
-    ]));
-
-  heroesReady = true;
-}
-
-function actualizarFraseStartup() {
-  const thought =
-    document.getElementById("startupThought");
-
-  if (!thought) {
-    return;
-  }
-
-  const index =
-    Math.floor(
-      Math.random() *
-      STARTUP_THOUGHTS.length
-    );
-
-  thought.textContent =
-    "“" +
-    STARTUP_THOUGHTS[index] +
-    "”";
-}
-
-function iniciarAnimacionStartup() {
-  actualizarFraseStartup();
-
-  if (startupThoughtTimer) {
-    clearInterval(
-      startupThoughtTimer
-    );
-  }
-
-  startupThoughtTimer =
-    setInterval(
-      actualizarFraseStartup,
-      1500
-    );
-
-  return startupThoughtTimer;
-}
-
-function actualizarEstadoStartup(
-  texto,
-  estado = "loading"
-) {
-  const overlay =
-    document.getElementById(
-      "startupOverlay"
-    );
-
-  const status =
-    document.getElementById(
-      "startupStatus"
-    );
-
-  const progressText =
-    document.getElementById(
-      "startupProgressText"
-    );
-
-  if (overlay) {
-    overlay.classList.toggle(
-      "is-error",
-      estado === "error"
-    );
-  }
-
-  if (status) {
-    status.innerHTML =
-      `<span></span>${escapeHtml(texto)}`;
-  }
-
-  if (progressText) {
-    progressText.textContent =
-      estado === "error"
-        ? "REINTENTO NECESARIO"
-        : "SINCRONIZANDO DATOS";
-  }
-}
-
-function mostrarStartupOverlay() {
-  const overlay =
-    document.getElementById(
-      "startupOverlay"
-    );
-
-  if (!overlay) {
-    return;
-  }
-
-  overlay.classList.add(
-    "is-visible"
-  );
-
-  overlay.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-  document.body.classList.add(
-    "startup-open"
-  );
-}
-
-async function activarBotonEntradaStartup() {
-  const startupButton =
-    document.getElementById(
-      "startupEnterButton"
-    );
-
-  if (startupButton) {
-    startupButton.disabled = true;
-    startupButton.textContent =
-      "CARGANDO DATOS";
-  }
-
-  await new Promise(
-    resolve =>
-      setTimeout(
-        resolve,
-        5000
-      )
-  );
-
-  if (startupButton) {
-    startupButton.disabled = false;
-    startupButton.textContent =
-      "TODO LISTO. COMENCEMOS.";
-  }
-
-  actualizarEstadoStartup(
-    "Bases de datos cargadas. CounterBro está listo."
-  );
-}
-
-
-function entrarACounterBro() {
-  const startupButton =
-    document.getElementById(
-      "startupEnterButton"
-    );
-
-  if (
-    startupButton &&
-    startupButton.disabled
-  ) {
-    return;
-  }
-
-  if (startupThoughtTimer) {
-    clearInterval(
-      startupThoughtTimer
-    );
-
-    startupThoughtTimer = null;
-  }
-
-  ocultarStartupOverlay();
-}
-
-
-function ocultarStartupOverlay() {
-  const overlay =
-    document.getElementById(
-      "startupOverlay"
-    );
-
-  if (!overlay) {
-    return;
-  }
-
-  overlay.classList.remove(
-    "is-visible",
-    "is-error"
-  );
-
-  overlay.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-  document.body.classList.remove(
-    "startup-open"
-  );
-}
-
-function mostrarErrorStartup() {
-  const overlay =
-    document.getElementById(
-      "startupOverlay"
-    );
-
-  if (!overlay) {
-    return;
-  }
-
-  actualizarEstadoStartup(
-    "No pude cargar la base preparada. Puedes recargar la página.",
-    "error"
-  );
-
-  const thought =
-    document.getElementById(
-      "startupThought"
-    );
-
-  if (thought) {
-    thought.textContent =
-      "“Algo salió mal... dame otro intento y vuelvo a pensar.”";
-  }
-
-  overlay.classList.add(
-    "is-visible",
-    "is-error"
-  );
-
-  overlay.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-  document.body.classList.add(
-    "startup-open"
-  );
-}
-
-async function cargarHeroesDesdeCache() {
-  try {
-    const raw =
-      localStorage.getItem(
-        HERO_CACHE_KEY
-      );
-
-    if (!raw) {
-      return false;
-    }
-
-    const cache =
-      JSON.parse(raw);
-
-    if (
-      !cache ||
-      !cache.savedAt ||
-      !cache.data
-    ) {
-      return false;
-    }
-
-    if (
-      Date.now() -
-      cache.savedAt >
-      HERO_CACHE_TTL_MS
-    ) {
-      localStorage.removeItem(
-        HERO_CACHE_KEY
-      );
-
-      return false;
-    }
-
-    aplicarDatosDeHeroes(
-      cache.data
-    );
-
-    console.info(
-      "CounterBro: usando la última base preparada guardada localmente.",
-      {
-        heroes:
-          HERO_DATABASE.length,
-        savedAt:
-          cache.savedAt
-      }
-    );
-
-    return true;
-
-  } catch (error) {
-    console.warn(
-      "CounterBro: cache local inválida.",
-      error
-    );
-
-    return false;
-  }
-}
-
-async function cargarBasePreparada() {
-  const response =
-    await fetch(
-      `${VERCEL_URL}/?getHeroes=true`,
-      {
-        cache: "no-store"
-      }
-    );
-
-  if (!response.ok) {
-    throw new Error(
-      `HTTP ${response.status}`
-    );
-  }
-
-  const data =
-    await response.json();
-
-  if (
-    !data ||
-    !Array.isArray(data.heroes) ||
-    !data.lanes
-  ) {
-    throw new Error(
-      "Respuesta de base preparada inválida."
-    );
-  }
-
-  aplicarDatosDeHeroes(
-    data
-  );
-
-  localStorage.setItem(
-    HERO_CACHE_KEY,
-    JSON.stringify({
-      savedAt:
-        Date.now(),
-      data
-    })
-  );
-
-  console.info(
-    "CounterBro: base preparada recibida.",
-    {
-      heroes:
-        HERO_DATABASE.length,
-      lanes: {
-        exp:
-          HERO_LANES.exp.length,
-        mid:
-          HERO_LANES.mid.length,
-        gold:
-          HERO_LANES.gold.length,
-        jungle:
-          HERO_LANES.jungle.length,
-        roam:
-          HERO_LANES.roam.length
-      },
-      source:
-        data.source || null,
-      syncedAt:
-        data.syncedAt || null
-    }
-  );
-
-  return true;
-}
-
-async function inicializarBaseDeHeroes() {
-  mostrarStartupOverlay();
-
-  iniciarAnimacionStartup();
-
-  actualizarEstadoStartup(
-    "Verificando la base de héroes"
-  );
-
-  const inicio =
-    performance.now();
-
-  try {
-    const cacheValida =
-      await cargarHeroesDesdeCache();
-
-    if (cacheValida) {
-      actualizarEstadoStartup(
-        "Base local encontrada. Confirmando datos preparados..."
-      );
-    }
-
-    await cargarBasePreparada();
-
-    const tiempo =
-      Math.round(
-        performance.now() -
-        inicio
-      );
-
-    const loader =
-      document.getElementById(
-        "startupLoader"
-      );
-
-    if (loader) {
-      loader.classList.add(
-        "is-ready"
-      );
-    }
-
-    actualizarEstadoStartup(
-      `Base lista · ${HERO_DATABASE.length} héroes disponibles`
-    );
-
-    const progressText =
-      document.getElementById(
-        "startupProgressText"
-      );
-
-    if (progressText) {
-      progressText.textContent =
-        `SISTEMA LISTO · ${tiempo} MS`;
-    }
-
-    await activarBotonEntradaStartup();
-
-    return true;
-
-  } catch (error) {
-    console.error(
-      "CounterBro: no fue posible cargar la base preparada.",
-      error
-    );
-
-    if (
-      HERO_DATABASE.length > 0 &&
-      Object.values(HERO_LANES)
-        .every(
-          heroes =>
-            Array.isArray(heroes) &&
-            heroes.length >= 5
-        )
-    ) {
-      actualizarEstadoStartup(
-        "Usando la última copia válida guardada localmente..."
-      );
-
-      await activarBotonEntradaStartup();
-
-      return true;
-    }
-
-    actualizarEstadoStartup(
-      "No hay una copia local válida y la base preparada no está disponible."
-    );
-
-    mostrarErrorStartup();
-
-    return false;
-
-  }
-}
-
-function asegurarHeroesListos() {
-  if (heroesReady) {
-    return Promise.resolve(true);
-  }
-
-  if (!heroesReadyPromise) {
-    heroesReadyPromise =
-      inicializarBaseDeHeroes();
-  }
-
-  return heroesReadyPromise;
-}
-
+];
 
 /* =======================================================
    IDIOMAS
@@ -1807,44 +1997,8 @@ async function buscarCounter() {
     }
 
 
-    const response =
-      await fetch(
-        `${VERCEL_URL}/?hero=${encodeURIComponent(
-          enemigoFinal
-        )}&lane=${encodeURIComponent(
-          linea
-        )}`,
-        {
-          cache: "no-store"
-        }
-      );
-
-    let data = null;
-
-    try {
-      data = await response.json();
-    } catch (jsonError) {
-      data = null;
-    }
-
-    if (!response.ok) {
-      const diagnostic =
-        data?.diagnostic?.message ||
-        data?.error ||
-        `HTTP ${response.status}`;
-
-      throw new Error(
-        diagnostic
-      );
-    }
-
-
     const apiCounters =
-      Array.isArray(
-        data.counters
-      )
-        ? data.counters
-        : [];
+      (await consultarCountersRone(enemigoFinal)).counters;
 
 
     const resultsEnemy =
