@@ -1,5 +1,4 @@
 const {
-  getHeroByIdentifier,
   getHeroCatalog,
   fetchHeroCounters
 } = require('./roneArenaClient');
@@ -72,70 +71,115 @@ function getCounterRows(records) {
   return Array.from(unique.values());
 }
 
-async function getCounters(hero, lane) {
-  const target = await getHeroByIdentifier(hero);
+function getTargetName(records, fallback) {
+  for (const record of records) {
+    const name =
+      cleanName(
+        record?.data?.main_hero?.data?.name
+      );
 
-  if (!target) {
+    if (name) {
+      return name;
+    }
+  }
+
+  return fallback;
+}
+
+async function getCounters(hero, lane) {
+  const requestedHero = cleanName(hero);
+
+  if (!requestedHero) {
     throw new Error(
-      'Rone Arena no pudo identificar el héroe: ' +
-      cleanName(hero)
+      'No se recibió un héroe para consultar.'
     );
   }
 
-  const records = await fetchHeroCounters(target.id);
-  const rows = getCounterRows(records);
+  /*
+    Rone documenta que el endpoint de counters acepta
+    directamente el nombre del héroe (por ejemplo, "miya"),
+    así que no hacemos una llamada previa al catálogo solo
+    para convertir el nombre a ID. Esto elimina un punto
+    adicional de fallo antes de consultar los counters.
+  */
+  const records =
+    await fetchHeroCounters(requestedHero);
+
+  const rows =
+    getCounterRows(records);
 
   if (rows.length === 0) {
     throw new Error(
-      'Rone Arena no devolvió counters utilizables para ' +
-      target.name +
-      '.'
+      'Rone Arena devolvió la consulta de ' +
+      requestedHero +
+      ', pero no devolvió counters utilizables.'
     );
   }
 
-  const catalog = await getHeroCatalog();
+  const catalog =
+    await getHeroCatalog();
 
-  const namesById = new Map(
-    catalog.map(item => [item.id, item.name])
-  );
+  const namesById =
+    new Map(
+      catalog.map(item => [
+        item.id,
+        item.name
+      ])
+    );
 
-  const counters = rows
-    .map(row => {
-      const name = namesById.get(row.heroId);
+  const counters =
+    rows
+      .map(row => {
+        const name =
+          namesById.get(row.heroId);
 
-      if (!name) {
-        return null;
-      }
+        if (!name) {
+          return null;
+        }
 
-      const winRate = formatPercentagePoints(row.edge);
+        const winRate =
+          formatPercentagePoints(
+            row.edge
+          );
 
-      if (!winRate) {
-        return null;
-      }
+        if (!winRate) {
+          return null;
+        }
 
-      return {
-        name,
-        winRate,
-        edge: row.edge * 100,
-        heroWinRate: row.heroWinRate,
-        reason:
-          'Ventaja estadística del matchup según Rone Arena.'
-      };
-    })
-    .filter(Boolean)
-    .sort((a, b) => b.edge - a.edge)
-    .slice(0, 12);
+        return {
+          name,
+          winRate,
+          edge: row.edge * 100,
+          heroWinRate: row.heroWinRate,
+          reason:
+            'Ventaja estadística del matchup según Rone Arena.'
+        };
+      })
+      .filter(Boolean)
+      .sort(
+        (a, b) =>
+          b.edge - a.edge
+      )
+      .slice(0, 12);
 
   if (counters.length === 0) {
     throw new Error(
-      'Rone Arena devolvió counters, pero no fue posible asociarlos con héroes conocidos.'
+      'Rone Arena devolvió counters para ' +
+      requestedHero +
+      ', pero sus IDs no pudieron asociarse al catálogo de héroes.'
     );
   }
 
   return {
-    hero: target.name,
-    lane: lane || null,
-    source: 'Rone Arena',
+    hero:
+      getTargetName(
+        records,
+        requestedHero
+      ),
+    lane:
+      lane || null,
+    source:
+      'Rone Arena',
     counters
   };
 }
