@@ -292,13 +292,28 @@ async function getHeroByIdentifier(identifier) {
 async function fetchHeroCounters(
   heroIdentifier
 ) {
+  const identifier =
+    cleanName(heroIdentifier);
+
+  if (!identifier) {
+    throw new Error(
+      'Rone Arena requiere un identificador de héroe.'
+    );
+  }
+
+  /*
+    Rone documenta explícitamente que los nombres de héroe
+    funcionan como identificadores y que la comparación
+    ignora mayúsculas, espacios y símbolos.
+
+    Usamos primero el endpoint principal documentado.
+    El endpoint Academy queda como respaldo por compatibilidad.
+  */
   const endpoints = [
     {
       path:
         '/heroes/' +
-        encodeURIComponent(
-          heroIdentifier
-        ) +
+        encodeURIComponent(identifier) +
         '/counters',
       params: {
         days: 7,
@@ -311,9 +326,7 @@ async function fetchHeroCounters(
     {
       path:
         '/academy/heroes/' +
-        encodeURIComponent(
-          heroIdentifier
-        ) +
+        encodeURIComponent(identifier) +
         '/counters',
       params: {
         rank: 'all',
@@ -352,11 +365,16 @@ async function fetchHeroCounters(
     }
   }
 
-  throw (
-    lastError ||
-    new Error(
-      'Rone Arena no pudo devolver counters.'
-    )
+  const detail =
+    lastError?.message
+      ? ' ' + lastError.message
+      : '';
+
+  throw new Error(
+    'No fue posible obtener counters de Rone Arena para "' +
+    identifier +
+    '".' +
+    detail
   );
 }
 
