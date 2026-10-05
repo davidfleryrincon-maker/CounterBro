@@ -506,6 +506,15 @@ async function consultarCountersRone(heroName) {
   };
 }
 
+const STARTUP_THOUGHTS = [
+  "Analizando el campo de batalla...",
+  "Preparando el cerebro de CounterBro...",
+  "Cargando conocimiento de héroes...",
+  "Afinando la estrategia...",
+  "Buscando las mejores respuestas...",
+  "CounterBro está tomando posiciones..."
+];
+
 function actualizarFraseStartup() {
   const thought =
     document.getElementById("startupThought");
