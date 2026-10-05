@@ -33,129 +33,6 @@ function normalizarNombreHeroe(value) {
     .replace(/[^a-z0-9]/g, "");
 }
 
-function extraerLanesRone(record) {
-  const roadsort = record?.data?.hero?.data?.roadsort;
-
-  if (!Array.isArray(roadsort)) {
-    return [];
-  }
-
-  const lanes = new Set();
-
-  roadsort.forEach(item => {
-    const data = item?.data || {};
-
-    [
-      data.road_sort_title,
-      item?.caption,
-      data.road_sort_id
-    ].forEach(value => {
-      const text = String(value || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-
-      if (text.includes("jungle") || text.includes("jungler")) {
-        lanes.add("jungle");
-      } else if (text.includes("roam") || text.includes("roamer")) {
-        lanes.add("roam");
-      } else if (text.includes("gold") || text.includes("goldlane")) {
-        lanes.add("gold");
-      } else if (
-        text === "mid" ||
-        text.includes("midlane") ||
-        text.includes("middle")
-      ) {
-        lanes.add("mid");
-      } else if (
-        text.includes("exp") ||
-        text.includes("explane")
-      ) {
-        lanes.add("exp");
-      }
-    });
-  });
-
-  return Array.from(lanes);
-}
-
-function transformarCatalogoRone(payload) {
-  if (
-    payload?.code !== undefined &&
-    Number(payload.code) !== 0
-  ) {
-    throw new Error(
-      "Rone Arena respondió con código " +
-      payload.code +
-      ": " +
-      (payload.message || "error desconocido")
-    );
-  }
-
-  const records = Array.isArray(payload?.data?.records)
-    ? payload.data.records
-    : [];
-
-  const byId = new Map();
-
-  records.forEach(record => {
-    const id = Number(record?.data?.hero_id);
-    const name = String(
-      record?.data?.hero?.data?.name || ""
-    ).trim();
-
-    if (!Number.isFinite(id) || !name) {
-      return;
-    }
-
-    byId.set(id, {
-      id,
-      name,
-      lanes: extraerLanesRone(record)
-    });
-  });
-
-  const heroes = Array.from(byId.values());
-
-  if (heroes.length < 50) {
-    throw new Error(
-      "Rone Arena devolvió solo " +
-      heroes.length +
-      " héroes en /heroes/positions."
-    );
-  }
-
-  const lanes = {
-    exp: [],
-    mid: [],
-    gold: [],
-    jungle: [],
-    roam: []
-  };
-
-  heroes.forEach(hero => {
-    hero.lanes.forEach(lane => {
-      if (lanes[lane]) {
-        lanes[lane].push(hero.name);
-      }
-    });
-  });
-
-  Object.keys(lanes).forEach(lane => {
-    lanes[lane] = Array.from(
-      new Set(lanes[lane])
-    ).sort((a, b) => a.localeCompare(b));
-  });
-
-  return {
-    schemaVersion: 2,
-    heroes,
-    lanes,
-    source: "Rone Arena",
-    syncedAt: new Date().toISOString()
-  };
-}
-
 function normalizarBaseLocal(data) {
   const rawHeroes = Array.isArray(data?.heroes)
     ? data.heroes
@@ -435,124 +312,6 @@ function esBasePreparadaValida(data) {
     nombresValidos &&
     lanesValidas
   );
-}
-
-async function cargarHeroesDesdeCache() {
-  try {
-    const raw = localStorage.getItem(
-      HERO_CACHE_KEY
-    );
-
-    if (!raw) {
-      return false;
-    }
-
-    const cache = JSON.parse(raw);
-
-    if (
-      !cache ||
-      !cache.savedAt ||
-      !cache.data
-    ) {
-      return false;
-    }
-
-    if (
-      Date.now() - cache.savedAt >
-      HERO_CACHE_TTL_MS
-    ) {
-      return false;
-    }
-
-    aplicarDatosDeHeroes(cache.data);
-
-    console.info(
-      "CounterBro: usando catálogo local cacheado.",
-      {
-        heroes: HERO_DATABASE.length,
-        source: cache.data.source || null
-      }
-    );
-
-    return true;
-
-  } catch (error) {
-    console.warn(
-      "CounterBro: cache local inválida.",
-      error
-    );
-
-    return false;
-  }
-}
-
-async function cargarBaseLocal() {
-  const response = await fetch(
-    LOCAL_HERO_DATA_URL,
-    {
-      cache: "no-store"
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      "No se pudo cargar " +
-      LOCAL_HERO_DATA_URL +
-      " (HTTP " +
-      response.status +
-      ")."
-    );
-  }
-
-  const data = await response.json();
-
-  aplicarDatosDeHeroes(data);
-
-  localStorage.setItem(
-    HERO_CACHE_KEY,
-    JSON.stringify({
-      savedAt: Date.now(),
-      data
-    })
-  );
-
-  return true;
-}
-
-async function sincronizarCatalogoRone() {
-  const url =
-    RONE_API_BASE +
-    "/heroes/positions?size=200&index=1&order=asc&lang=en";
-
-  const payload =
-    await fetchJsonWithRetry(
-      url,
-      "Catálogo de héroes"
-    );
-
-  const data =
-    transformarCatalogoRone(payload);
-
-  aplicarDatosDeHeroes(data);
-
-  localStorage.setItem(
-    HERO_CACHE_KEY,
-    JSON.stringify({
-      savedAt: Date.now(),
-      data
-    })
-  );
-
-  console.info(
-    "CounterBro: catálogo Rone sincronizado.",
-    {
-      heroes: HERO_DATABASE.length,
-      source: data.source,
-      syncedAt: data.syncedAt
-    }
-  );
-
-  return true;
 }
 
 async function consultarCountersRone(heroName) {
@@ -1021,7 +780,7 @@ async function cargarHeroesDesdeCache() {
     );
 
     console.info(
-      "CounterBro: usando la última base Rone preparada guardada localmente.",
+      "CounterBro: usando la última base preparada guardada localmente.",
       {
         heroes:
           HERO_DATABASE.length,
@@ -1063,7 +822,7 @@ async function cargarBasePreparada() {
 
   if (!esBasePreparadaValida(data)) {
     throw new Error(
-      "La base /data/heroes.json no es una base Rone completa y preparada."
+      "La base /data/heroes.json no es una estructura preparada de CounterBro."
     );
   }
 
@@ -1114,7 +873,7 @@ async function inicializarBaseDeHeroes() {
 
     } catch (errorBase) {
       console.warn(
-        "CounterBro: /data/heroes.json no pudo validarse. Intentando la última copia Rone válida.",
+        "CounterBro: /data/heroes.json no pudo validarse. Intentando la última copia válida.",
         errorBase
       );
 
@@ -1164,7 +923,6 @@ async function inicializarBaseDeHeroes() {
 
     if (
       HERO_DATABASE.length >= 100 &&
-      HERO_CATALOG.length >= 100 &&
       Object.values(HERO_LANES).every(
         heroes =>
           Array.isArray(heroes) &&
@@ -1172,7 +930,7 @@ async function inicializarBaseDeHeroes() {
       )
     ) {
       actualizarEstadoStartup(
-        "Usando la última copia Rone válida guardada localmente..."
+        "Usando la última copia válida guardada localmente..."
       );
 
       await activarBotonEntradaStartup();
