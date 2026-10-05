@@ -177,17 +177,6 @@ async function main() {
     );
   }
 
-  const ids = heroes.map(hero => hero.id);
-
-  if (
-    ids.some(id => !Number.isFinite(id)) ||
-    new Set(ids).size !== ids.length
-  ) {
-    throw new Error(
-      "La actualización contiene IDs de héroe inválidos o duplicados."
-    );
-  }
-
   const lanes = {
     exp: [],
     mid: [],
@@ -225,10 +214,7 @@ async function main() {
   });
 
   const payloadLocal = {
-    schemaVersion: 2,
-    source: "Rone Arena",
-    syncedAt: new Date().toISOString(),
-    heroes,
+    heroes: heroes.map(hero => hero.name),
     lanes
   };
 
