@@ -2443,6 +2443,10 @@ async function buscarCounter() {
     );
 
 
+    const technicalMessage =
+      error?.message ||
+      "Error desconocido al consultar Rone Arena.";
+
     generalResult.innerHTML =
       `
       <div class="error-result">
@@ -2452,9 +2456,13 @@ async function buscarCounter() {
         </strong>
 
         <p>
-          Revisa tu conexión e inténtalo
-          nuevamente.
+          CounterBro intentó consultar Rone Arena directamente
+          desde tu navegador y la fuente no respondió.
         </p>
+
+        <small>
+          ${escapeHtml(technicalMessage)}
+        </small>
 
       </div>
       `;
@@ -2464,7 +2472,12 @@ async function buscarCounter() {
       `
       <div class="error-result">
 
-        No se pudo procesar el matchup.
+        <strong>No se pudo procesar el matchup.</strong>
+
+        <p>
+          La recomendación personal también depende de los
+          datos del matchup.
+        </p>
 
       </div>
       `;
