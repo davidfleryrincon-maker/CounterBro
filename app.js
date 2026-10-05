@@ -314,7 +314,7 @@ function esBasePreparadaValida(data) {
   );
 }
 
-async function consultarCountersRone(heroName) {
+async function consultarCountersRone(heroName, linea) {
   const normalized =
     normalizarNombreHeroe(heroName);
 
@@ -329,24 +329,43 @@ async function consultarCountersRone(heroName) {
     catalogHero?.id ||
     heroName;
 
-  const url =
+  /*
+     Rone Academy permite consultar los matchups
+     manteniendo la línea seleccionada.
+
+     Esto es diferente del endpoint /heroes/{hero}/counters,
+     que devuelve solamente los counters generales.
+  */
+  const countersUrl =
     RONE_API_BASE +
-    "/heroes/" +
+    "/academy/heroes/" +
     encodeURIComponent(identifier) +
-    "/counters?days=7&rank=all&size=200&index=1&lang=en";
+    "/counters?rank=all&size=200&index=1&lang=en";
 
-  const payload =
-    await fetchJsonWithRetry(
-      url,
-      "Counters de " + heroName
-    );
+  const laneUrl =
+    RONE_API_BASE +
+    "/academy/heroes?lane=" +
+    encodeURIComponent(linea) +
+    "&size=200&index=1&order=asc&lang=en";
 
-  const records =
-    Array.isArray(payload?.data?.records)
-      ? payload.data.records
+  const [countersPayload, lanePayload] =
+    await Promise.all([
+      fetchJsonWithRetry(
+        countersUrl,
+        "Counters de " + heroName
+      ),
+      fetchJsonWithRetry(
+        laneUrl,
+        "Héroes de línea " + linea
+      )
+    ]);
+
+  const counterRecords =
+    Array.isArray(countersPayload?.data?.records)
+      ? countersPayload.data.records
       : [];
 
-  if (records.length === 0) {
+  if (counterRecords.length === 0) {
     throw new Error(
       "Rone Arena no devolvió counters para " +
       heroName +
@@ -354,47 +373,55 @@ async function consultarCountersRone(heroName) {
     );
   }
 
-  let namesById =
-    new Map(
-      HERO_CATALOG
-        .filter(hero => Number.isFinite(hero.id))
-        .map(hero => [
-          Number(hero.id),
-          hero.name
-        ])
-    );
+  const laneRecords =
+    Array.isArray(lanePayload?.data?.records)
+      ? lanePayload.data.records
+      : [];
 
-  if (namesById.size < 50) {
-    const catalogPayload =
-      await fetchJsonWithRetry(
-        RONE_API_BASE +
-          "/heroes?size=200&index=1&order=asc&lang=en",
-        "Catálogo de nombres de héroes"
-      );
+  const laneIds = new Set();
 
-    const catalogRecords =
-      Array.isArray(catalogPayload?.data?.records)
-        ? catalogPayload.data.records
-        : [];
+  const laneNames = new Map();
 
-    catalogRecords.forEach(record => {
-      const id = Number(record?.data?.hero_id);
-      const name = String(
-        record?.data?.hero?.data?.name || ""
+  laneRecords.forEach(record => {
+    const id =
+      Number(record?.data?.hero_id);
+
+    const name =
+      String(
+        record?.data?.hero?.data?.name ||
+        record?.data?.hero?.name ||
+        ""
       ).trim();
 
-      if (
-        Number.isFinite(id) &&
-        name
-      ) {
-        namesById.set(id, name);
-      }
-    });
+    if (Number.isFinite(id)) {
+      laneIds.add(id);
+    }
+
+    if (Number.isFinite(id) && name) {
+      laneNames.set(id, name);
+    }
+  });
+
+  if (laneIds.size === 0) {
+    throw new Error(
+      "Rone Arena no devolvió héroes válidos para la línea " +
+      linea +
+      "."
+    );
   }
 
+  /*
+     Los counters de Academy ya contienen la métrica
+     increase_win_rate para cada matchup.
+
+     Conservamos únicamente héroes pertenecientes
+     a la línea seleccionada y únicamente ventajas
+     positivas. Así B significa realmente:
+     "mejor counter disponible en esta línea".
+  */
   const rows = [];
 
-  records.forEach(record => {
+  counterRecords.forEach(record => {
     const subHeroes =
       Array.isArray(record?.data?.sub_hero)
         ? record.data.sub_hero
@@ -412,7 +439,9 @@ async function consultarCountersRone(heroName) {
 
       if (
         !Number.isFinite(heroId) ||
-        !Number.isFinite(edge)
+        !Number.isFinite(edge) ||
+        !laneIds.has(heroId) ||
+        edge <= 0
       ) {
         return;
       }
@@ -425,7 +454,7 @@ async function consultarCountersRone(heroName) {
         ).trim();
 
       const name =
-        namesById.get(heroId) ||
+        laneNames.get(heroId) ||
         embeddedName;
 
       if (!name) {
@@ -470,25 +499,31 @@ async function consultarCountersRone(heroName) {
       .map(row => ({
         name: row.name,
         winRate:
-          (row.edge >= 0 ? "+" : "") +
-          (row.edge * 100).toFixed(1) +
+          "+" +
+          (row.edge * 100).toFixed(2) +
           " pp",
         edge:
           row.edge * 100,
         heroWinRate:
           row.heroWinRate,
         reason:
-          "Ventaja estadística del matchup según Rone Arena."
+          "Ventaja estadística del matchup en " +
+          linea.toUpperCase() +
+          " según Rone Arena."
       }));
 
   if (counters.length === 0) {
     throw new Error(
-      "Rone Arena respondió, pero CounterBro no pudo asociar los IDs de sus counters con el catálogo de héroes."
+      "Rone Arena no encontró counters positivos verificados para " +
+      heroName +
+      " en " +
+      linea.toUpperCase() +
+      "."
     );
   }
 
   const targetName =
-    records
+    counterRecords
       .map(
         record =>
           String(
@@ -501,7 +536,7 @@ async function consultarCountersRone(heroName) {
 
   return {
     hero: targetName,
-    source: "Rone Arena",
+    source: "Rone Arena Academy",
     counters
   };
 }
@@ -2216,7 +2251,12 @@ async function buscarCounter() {
 
 
     const apiCounters =
-      (await consultarCountersRone(enemigoFinal)).counters;
+      (
+        await consultarCountersRone(
+          enemigoFinal,
+          linea
+        )
+      ).counters;
 
 
     const resultsEnemy =
