@@ -32,6 +32,9 @@ function getCounterRows(records) {
       const heroId = Number(counter?.heroid);
       const edge = Number(counter?.increase_win_rate);
       const heroWinRate = Number(counter?.hero_win_rate);
+      const embeddedName = cleanName(
+        counter?.hero?.data?.name
+      );
 
       if (!Number.isFinite(heroId) || !Number.isFinite(edge)) {
         return;
@@ -40,7 +43,8 @@ function getCounterRows(records) {
       rows.push({
         heroId,
         edge,
-        heroWinRate: Number.isFinite(heroWinRate) ? heroWinRate : null
+        heroWinRate: Number.isFinite(heroWinRate) ? heroWinRate : null,
+        embeddedName: embeddedName || null
       });
     });
   });
@@ -91,7 +95,10 @@ async function getCounters(hero, lane) {
 
   const counters = rows
     .map(row => {
-      const name = namesById.get(row.heroId);
+      const name =
+        row.embeddedName ||
+        namesById.get(row.heroId);
+
       if (!name) return null;
 
       const winRate = formatPercentagePoints(row.edge);
