@@ -639,8 +639,16 @@ async function consultarCountersRone(heroName) {
         return;
       }
 
+      const embeddedName =
+        String(
+          counter?.hero?.data?.name ||
+          counter?.hero?.name ||
+          ""
+        ).trim();
+
       const name =
-        namesById.get(heroId);
+        namesById.get(heroId) ||
+        embeddedName;
 
       if (!name) {
         return;
