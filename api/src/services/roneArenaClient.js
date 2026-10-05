@@ -1,9 +1,9 @@
 const axios = require('axios');
 
-const BASE_URL =
-  'https://arena.rone.dev/api';
+const BASE_URL = 'https://arena.rone.dev/api';
 
-const REQUEST_TIMEOUT = 15000;
+const REQUEST_TIMEOUT = 12000;
+const RETRIES = 2;
 
 const LANE_KEYS = [
   'exp',
@@ -14,7 +14,6 @@ const LANE_KEYS = [
 ];
 
 let heroCatalogPromise = null;
-let laneCatalogPromise = null;
 
 function cleanName(value) {
   return String(value || '')
@@ -30,176 +29,234 @@ function normalizeName(value) {
     .replace(/[^a-z0-9]/g, '');
 }
 
-function extractRecords(response) {
-  return Array.isArray(
-    response?.data?.records
-  )
-    ? response.data.records
+function extractRecords(payload) {
+  return Array.isArray(payload?.data?.records)
+    ? payload.data.records
     : [];
 }
 
+function isRetryable(error) {
+  const status = error?.response?.status;
+
+  return (
+    !status ||
+    status === 408 ||
+    status === 425 ||
+    status === 429 ||
+    status >= 500
+  );
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function request(path, params = {}) {
-  const response =
-    await axios.get(
-      BASE_URL + path,
-      {
-        params,
-        timeout: REQUEST_TIMEOUT,
-        headers: {
-          'User-Agent':
-            'CounterBro/2.1 (+https://github.com/davidfleryrincon-maker/CounterBro)',
-          'Accept':
-            'application/json'
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= RETRIES; attempt += 1) {
+    try {
+      const response = await axios.get(
+        BASE_URL + path,
+        {
+          params,
+          timeout: REQUEST_TIMEOUT,
+          headers: {
+            Accept: 'application/json',
+            'User-Agent':
+              'CounterBro/3.0 (+https://github.com/davidfleryrincon-maker/CounterBro)'
+          },
+          validateStatus: status => status >= 200 && status < 300
         }
+      );
+
+      const payload = response.data;
+
+      if (
+        payload?.code !== undefined &&
+        Number(payload.code) !== 0
+      ) {
+        const error = new Error(
+          'Rone Arena code ' +
+          payload.code +
+          ': ' +
+          (payload.message || 'error desconocido')
+        );
+
+        error.roneCode = payload.code;
+        error.roneMessage = payload.message || null;
+
+        throw error;
       }
-    );
 
-  const payload =
-    response?.data;
+      return payload;
 
-  if (
-    payload?.code !== undefined &&
-    Number(payload.code) !== 0
-  ) {
-    throw new Error(
-      'Rone Arena respondió con código ' +
-      payload.code +
-      ': ' +
-      (
-        payload.message ||
-        'error desconocido'
-      )
-    );
+    } catch (error) {
+      lastError = error;
+
+      if (
+        attempt >= RETRIES ||
+        !isRetryable(error)
+      ) {
+        break;
+      }
+
+      await sleep(700 * attempt);
+    }
   }
 
-  return payload;
+  throw lastError;
 }
 
 /*
-  Rone documenta /api/academy/heroes como
-  una respuesta sencilla:
+  Una sola llamada a /heroes/positions nos da:
+  - ID
+  - nombre
+  - posiciones/líneas
 
-  data.records[].data.hero_id
-  data.records[].data.hero.data.name
+  Esto reemplaza las cinco llamadas paralelas que
+  CounterBro hacía anteriormente.
 
-  Usamos este endpoint para el catálogo porque
-  no necesitamos depender de estructuras de posición
-  para reconocer un héroe.
+  Rone documenta /api/heroes/positions como el endpoint
+  para filtrar héroes por posición y devuelve roadsort
+  dentro del héroe.
 */
-function transformarHeroAcademy(record) {
-  const data =
-    record?.data || {};
+function laneKeyFromValue(value) {
+  const text = normalizeName(value);
 
-  const heroId =
-    Number(data.hero_id);
-
-  const name =
-    cleanName(
-      data?.hero?.data?.name
-    );
+  if (!text) return null;
 
   if (
-    !Number.isFinite(heroId) ||
-    !name
+    text.includes('jungle') ||
+    text.includes('jungler')
   ) {
+    return 'jungle';
+  }
+
+  if (
+    text.includes('roam') ||
+    text.includes('roamer')
+  ) {
+    return 'roam';
+  }
+
+  if (
+    text.includes('gold') ||
+    text.includes('goldlane')
+  ) {
+    return 'gold';
+  }
+
+  if (
+    text === 'mid' ||
+    text.includes('midlane') ||
+    text.includes('middle')
+  ) {
+    return 'mid';
+  }
+
+  if (
+    text.includes('exp') ||
+    text.includes('explane')
+  ) {
+    return 'exp';
+  }
+
+  return null;
+}
+
+function extractLaneKeys(heroRecord) {
+  const roadsort =
+    heroRecord?.data?.hero?.data?.roadsort;
+
+  if (!Array.isArray(roadsort)) {
+    return [];
+  }
+
+  const lanes = new Set();
+
+  roadsort.forEach(item => {
+    const data = item?.data || {};
+
+    [
+      data.road_sort_title,
+      item?.caption,
+      data.road_sort_id
+    ].forEach(value => {
+      const lane = laneKeyFromValue(value);
+
+      if (lane) {
+        lanes.add(lane);
+      }
+    });
+  });
+
+  return Array.from(lanes);
+}
+
+function transformHeroPosition(record) {
+  const data = record?.data || {};
+  const hero = data?.hero?.data || {};
+
+  const id = Number(data.hero_id);
+  const name = cleanName(hero.name);
+
+  if (!Number.isFinite(id) || !name) {
     return null;
   }
 
   return {
-    id: heroId,
-    name
+    id,
+    name,
+    lanes: extractLaneKeys(record)
   };
 }
 
-async function fetchHeroCatalog() {
-  const response =
-    await request(
-      '/academy/heroes',
-      {
-        size: 200,
-        index: 1,
-        order: 'asc',
-        lang: 'en'
-      }
-    );
+async function fetchHeroPositions() {
+  const response = await request(
+    '/heroes/positions',
+    {
+      size: 200,
+      index: 1,
+      order: 'asc',
+      lang: 'en'
+    }
+  );
 
-  const heroes =
-    extractRecords(response)
-      .map(
-        transformarHeroAcademy
-      )
-      .filter(Boolean);
+  const heroes = extractRecords(response)
+    .map(transformHeroPosition)
+    .filter(Boolean);
 
   if (heroes.length < 50) {
     throw new Error(
       'Rone Arena devolvió solo ' +
       heroes.length +
-      ' héroes en /academy/heroes.'
+      ' héroes en /heroes/positions.'
     );
   }
 
-  const unique =
-    new Map();
+  const unique = new Map();
 
   heroes.forEach(hero => {
-    unique.set(
-      hero.id,
-      hero
-    );
+    unique.set(hero.id, hero);
   });
 
-  return Array.from(
-    unique.values()
-  );
+  return Array.from(unique.values());
 }
 
 async function getHeroCatalog() {
   if (!heroCatalogPromise) {
-    heroCatalogPromise =
-      fetchHeroCatalog()
-        .catch(error => {
-          heroCatalogPromise = null;
-          throw error;
-        });
+    heroCatalogPromise = fetchHeroPositions()
+      .catch(error => {
+        heroCatalogPromise = null;
+        throw error;
+      });
   }
 
   return heroCatalogPromise;
 }
 
-async function fetchHeroesForLane(lane) {
-  const response =
-    await request(
-      '/academy/heroes',
-      {
-        lane,
-        size: 200,
-        index: 1,
-        order: 'asc',
-        lang: 'en'
-      }
-    );
-
-  return extractRecords(response)
-    .map(
-      transformarHeroAcademy
-    )
-    .filter(Boolean);
-}
-
-async function fetchLaneCatalog() {
-  const entries =
-    await Promise.all(
-      LANE_KEYS.map(
-        async lane => ({
-          lane,
-          heroes:
-            await fetchHeroesForLane(
-              lane
-            )
-        })
-      )
-    );
-
+function buildLaneCatalog(heroes) {
   const lanes = {
     exp: [],
     mid: [],
@@ -208,189 +265,119 @@ async function fetchLaneCatalog() {
     roam: []
   };
 
-  entries.forEach(
-    ({ lane, heroes }) => {
-      lanes[lane] =
-        Array.from(
-          new Set(
-            heroes.map(
-              hero => hero.name
-            )
-          )
-        ).sort(
-          (a, b) =>
-            a.localeCompare(b)
-        );
-    }
-  );
+  heroes.forEach(hero => {
+    hero.lanes.forEach(lane => {
+      if (lanes[lane]) {
+        lanes[lane].push(hero.name);
+      }
+    });
+  });
 
-  for (const lane of LANE_KEYS) {
-    if (
-      lanes[lane].length < 5
-    ) {
-      throw new Error(
-        'Rone Arena devolvió solo ' +
-        lanes[lane].length +
-        ' héroes para ' +
-        lane +
-        '.'
-      );
-    }
-  }
+  LANE_KEYS.forEach(lane => {
+    lanes[lane] = Array.from(
+      new Set(lanes[lane])
+    ).sort((a, b) => a.localeCompare(b));
+  });
 
   return lanes;
 }
 
-async function getLaneCatalog() {
-  if (!laneCatalogPromise) {
-    laneCatalogPromise =
-      fetchLaneCatalog()
-        .catch(error => {
-          laneCatalogPromise = null;
-          throw error;
-        });
+async function fetchFreshHeroesFromRoneArena() {
+  const heroes = await getHeroCatalog();
+  const lanes = buildLaneCatalog(heroes);
+
+  const missingLanes = LANE_KEYS.filter(
+    lane => lanes[lane].length < 5
+  );
+
+  /*
+    Algunas versiones del origen pueden no exponer
+    roadsort completo. En ese caso no rompemos todo
+    el catálogo: usamos el fallback local desde api/index.js.
+  */
+  if (missingLanes.length > 0) {
+    throw new Error(
+      'Rone Arena no devolvió posiciones suficientes para: ' +
+      missingLanes.join(', ')
+    );
   }
 
-  return laneCatalogPromise;
+  return {
+    heroes: heroes
+      .map(hero => hero.name)
+      .sort((a, b) => a.localeCompare(b)),
+
+    lanes,
+
+    source: 'Rone Arena',
+
+    syncedAt: new Date().toISOString()
+  };
+}
+
+async function fetchHeroCounters(heroIdentifier) {
+  const identifier = cleanName(heroIdentifier);
+
+  if (!identifier) {
+    throw new Error(
+      'Rone Arena requiere un héroe.'
+    );
+  }
+
+  /*
+    UNA sola consulta por matchup.
+    Rone documenta que el nombre funciona como
+    identificador: miya, Miya o 1 son equivalentes.
+  */
+  const response = await request(
+    '/heroes/' +
+      encodeURIComponent(identifier) +
+      '/counters',
+    {
+      days: 7,
+      rank: 'all',
+      size: 200,
+      index: 1,
+      lang: 'en'
+    }
+  );
+
+  const records = extractRecords(response);
+
+  if (records.length === 0) {
+    throw new Error(
+      'Rone Arena no devolvió counters para "' +
+      identifier +
+      '".'
+    );
+  }
+
+  return records;
 }
 
 async function getHeroByIdentifier(identifier) {
-  const heroes =
-    await getHeroCatalog();
+  const heroes = await getHeroCatalog();
+  const normalized = normalizeName(identifier);
 
-  const normalized =
-    normalizeName(identifier);
-
-  const numericId =
-    Number(identifier);
+  const numericId = Number(identifier);
 
   if (
     Number.isFinite(numericId) &&
     String(identifier).trim() !== ''
   ) {
-    const byId =
-      heroes.find(
-        hero =>
-          hero.id === numericId
-      );
+    const byId = heroes.find(
+      hero => hero.id === numericId
+    );
 
-    if (byId) {
-      return byId;
-    }
+    if (byId) return byId;
   }
 
   return (
     heroes.find(
       hero =>
-        normalizeName(
-          hero.name
-        ) === normalized
+        normalizeName(hero.name) === normalized
     ) || null
   );
-}
-
-async function fetchHeroCounters(
-  heroIdentifier
-) {
-  const identifier = cleanName(heroIdentifier);
-
-  if (!identifier) {
-    throw new Error(
-      'Rone Arena requiere un identificador de héroe.'
-    );
-  }
-
-  const endpoints = [
-    {
-      path:
-        '/heroes/' +
-        encodeURIComponent(identifier) +
-        '/counters',
-      params: {
-        days: 7,
-        rank: 'all',
-        size: 200,
-        index: 1,
-        lang: 'en'
-      }
-    },
-    {
-      path:
-        '/academy/heroes/' +
-        encodeURIComponent(identifier) +
-        '/counters',
-      params: {
-        rank: 'all',
-        size: 200,
-        index: 1,
-        lang: 'en'
-      }
-    }
-  ];
-
-  let lastError = null;
-
-  for (const endpoint of endpoints) {
-    try {
-      const response = await request(
-        endpoint.path,
-        endpoint.params
-      );
-
-      const records = extractRecords(response);
-
-      if (records.length > 0) {
-        return records;
-      }
-
-      lastError = new Error(
-        'Rone Arena no devolvió registros en ' +
-        endpoint.path
-      );
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  const detail =
-    lastError?.message
-      ? ' ' + lastError.message
-      : '';
-
-  throw new Error(
-    'No fue posible obtener counters de Rone Arena para "' +
-    identifier +
-    '".' +
-    detail
-  );
-}
-
-async function fetchFreshHeroesFromRoneArena() {
-  const [
-    heroes,
-    lanes
-  ] = await Promise.all([
-    getHeroCatalog(),
-    getLaneCatalog()
-  ]);
-
-  return {
-    heroes:
-      heroes
-        .map(hero => hero.name)
-        .sort(
-          (a, b) =>
-            a.localeCompare(b)
-        ),
-
-    lanes,
-
-    source:
-      'Rone Arena',
-
-    syncedAt:
-      new Date().toISOString()
-  };
 }
 
 module.exports = {
