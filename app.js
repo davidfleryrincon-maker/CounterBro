@@ -542,12 +542,30 @@ async function consultarCountersRone(heroName, linea) {
 }
 
 const STARTUP_THOUGHTS = [
-  "Analizando el campo de batalla...",
-  "Preparando el cerebro de CounterBro...",
-  "Cargando conocimiento de héroes...",
-  "Afinando la estrategia...",
-  "Buscando las mejores respuestas...",
-  "CounterBro está tomando posiciones..."
+  "Despertando a Nana de su quinta siesta",
+  "Contratando al primer Lord de esta partida",
+  "Haciendo inventario de Minions",
+  "Buscando a Eudora entre los arbustos",
+  "Revisando por qué alguien eligió Hanabi",
+  "Contando cuántas veces murió Yin",
+  "Alimentando a la Tortuga",
+  "Preguntándole a Johnson dónde va",
+  "Revisando el arbusto sospechoso",
+  "Ajustando la puntería de Franco",
+  "Contando torres destruidas",
+  "Buscando el oro de las torres",
+  "Revisando quién se robó el buff rojo",
+  "Enseñándole nuevos trucos a Helcurt",
+  "Diseñando nuevos Backeos",
+  "Revisando si Tigreal sigue campeando",
+  "Buscando una partida sin trolls",
+  "Contando hasta diez antes de iniciar",
+  "Revisando mis archivos secretos",
+  "Fingiendo que todo está bajo control",
+  "Consultando al departamento de estrategia",
+  "Ignorando temporalmente mis problemas",
+  "Ordenando mis pensamientos digitales",
+  "Recordando por qué estoy aquí"
 ];
 
 function actualizarFraseStartup() {
