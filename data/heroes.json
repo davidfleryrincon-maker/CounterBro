@@ -1,0 +1,1101 @@
+{
+  "schemaVersion": 2,
+  "source": "CounterBro local snapshot",
+  "syncedAt": "2026-10-04T21:09:05.850Z",
+  "heroes": [
+    {
+      "id": null,
+      "name": "Aamon",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Akai",
+      "lanes": [
+        "jungle",
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Aldous",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Alice",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Alpha",
+      "lanes": [
+        "exp",
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Alucard",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Angela",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Argus",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Arlott",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Atlas",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Aulus",
+      "lanes": [
+        "exp",
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Aurora",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Badang",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Balmond",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Bane",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Barats",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Baxia",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Beatrix",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Belerick",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Benedetta",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Brody",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Bruno",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Carmilla",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Cecilion",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Chang'e",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Chip",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Chou",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Cici",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Claude",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Clint",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Cyclops",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Diggie",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Dyrroth",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Edith",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Esmeralda",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Estes",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Eudora",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Fanny",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Faramis",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Floryn",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Franco",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Fredrinn",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Freya",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Gatotkaca",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Gloo",
+      "lanes": [
+        "exp",
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Gord",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Granger",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Grock",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Guinevere",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Gusion",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Hanabi",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Hanzo",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Harith",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Harley",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Hayabusa",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Helcurt",
+      "lanes": [
+        "jungle",
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Hilda",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Hirara",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Hylos",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Irithel",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Ixia",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Jawhead",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Johnson",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Joy",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Julian",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Kadita",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Kagura",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Kaja",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Kalea",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Karina",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Karrie",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Khaleed",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Khufra",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Kimmy",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Lancelot",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Lapu-Lapu",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Layla",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Leomord",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Lesley",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Ling",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Lolita",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Lukas",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Lunox",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Luo Yi",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Lylia",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Marcel",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Martis",
+      "lanes": [
+        "exp",
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Masha",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Mathilda",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Melissa",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Minotaur",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Minsitthar",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Miya",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Moskov",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Nana",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Natalia",
+      "lanes": [
+        "jungle",
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Natan",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Nolan",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Novaria",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Obsidia",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Odette",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Paquito",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Pharsa",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Phoveus",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Popol and Kupa",
+      "lanes": [
+        "gold",
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Rafaela",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Roger",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Ruby",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Saber",
+      "lanes": [
+        "jungle",
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Selena",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Silvanna",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Sora",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Sun",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Suyou",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Terizla",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Thamuz",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Tigreal",
+      "lanes": [
+        "roam"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Uranus",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Vale",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Valentina",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Valir",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Vexana",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Wanwan",
+      "lanes": [
+        "gold"
+      ]
+    },
+    {
+      "id": null,
+      "name": "X.Borg",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Xavier",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Yi Sun-shin",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Yin",
+      "lanes": [
+        "jungle"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Yu Zhong",
+      "lanes": [
+        "exp"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Yve",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Zetian",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Zhask",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Zhuxin",
+      "lanes": [
+        "mid"
+      ]
+    },
+    {
+      "id": null,
+      "name": "Zilong",
+      "lanes": [
+        "exp"
+      ]
+    }
+  ],
+  "lanes": {
+    "gold": [
+      "Beatrix",
+      "Brody",
+      "Bruno",
+      "Claude",
+      "Clint",
+      "Granger",
+      "Hanabi",
+      "Harith",
+      "Irithel",
+      "Ixia",
+      "Karrie",
+      "Layla",
+      "Lesley",
+      "Melissa",
+      "Miya",
+      "Moskov",
+      "Natan",
+      "Obsidia",
+      "Popol and Kupa",
+      "Wanwan"
+    ],
+    "exp": [
+      "Aldous",
+      "Alice",
+      "Alpha",
+      "Argus",
+      "Arlott",
+      "Aulus",
+      "Barats",
+      "Benedetta",
+      "Chou",
+      "Cici",
+      "Edith",
+      "Esmeralda",
+      "Gloo",
+      "Guinevere",
+      "Jawhead",
+      "Lapu-Lapu",
+      "Martis",
+      "Masha",
+      "Minsitthar",
+      "Paquito",
+      "Phoveus",
+      "Ruby",
+      "Silvanna",
+      "Sora",
+      "Terizla",
+      "Thamuz",
+      "Uranus",
+      "X.Borg",
+      "Yu Zhong",
+      "Zilong"
+    ],
+    "mid": [
+      "Aurora",
+      "Cecilion",
+      "Chang'e",
+      "Cyclops",
+      "Eudora",
+      "Faramis",
+      "Gord",
+      "Kadita",
+      "Kagura",
+      "Kimmy",
+      "Lunox",
+      "Luo Yi",
+      "Lylia",
+      "Nana",
+      "Novaria",
+      "Odette",
+      "Pharsa",
+      "Selena",
+      "Vale",
+      "Valentina",
+      "Valir",
+      "Vexana",
+      "Xavier",
+      "Yve",
+      "Zetian",
+      "Zhask",
+      "Zhuxin"
+    ],
+    "jungle": [
+      "Aamon",
+      "Akai",
+      "Alpha",
+      "Alucard",
+      "Aulus",
+      "Balmond",
+      "Bane",
+      "Baxia",
+      "Dyrroth",
+      "Fanny",
+      "Fredrinn",
+      "Freya",
+      "Gusion",
+      "Hanzo",
+      "Harley",
+      "Hayabusa",
+      "Helcurt",
+      "Hirara",
+      "Joy",
+      "Julian",
+      "Karina",
+      "Lancelot",
+      "Leomord",
+      "Ling",
+      "Lukas",
+      "Martis",
+      "Natalia",
+      "Nolan",
+      "Popol and Kupa",
+      "Roger",
+      "Saber",
+      "Sun",
+      "Suyou",
+      "Yi Sun-shin",
+      "Yin"
+    ],
+    "roam": [
+      "Akai",
+      "Angela",
+      "Atlas",
+      "Badang",
+      "Belerick",
+      "Carmilla",
+      "Chip",
+      "Diggie",
+      "Estes",
+      "Floryn",
+      "Franco",
+      "Gatotkaca",
+      "Gloo",
+      "Grock",
+      "Helcurt",
+      "Hilda",
+      "Hylos",
+      "Johnson",
+      "Kaja",
+      "Kalea",
+      "Khaleed",
+      "Khufra",
+      "Lolita",
+      "Marcel",
+      "Mathilda",
+      "Minotaur",
+      "Natalia",
+      "Rafaela",
+      "Saber",
+      "Tigreal"
+    ]
+  }
+}
