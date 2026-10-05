@@ -1813,23 +1813,30 @@ async function buscarCounter() {
           enemigoFinal
         )}&lane=${encodeURIComponent(
           linea
-        )}`
+        )}`,
+        {
+          cache: "no-store"
+        }
       );
 
+    let data = null;
 
-    if (
-      !response.ok
-    ) {
-
-      throw new Error(
-        `HTTP ${response.status}`
-      );
-
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      data = null;
     }
 
+    if (!response.ok) {
+      const diagnostic =
+        data?.diagnostic?.message ||
+        data?.error ||
+        `HTTP ${response.status}`;
 
-    const data =
-      await response.json();
+      throw new Error(
+        diagnostic
+      );
+    }
 
 
     const apiCounters =
