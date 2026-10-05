@@ -10,7 +10,7 @@ const PREPARED_HEROES_PATH =
 
 let preparedHeroes = null;
 
-function cargarBasePreparada() {
+function cargarBasePreparadaLocal() {
   if (!preparedHeroes) {
     preparedHeroes =
       JSON.parse(
@@ -22,6 +22,29 @@ function cargarBasePreparada() {
   }
 
   return preparedHeroes;
+}
+
+async function cargarBasePreparada() {
+  const {
+    fetchFreshHeroesFromRoneArena
+  } = require('./src/services/roneArenaClient');
+
+  try {
+    const fresh =
+      await fetchFreshHeroesFromRoneArena();
+
+    preparedHeroes = fresh;
+
+    return fresh;
+
+  } catch (error) {
+    console.error(
+      'Rone Arena hero base error, using local fallback:',
+      error
+    );
+
+    return cargarBasePreparadaLocal();
+  }
 }
 
 module.exports = async (req, res) => {
@@ -38,7 +61,7 @@ module.exports = async (req, res) => {
 
   if (getHeroes === 'true') {
     try {
-      const data = cargarBasePreparada();
+      const data = await cargarBasePreparada();
       res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=3600');
       return res.status(200).json({
         ...data,
