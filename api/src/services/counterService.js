@@ -88,10 +88,19 @@ async function getCounters(hero, lane) {
     );
   }
 
-  const catalog = await getHeroCatalog();
-  const namesById = new Map(
-    catalog.map(item => [item.id, item.name])
+  const unresolvedIds = rows.filter(
+    row => !row.embeddedName
   );
+
+  let namesById = new Map();
+
+  if (unresolvedIds.length > 0) {
+    const catalog = await getHeroCatalog();
+
+    namesById = new Map(
+      catalog.map(item => [item.id, item.name])
+    );
+  }
 
   const counters = rows
     .map(row => {
@@ -101,7 +110,9 @@ async function getCounters(hero, lane) {
 
       if (!name) return null;
 
-      const winRate = formatPercentagePoints(row.edge);
+      const winRate =
+        formatPercentagePoints(row.edge);
+
       if (!winRate) return null;
 
       return {
@@ -109,7 +120,8 @@ async function getCounters(hero, lane) {
         winRate,
         edge: row.edge * 100,
         heroWinRate: row.heroWinRate,
-        reason: 'Ventaja estadística del matchup según Rone Arena.'
+        reason:
+          'Ventaja estadística del matchup según Rone Arena.'
       };
     })
     .filter(Boolean)
