@@ -403,6 +403,41 @@ async function fetchJsonWithRetry(url, label) {
   throw lastError;
 }
 
+function esBasePreparadaValida(data) {
+  const heroes = Array.isArray(data?.heroes)
+    ? data.heroes
+    : [];
+
+  const ids = heroes.map(hero => Number(hero?.id));
+
+  const sourceValida =
+    String(data?.source || "").trim() ===
+    "Rone Arena";
+
+  const cantidadValida =
+    heroes.length >= 100;
+
+  const idsValidos =
+    ids.length === heroes.length &&
+    ids.every(id => Number.isFinite(id)) &&
+    new Set(ids).size === ids.length;
+
+  const lanesValidas =
+    ["exp", "mid", "gold", "jungle", "roam"].every(
+      lane =>
+        Array.isArray(data?.lanes?.[lane]) &&
+        data.lanes[lane].length >= 5
+    );
+
+  return (
+    data?.schemaVersion === 2 &&
+    sourceValida &&
+    cantidadValida &&
+    idsValidos &&
+    lanesValidas
+  );
+}
+
 async function cargarHeroesDesdeCache() {
   try {
     const raw = localStorage.getItem(
@@ -970,17 +1005,31 @@ async function cargarHeroesDesdeCache() {
       return false;
     }
 
+    if (!esBasePreparadaValida(cache.data)) {
+      console.warn(
+        "CounterBro: la cache local no corresponde a una base Rone preparada."
+      );
+
+      localStorage.removeItem(
+        HERO_CACHE_KEY
+      );
+
+      return false;
+    }
+
     aplicarDatosDeHeroes(
       cache.data
     );
 
     console.info(
-      "CounterBro: usando la última base preparada guardada localmente.",
+      "CounterBro: usando la última base Rone preparada guardada localmente.",
       {
         heroes:
           HERO_DATABASE.length,
         savedAt:
-          cache.savedAt
+          cache.savedAt,
+        syncedAt:
+          cache.data.syncedAt || null
       }
     );
 
@@ -1010,9 +1059,18 @@ async function cargarBasePreparada() {
     );
   }
 
-  const data = await response.json();
+  const data =
+    await response.json();
 
-  aplicarDatosDeHeroes(data);
+  if (!esBasePreparadaValida(data)) {
+    throw new Error(
+      "La base /data/heroes.json no es una base Rone completa y preparada."
+    );
+  }
+
+  aplicarDatosDeHeroes(
+    data
+  );
 
   localStorage.setItem(
     HERO_CACHE_KEY,
@@ -1023,11 +1081,14 @@ async function cargarBasePreparada() {
   );
 
   console.info(
-    "CounterBro: base estática local cargada.",
+    "CounterBro: base estática Rone cargada.",
     {
-      heroes: HERO_DATABASE.length,
-      source: data.source || null,
-      syncedAt: data.syncedAt || null
+      heroes:
+        HERO_DATABASE.length,
+      source:
+        data.source || null,
+      syncedAt:
+        data.syncedAt || null
     }
   );
 
@@ -1045,16 +1106,30 @@ async function inicializarBaseDeHeroes() {
   const inicio = performance.now();
 
   try {
-    const cacheValida =
-      await cargarHeroesDesdeCache();
+    actualizarEstadoStartup(
+      "Cargando la base preparada de CounterBro"
+    );
 
-    if (cacheValida) {
-      actualizarEstadoStartup(
-        "Base local encontrada. Confirmando datos preparados..."
+    try {
+      await cargarBasePreparada();
+
+    } catch (errorBase) {
+      console.warn(
+        "CounterBro: /data/heroes.json no pudo validarse. Intentando la última copia Rone válida.",
+        errorBase
       );
-    }
 
-    await cargarBasePreparada();
+      actualizarEstadoStartup(
+        "Base local no disponible. Comprobando la última copia válida..."
+      );
+
+      const cacheValida =
+        await cargarHeroesDesdeCache();
+
+      if (!cacheValida) {
+        throw errorBase;
+      }
+    }
 
     const tiempo =
       Math.round(performance.now() - inicio);
@@ -1089,7 +1164,12 @@ async function inicializarBaseDeHeroes() {
     );
 
     if (
-      HERO_DATABASE.length > 0 &&
+      HERO_DATABASE.length >= 100 &&
+      HERO_CATALOG.length >= 100 &&
+      HERO_CATALOG.every(
+        hero =>
+          Number.isFinite(hero.id)
+      ) &&
       Object.values(HERO_LANES).every(
         heroes =>
           Array.isArray(heroes) &&
@@ -1097,7 +1177,7 @@ async function inicializarBaseDeHeroes() {
       )
     ) {
       actualizarEstadoStartup(
-        "Usando la última copia válida guardada localmente..."
+        "Usando la última copia Rone válida guardada localmente..."
       );
 
       await activarBotonEntradaStartup();
