@@ -292,8 +292,7 @@ async function getHeroByIdentifier(identifier) {
 async function fetchHeroCounters(
   heroIdentifier
 ) {
-  const identifier =
-    cleanName(heroIdentifier);
+  const identifier = cleanName(heroIdentifier);
 
   if (!identifier) {
     throw new Error(
@@ -301,14 +300,6 @@ async function fetchHeroCounters(
     );
   }
 
-  /*
-    Rone documenta explícitamente que los nombres de héroe
-    funcionan como identificadores y que la comparación
-    ignora mayúsculas, espacios y símbolos.
-
-    Usamos primero el endpoint principal documentado.
-    El endpoint Academy queda como respaldo por compatibilidad.
-  */
   const endpoints = [
     {
       path:
@@ -341,25 +332,21 @@ async function fetchHeroCounters(
 
   for (const endpoint of endpoints) {
     try {
-      const response =
-        await request(
-          endpoint.path,
-          endpoint.params
-        );
+      const response = await request(
+        endpoint.path,
+        endpoint.params
+      );
 
-      const records =
-        extractRecords(response);
+      const records = extractRecords(response);
 
       if (records.length > 0) {
         return records;
       }
 
-      lastError =
-        new Error(
-          'Rone Arena no devolvió registros en ' +
-          endpoint.path
-        );
-
+      lastError = new Error(
+        'Rone Arena no devolvió registros en ' +
+        endpoint.path
+      );
     } catch (error) {
       lastError = error;
     }
