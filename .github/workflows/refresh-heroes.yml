@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   refresh-heroes:
-    name: Refresh MLBBHub hero base
+    name: Refresh Rone Arena hero base
     runs-on: ubuntu-latest
 
     steps:
@@ -39,5 +39,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add api/data/heroes.json
-          git commit -m "Refresh MLBB hero base"
+          git commit -m "Refresh MLBB hero base from Rone Arena"
           git push
