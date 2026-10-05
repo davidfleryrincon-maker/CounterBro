@@ -1,17 +1,20 @@
 const axios = require('axios');
 
-const BASE_URL = 'https://arena.rone.dev/api';
+const BASE_URL =
+  'https://arena.rone.dev/api';
+
 const REQUEST_TIMEOUT = 15000;
 
-const LANE_KEYS = new Set([
+const LANE_KEYS = [
   'exp',
   'mid',
   'gold',
   'jungle',
   'roam'
-]);
+];
 
 let heroCatalogPromise = null;
+let laneCatalogPromise = null;
 
 function cleanName(value) {
   return String(value || '')
@@ -28,84 +31,72 @@ function normalizeName(value) {
 }
 
 function extractRecords(response) {
-  return Array.isArray(response?.data?.data?.records)
-    ? response.data.data.records
+  return Array.isArray(
+    response?.data?.records
+  )
+    ? response.data.records
     : [];
 }
 
 async function request(path, params = {}) {
-  const response = await axios.get(
-    BASE_URL + path,
-    {
-      params,
-      timeout: REQUEST_TIMEOUT,
-      headers: {
-        'User-Agent':
-          'CounterBro/2.0 (+https://github.com/davidfleryrincon-maker/CounterBro)',
-        'Accept':
-          'application/json'
+  const response =
+    await axios.get(
+      BASE_URL + path,
+      {
+        params,
+        timeout: REQUEST_TIMEOUT,
+        headers: {
+          'User-Agent':
+            'CounterBro/2.1 (+https://github.com/davidfleryrincon-maker/CounterBro)',
+          'Accept':
+            'application/json'
+        }
       }
-    }
-  );
+    );
+
+  const payload =
+    response?.data;
 
   if (
-    response?.data?.code !== undefined &&
-    Number(response.data.code) !== 0
+    payload?.code !== undefined &&
+    Number(payload.code) !== 0
   ) {
     throw new Error(
       'Rone Arena respondió con código ' +
-      response.data.code +
+      payload.code +
       ': ' +
-      (response.data.message || 'error desconocido')
+      (
+        payload.message ||
+        'error desconocido'
+      )
     );
   }
 
-  return response.data;
+  return payload;
 }
 
-function detectarLanes(record) {
-  const roadsort =
-    record?.data?.hero?.data?.roadsort;
+/*
+  Rone documenta /api/academy/heroes como
+  una respuesta sencilla:
 
-  if (!Array.isArray(roadsort)) {
-    return [];
-  }
+  data.records[].data.hero_id
+  data.records[].data.hero.data.name
 
-  const lanes = new Set();
-
-  roadsort.forEach(item => {
-    if (!item || typeof item !== 'object') {
-      return;
-    }
-
-    const data = item.data || {};
-
-    [
-      data.road_sort_title,
-      item.caption
-    ].forEach(value => {
-      const texto = cleanName(value).toLowerCase();
-
-      if (/\bexp\b/.test(texto)) lanes.add('exp');
-      if (/\bmid\b/.test(texto)) lanes.add('mid');
-      if (/\bgold\b/.test(texto)) lanes.add('gold');
-      if (/\bjungle|jungler\b/.test(texto)) lanes.add('jungle');
-      if (/\broam|roamer\b/.test(texto)) lanes.add('roam');
-    });
-  });
-
-  return Array.from(lanes);
-}
-
-function transformarHero(record) {
-  const data = record?.data || {};
-  const heroData = data?.hero?.data || {};
+  Usamos este endpoint para el catálogo porque
+  no necesitamos depender de estructuras de posición
+  para reconocer un héroe.
+*/
+function transformarHeroAcademy(record) {
+  const data =
+    record?.data || {};
 
   const heroId =
-    Number(data.hero_id ?? heroData.heroid);
+    Number(data.hero_id);
 
   const name =
-    cleanName(heroData.name);
+    cleanName(
+      data?.hero?.data?.name
+    );
 
   if (
     !Number.isFinite(heroId) ||
@@ -116,82 +107,151 @@ function transformarHero(record) {
 
   return {
     id: heroId,
-    name,
-    lanes: detectarLanes(record)
+    name
   };
 }
 
 async function fetchHeroCatalog() {
-  const endpoints = [
-    {
-      path: '/academy/heroes/catalog',
-      params: {
-        size: 200,
-        index: 1,
-        lang: 'en'
-      }
-    },
-    {
-      path: '/heroes/positions',
-      params: {
+  const response =
+    await request(
+      '/academy/heroes',
+      {
         size: 200,
         index: 1,
         order: 'asc',
         lang: 'en'
       }
-    }
-  ];
+    );
 
-  let lastError = null;
+  const heroes =
+    extractRecords(response)
+      .map(
+        transformarHeroAcademy
+      )
+      .filter(Boolean);
 
-  for (const endpoint of endpoints) {
-    try {
-      const response =
-        await request(
-          endpoint.path,
-          endpoint.params
-        );
-
-      const heroes =
-        extractRecords(response)
-          .map(transformarHero)
-          .filter(Boolean);
-
-      if (heroes.length >= 50) {
-        return heroes;
-      }
-
-      lastError =
-        new Error(
-          'Rone Arena devolvió muy pocos héroes en ' +
-          endpoint.path +
-          ': ' +
-          heroes.length
-        );
-
-    } catch (error) {
-      lastError = error;
-    }
+  if (heroes.length < 50) {
+    throw new Error(
+      'Rone Arena devolvió solo ' +
+      heroes.length +
+      ' héroes en /academy/heroes.'
+    );
   }
 
-  throw (
-    lastError ||
-    new Error(
-      'Rone Arena no pudo devolver el catálogo de héroes.'
-    )
+  const unique =
+    new Map();
+
+  heroes.forEach(hero => {
+    unique.set(
+      hero.id,
+      hero
+    );
+  });
+
+  return Array.from(
+    unique.values()
   );
 }
 
 async function getHeroCatalog() {
   if (!heroCatalogPromise) {
     heroCatalogPromise =
-      fetchHeroCatalog().catch(error => {
-        heroCatalogPromise = null;
-        throw error;
-      });
+      fetchHeroCatalog()
+        .catch(error => {
+          heroCatalogPromise = null;
+          throw error;
+        });
   }
 
   return heroCatalogPromise;
+}
+
+async function fetchHeroesForLane(lane) {
+  const response =
+    await request(
+      '/academy/heroes',
+      {
+        lane,
+        size: 200,
+        index: 1,
+        order: 'asc',
+        lang: 'en'
+      }
+    );
+
+  return extractRecords(response)
+    .map(
+      transformarHeroAcademy
+    )
+    .filter(Boolean);
+}
+
+async function fetchLaneCatalog() {
+  const entries =
+    await Promise.all(
+      LANE_KEYS.map(
+        async lane => ({
+          lane,
+          heroes:
+            await fetchHeroesForLane(
+              lane
+            )
+        })
+      )
+    );
+
+  const lanes = {
+    exp: [],
+    mid: [],
+    gold: [],
+    jungle: [],
+    roam: []
+  };
+
+  entries.forEach(
+    ({ lane, heroes }) => {
+      lanes[lane] =
+        Array.from(
+          new Set(
+            heroes.map(
+              hero => hero.name
+            )
+          )
+        ).sort(
+          (a, b) =>
+            a.localeCompare(b)
+        );
+    }
+  );
+
+  for (const lane of LANE_KEYS) {
+    if (
+      lanes[lane].length < 5
+    ) {
+      throw new Error(
+        'Rone Arena devolvió solo ' +
+        lanes[lane].length +
+        ' héroes para ' +
+        lane +
+        '.'
+      );
+    }
+  }
+
+  return lanes;
+}
+
+async function getLaneCatalog() {
+  if (!laneCatalogPromise) {
+    laneCatalogPromise =
+      fetchLaneCatalog()
+        .catch(error => {
+          laneCatalogPromise = null;
+          throw error;
+        });
+  }
+
+  return laneCatalogPromise;
 }
 
 async function getHeroByIdentifier(identifier) {
@@ -210,7 +270,8 @@ async function getHeroByIdentifier(identifier) {
   ) {
     const byId =
       heroes.find(
-        hero => hero.id === numericId
+        hero =>
+          hero.id === numericId
       );
 
     if (byId) {
@@ -221,18 +282,23 @@ async function getHeroByIdentifier(identifier) {
   return (
     heroes.find(
       hero =>
-        normalizeName(hero.name) ===
-        normalized
+        normalizeName(
+          hero.name
+        ) === normalized
     ) || null
   );
 }
 
-async function fetchHeroCounters(heroIdentifier) {
+async function fetchHeroCounters(
+  heroIdentifier
+) {
   const endpoints = [
     {
       path:
         '/heroes/' +
-        encodeURIComponent(heroIdentifier) +
+        encodeURIComponent(
+          heroIdentifier
+        ) +
         '/counters',
       params: {
         days: 7,
@@ -245,7 +311,9 @@ async function fetchHeroCounters(heroIdentifier) {
     {
       path:
         '/academy/heroes/' +
-        encodeURIComponent(heroIdentifier) +
+        encodeURIComponent(
+          heroIdentifier
+        ) +
         '/counters',
       params: {
         rank: 'all',
@@ -275,7 +343,7 @@ async function fetchHeroCounters(heroIdentifier) {
 
       lastError =
         new Error(
-          'Rone Arena no devolvió registros de counters en ' +
+          'Rone Arena no devolvió registros en ' +
           endpoint.path
         );
 
@@ -287,59 +355,36 @@ async function fetchHeroCounters(heroIdentifier) {
   throw (
     lastError ||
     new Error(
-      'Rone Arena no pudo devolver counters para el héroe.'
+      'Rone Arena no pudo devolver counters.'
     )
   );
 }
 
 async function fetchFreshHeroesFromRoneArena() {
-  const heroes =
-    await getHeroCatalog();
-
-  const lanes = {
-    exp: [],
-    mid: [],
-    gold: [],
-    jungle: [],
-    roam: []
-  };
-
-  heroes.forEach(hero => {
-    hero.lanes.forEach(lane => {
-      if (
-        LANE_KEYS.has(lane) &&
-        !lanes[lane].includes(hero.name)
-      ) {
-        lanes[lane].push(hero.name);
-      }
-    });
-  });
-
-  const validHeroes =
-    heroes.map(hero => hero.name);
-
-  for (const lane of Object.keys(lanes)) {
-    lanes[lane].sort(
-      (a, b) => a.localeCompare(b)
-    );
-
-    if (lanes[lane].length < 5) {
-      throw new Error(
-        'Rone Arena no devolvió suficientes héroes para ' +
-        lane +
-        ': ' +
-        lanes[lane].length
-      );
-    }
-  }
+  const [
+    heroes,
+    lanes
+  ] = await Promise.all([
+    getHeroCatalog(),
+    getLaneCatalog()
+  ]);
 
   return {
     heroes:
-      Array.from(new Set(validHeroes))
-        .sort((a, b) => a.localeCompare(b)),
+      heroes
+        .map(hero => hero.name)
+        .sort(
+          (a, b) =>
+            a.localeCompare(b)
+        ),
+
     lanes,
-    source: 'Rone Arena',
-    syncedAt: new Date().toISOString()
+
+    source:
+      'Rone Arena',
+
+    syncedAt:
+      new Date().toISOString()
   };
 }
 
