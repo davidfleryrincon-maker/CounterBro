@@ -408,32 +408,31 @@ function esBasePreparadaValida(data) {
     ? data.heroes
     : [];
 
-  const ids = heroes.map(hero => Number(hero?.id));
-
-  const sourceValida =
-    String(data?.source || "").trim() ===
-    "Rone Arena";
-
-  const cantidadValida =
-    heroes.length >= 100;
-
-  const idsValidos =
-    ids.length === heroes.length &&
-    ids.every(id => Number.isFinite(id)) &&
-    new Set(ids).size === ids.length;
+  const nombresValidos =
+    heroes.length >= 100 &&
+    heroes.every(
+      hero =>
+        typeof hero === "string" &&
+        hero.trim()
+    ) &&
+    new Set(
+      heroes.map(hero => hero.trim())
+    ).size === heroes.length;
 
   const lanesValidas =
     ["exp", "mid", "gold", "jungle", "roam"].every(
       lane =>
         Array.isArray(data?.lanes?.[lane]) &&
-        data.lanes[lane].length >= 5
+        data.lanes[lane].length >= 5 &&
+        data.lanes[lane].every(
+          hero =>
+            typeof hero === "string" &&
+            hero.trim()
+        )
     );
 
   return (
-    data?.schemaVersion === 2 &&
-    sourceValida &&
-    cantidadValida &&
-    idsValidos &&
+    nombresValidos &&
     lanesValidas
   );
 }
@@ -1166,10 +1165,6 @@ async function inicializarBaseDeHeroes() {
     if (
       HERO_DATABASE.length >= 100 &&
       HERO_CATALOG.length >= 100 &&
-      HERO_CATALOG.every(
-        hero =>
-          Number.isFinite(hero.id)
-      ) &&
       Object.values(HERO_LANES).every(
         heroes =>
           Array.isArray(heroes) &&
