@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 const {
-  fetchFreshHeroesFromMLBBHub
+  fetchFreshHeroesFromRoneArena
 } = require(
-  '../api/src/services/mlbbHubClient'
+  '../api/src/services/roneArenaClient'
 );
 
 const OUTPUT_PATH =
@@ -18,11 +18,11 @@ const OUTPUT_PATH =
 
 async function main() {
   console.log(
-    'CounterBro: iniciando actualización de la base de héroes...'
+    'CounterBro: iniciando actualización de la base de héroes desde Rone Arena...'
   );
 
   const data =
-    await fetchFreshHeroesFromMLBBHub();
+    await fetchFreshHeroesFromRoneArena();
 
   if (
     !data ||
@@ -79,10 +79,9 @@ async function main() {
   );
 
   console.log(
-    'CounterBro: base actualizada correctamente.',
+    'CounterBro: base actualizada correctamente desde Rone Arena.',
     {
-      heroes:
-        data.heroes.length,
+      heroes: data.heroes.length,
       lanes:
         Object.fromEntries(
           lanes.map(
@@ -92,8 +91,7 @@ async function main() {
             ]
           )
         ),
-      syncedAt:
-        data.syncedAt
+      syncedAt: data.syncedAt
     }
   );
 }
