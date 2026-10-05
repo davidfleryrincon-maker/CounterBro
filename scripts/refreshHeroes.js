@@ -152,11 +152,39 @@ async function main() {
         a.name.localeCompare(b.name)
     );
 
-  if (heroes.length < 50) {
+  const expectedTotal =
+    Number(payload?.data?.total);
+
+  if (heroes.length < 100) {
     throw new Error(
       "La actualización devolvió solo " +
       heroes.length +
       " héroes."
+    );
+  }
+
+  if (
+    Number.isFinite(expectedTotal) &&
+    expectedTotal > 0 &&
+    heroes.length !== expectedTotal
+  ) {
+    throw new Error(
+      "La actualización quedó incompleta: Rone reportó " +
+      expectedTotal +
+      " héroes y se pudieron construir " +
+      heroes.length +
+      "."
+    );
+  }
+
+  const ids = heroes.map(hero => hero.id);
+
+  if (
+    ids.some(id => !Number.isFinite(id)) ||
+    new Set(ids).size !== ids.length
+  ) {
+    throw new Error(
+      "La actualización contiene IDs de héroe inválidos o duplicados."
     );
   }
 
