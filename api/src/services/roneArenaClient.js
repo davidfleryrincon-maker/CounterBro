@@ -122,30 +122,64 @@ function transformarHero(record) {
 }
 
 async function fetchHeroCatalog() {
-  const response =
-    await request(
-      '/heroes/positions',
-      {
+  const endpoints = [
+    {
+      path: '/academy/heroes/catalog',
+      params: {
+        size: 200,
+        index: 1,
+        lang: 'en'
+      }
+    },
+    {
+      path: '/heroes/positions',
+      params: {
         size: 200,
         index: 1,
         order: 'asc',
         lang: 'en'
       }
-    );
+    }
+  ];
 
-  const heroes =
-    extractRecords(response)
-      .map(transformarHero)
-      .filter(Boolean);
+  let lastError = null;
 
-  if (heroes.length < 50) {
-    throw new Error(
-      'Rone Arena devolvió muy pocos héroes: ' +
-      heroes.length
-    );
+  for (const endpoint of endpoints) {
+    try {
+      const response =
+        await request(
+          endpoint.path,
+          endpoint.params
+        );
+
+      const heroes =
+        extractRecords(response)
+          .map(transformarHero)
+          .filter(Boolean);
+
+      if (heroes.length >= 50) {
+        return heroes;
+      }
+
+      lastError =
+        new Error(
+          'Rone Arena devolvió muy pocos héroes en ' +
+          endpoint.path +
+          ': ' +
+          heroes.length
+        );
+
+    } catch (error) {
+      lastError = error;
+    }
   }
 
-  return heroes;
+  throw (
+    lastError ||
+    new Error(
+      'Rone Arena no pudo devolver el catálogo de héroes.'
+    )
+  );
 }
 
 async function getHeroCatalog() {
@@ -194,20 +228,68 @@ async function getHeroByIdentifier(identifier) {
 }
 
 async function fetchHeroCounters(heroIdentifier) {
-  const response =
-    await request(
-      '/academy/heroes/' +
-      encodeURIComponent(heroIdentifier) +
-      '/counters',
-      {
+  const endpoints = [
+    {
+      path:
+        '/heroes/' +
+        encodeURIComponent(heroIdentifier) +
+        '/counters',
+      params: {
+        days: 7,
         rank: 'all',
         size: 200,
         index: 1,
         lang: 'en'
       }
-    );
+    },
+    {
+      path:
+        '/academy/heroes/' +
+        encodeURIComponent(heroIdentifier) +
+        '/counters',
+      params: {
+        rank: 'all',
+        size: 200,
+        index: 1,
+        lang: 'en'
+      }
+    }
+  ];
 
-  return extractRecords(response);
+  let lastError = null;
+
+  for (const endpoint of endpoints) {
+    try {
+      const response =
+        await request(
+          endpoint.path,
+          endpoint.params
+        );
+
+      const records =
+        extractRecords(response);
+
+      if (records.length > 0) {
+        return records;
+      }
+
+      lastError =
+        new Error(
+          'Rone Arena no devolvió registros de counters en ' +
+          endpoint.path
+        );
+
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw (
+    lastError ||
+    new Error(
+      'Rone Arena no pudo devolver counters para el héroe.'
+    )
+  );
 }
 
 async function fetchFreshHeroesFromRoneArena() {
