@@ -1,4 +1,4 @@
-name: Refresh CounterBro hero base
+name: Refresh CounterBro hero catalog
 
 on:
   schedule:
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   refresh-heroes:
-    name: Refresh Rone Arena hero base
+    name: Refresh static hero catalog from Rone Arena
     runs-on: ubuntu-latest
 
     steps:
@@ -22,22 +22,19 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install backend dependencies
-        run: npm install --prefix api --no-package-lock
-
-      - name: Refresh prepared hero base
+      - name: Refresh static hero catalog
         run: node scripts/refreshHeroes.js
 
-      - name: Commit updated hero base
+      - name: Commit updated catalog
         run: |
-          if git diff --quiet -- api/data/heroes.json; then
-            echo "No hubo cambios en la base de héroes."
+          if git diff --quiet -- data/heroes.json; then
+            echo "No hubo cambios en el catálogo."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add api/data/heroes.json
-          git commit -m "Refresh MLBB hero base from Rone Arena"
+          git add data/heroes.json
+          git commit -m "Refresh CounterBro hero catalog from Rone Arena"
           git push
