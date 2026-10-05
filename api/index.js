@@ -91,7 +91,13 @@ module.exports = async (req, res) => {
       error: 'No fue posible obtener los counters.',
       diagnostic: {
         name: error?.name || 'Error',
-        message: error?.message || String(error)
+        message: error?.message || String(error),
+        code: error?.code || null,
+        status: error?.response?.status || null,
+        upstreamMessage:
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          null
       }
     });
   }
