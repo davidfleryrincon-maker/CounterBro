@@ -604,7 +604,7 @@ async function consultarCountersRone(heroName) {
     );
   }
 
-  const namesById =
+  let namesById =
     new Map(
       HERO_CATALOG
         .filter(hero => Number.isFinite(hero.id))
@@ -613,6 +613,34 @@ async function consultarCountersRone(heroName) {
           hero.name
         ])
     );
+
+  if (namesById.size < 50) {
+    const catalogPayload =
+      await fetchJsonWithRetry(
+        RONE_API_BASE +
+          "/heroes?size=200&index=1&order=asc&lang=en",
+        "Catálogo de nombres de héroes"
+      );
+
+    const catalogRecords =
+      Array.isArray(catalogPayload?.data?.records)
+        ? catalogPayload.data.records
+        : [];
+
+    catalogRecords.forEach(record => {
+      const id = Number(record?.data?.hero_id);
+      const name = String(
+        record?.data?.hero?.data?.name || ""
+      ).trim();
+
+      if (
+        Number.isFinite(id) &&
+        name
+      ) {
+        namesById.set(id, name);
+      }
+    });
+  }
 
   const rows = [];
 
@@ -728,32 +756,592 @@ async function consultarCountersRone(heroName) {
   };
 }
 
-const STARTUP_THOUGHTS = [
-  "Despertando a Nana de su quinta siesta",
-  "Contratando al primer Lord de esta partida",
-  "Haciendo inventario de Minions",
-  "Buscando a Eudora entre los arbustos",
-  "Revisando por qué alguien eligió Hanabi",
-  "Contando cuántas veces murió Yin",
-  "Alimentando a la Tortuga",
-  "Preguntándole a Johnson dónde va",
-  "Revisando el arbusto sospechoso",
-  "Ajustando la puntería de Franco",
-  "Contando torres destruidas",
-  "Buscando el oro de las torres",
-  "Revisando quién se robó el buff rojo",
-  "Enseñándole nuevos trucos a Helcurt",
-  "Diseñando nuevos Backeos",
-  "Revisando si Tigreal sigue campeando",
-  "Buscando una partida sin trolls",
-  "Contando hasta diez antes de iniciar",
-  "Revisando mis archivos secretos",
-  "Fingiendo que todo está bajo control",
-  "Consultando al departamento de estrategia",
-  "Ignorando temporalmente mis problemas",
-  "Ordenando mis pensamientos digitales",
-  "Recordando por qué estoy aquí"
-];
+function actualizarFraseStartup() {
+  const thought =
+    document.getElementById("startupThought");
+
+  if (!thought) {
+    return;
+  }
+
+  const index =
+    Math.floor(
+      Math.random() *
+      STARTUP_THOUGHTS.length
+    );
+
+  thought.textContent =
+    "“" +
+    STARTUP_THOUGHTS[index] +
+    "”";
+}
+
+function iniciarAnimacionStartup() {
+  actualizarFraseStartup();
+
+  if (startupThoughtTimer) {
+    clearInterval(
+      startupThoughtTimer
+    );
+  }
+
+  startupThoughtTimer =
+    setInterval(
+      actualizarFraseStartup,
+      1500
+    );
+
+  return startupThoughtTimer;
+}
+
+function actualizarEstadoStartup(
+  texto,
+  estado = "loading"
+) {
+  const overlay =
+    document.getElementById(
+      "startupOverlay"
+    );
+
+  const status =
+    document.getElementById(
+      "startupStatus"
+    );
+
+  const progressText =
+    document.getElementById(
+      "startupProgressText"
+    );
+
+  if (overlay) {
+    overlay.classList.toggle(
+      "is-error",
+      estado === "error"
+    );
+  }
+
+  if (status) {
+    status.innerHTML =
+      `<span></span>${escapeHtml(texto)}`;
+  }
+
+  if (progressText) {
+    progressText.textContent =
+      estado === "error"
+        ? "REINTENTO NECESARIO"
+        : "SINCRONIZANDO DATOS";
+  }
+}
+
+function mostrarStartupOverlay() {
+  const overlay =
+    document.getElementById(
+      "startupOverlay"
+    );
+
+  if (!overlay) {
+    return;
+  }
+
+  overlay.classList.add(
+    "is-visible"
+  );
+
+  overlay.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  document.body.classList.add(
+    "startup-open"
+  );
+}
+
+async function activarBotonEntradaStartup() {
+  const startupButton =
+    document.getElementById(
+      "startupEnterButton"
+    );
+
+  if (startupButton) {
+    startupButton.disabled = true;
+    startupButton.textContent =
+      "CARGANDO DATOS";
+  }
+
+  await new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        5000
+      )
+  );
+
+  if (startupButton) {
+    startupButton.disabled = false;
+    startupButton.textContent =
+      "TODO LISTO. COMENCEMOS.";
+  }
+
+  actualizarEstadoStartup(
+    "Bases de datos cargadas. CounterBro está listo."
+  );
+}
+
+
+function entrarACounterBro() {
+  const startupButton =
+    document.getElementById(
+      "startupEnterButton"
+    );
+
+  if (
+    startupButton &&
+    startupButton.disabled
+  ) {
+    return;
+  }
+
+  if (startupThoughtTimer) {
+    clearInterval(
+      startupThoughtTimer
+    );
+
+    startupThoughtTimer = null;
+  }
+
+  ocultarStartupOverlay();
+}
+
+
+function ocultarStartupOverlay() {
+  const overlay =
+    document.getElementById(
+      "startupOverlay"
+    );
+
+  if (!overlay) {
+    return;
+  }
+
+  overlay.classList.remove(
+    "is-visible",
+    "is-error"
+  );
+
+  overlay.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  document.body.classList.remove(
+    "startup-open"
+  );
+}
+
+function mostrarErrorStartup() {
+  const overlay =
+    document.getElementById(
+      "startupOverlay"
+    );
+
+  if (!overlay) {
+    return;
+  }
+
+  actualizarEstadoStartup(
+    "No pude cargar la base preparada. Puedes recargar la página.",
+    "error"
+  );
+
+  const thought =
+    document.getElementById(
+      "startupThought"
+    );
+
+  if (thought) {
+    thought.textContent =
+      "“Algo salió mal... dame otro intento y vuelvo a pensar.”";
+  }
+
+  overlay.classList.add(
+    "is-visible",
+    "is-error"
+  );
+
+  overlay.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  document.body.classList.add(
+    "startup-open"
+  );
+}
+
+async function cargarHeroesDesdeCache() {
+  try {
+    const raw =
+      localStorage.getItem(
+        HERO_CACHE_KEY
+      );
+
+    if (!raw) {
+      return false;
+    }
+
+    const cache =
+      JSON.parse(raw);
+
+    if (
+      !cache ||
+      !cache.savedAt ||
+      !cache.data
+    ) {
+      return false;
+    }
+
+    if (
+      Date.now() -
+      cache.savedAt >
+      HERO_CACHE_TTL_MS
+    ) {
+      localStorage.removeItem(
+        HERO_CACHE_KEY
+      );
+
+      return false;
+    }
+
+    aplicarDatosDeHeroes(
+      cache.data
+    );
+
+    console.info(
+      "CounterBro: usando la última base preparada guardada localmente.",
+      {
+        heroes:
+          HERO_DATABASE.length,
+        savedAt:
+          cache.savedAt
+      }
+    );
+
+    return true;
+
+  } catch (error) {
+    console.warn(
+      "CounterBro: cache local inválida.",
+      error
+    );
+
+    return false;
+  }
+}
+
+async function cargarBasePreparada() {
+  const response =
+    await fetch(
+      `${VERCEL_URL}/?getHeroes=true`,
+      {
+        cache: "no-store"
+      }
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP ${response.status}`
+    );
+  }
+
+  const data =
+    await response.json();
+
+  if (
+    !data ||
+    !Array.isArray(data.heroes) ||
+    !data.lanes
+  ) {
+    throw new Error(
+      "Respuesta de base preparada inválida."
+    );
+  }
+
+  aplicarDatosDeHeroes(
+    data
+  );
+
+  localStorage.setItem(
+    HERO_CACHE_KEY,
+    JSON.stringify({
+      savedAt:
+        Date.now(),
+      data
+    })
+  );
+
+  console.info(
+    "CounterBro: base preparada recibida.",
+    {
+      heroes:
+        HERO_DATABASE.length,
+      lanes: {
+        exp:
+          HERO_LANES.exp.length,
+        mid:
+          HERO_LANES.mid.length,
+        gold:
+          HERO_LANES.gold.length,
+        jungle:
+          HERO_LANES.jungle.length,
+        roam:
+          HERO_LANES.roam.length
+      },
+      source:
+        data.source || null,
+      syncedAt:
+        data.syncedAt || null
+    }
+  );
+
+  return true;
+}
+
+async function inicializarBaseDeHeroes() {
+  mostrarStartupOverlay();
+
+  iniciarAnimacionStartup();
+
+  actualizarEstadoStartup(
+    "Verificando la base de héroes"
+  );
+
+  const inicio =
+    performance.now();
+
+  try {
+    const cacheValida =
+      await cargarHeroesDesdeCache();
+
+    if (cacheValida) {
+      actualizarEstadoStartup(
+        "Base local encontrada. Confirmando datos preparados..."
+      );
+    }
+
+    await cargarBasePreparada();
+
+    const tiempo =
+      Math.round(
+        performance.now() -
+        inicio
+      );
+
+    const loader =
+      document.getElementById(
+        "startupLoader"
+      );
+
+    if (loader) {
+      loader.classList.add(
+        "is-ready"
+      );
+    }
+
+    actualizarEstadoStartup(
+      `Base lista · ${HERO_DATABASE.length} héroes disponibles`
+    );
+
+    const progressText =
+      document.getElementById(
+        "startupProgressText"
+      );
+
+    if (progressText) {
+      progressText.textContent =
+        `SISTEMA LISTO · ${tiempo} MS`;
+    }
+
+    await activarBotonEntradaStartup();
+
+    return true;
+
+  } catch (error) {
+    console.error(
+      "CounterBro: no fue posible cargar la base preparada.",
+      error
+    );
+
+    if (
+      HERO_DATABASE.length > 0 &&
+      Object.values(HERO_LANES)
+        .every(
+          heroes =>
+            Array.isArray(heroes) &&
+            heroes.length >= 5
+        )
+    ) {
+      actualizarEstadoStartup(
+        "Usando la última copia válida guardada localmente..."
+      );
+
+      await activarBotonEntradaStartup();
+
+      return true;
+    }
+
+    actualizarEstadoStartup(
+      "No hay una copia local válida y la base preparada no está disponible."
+    );
+
+    mostrarErrorStartup();
+
+    return false;
+
+  }
+}
+
+function asegurarHeroesListos() {
+  if (heroesReady) {
+    return Promise.resolve(true);
+  }
+
+  if (!heroesReadyPromise) {
+    heroesReadyPromise =
+      inicializarBaseDeHeroes();
+  }
+
+  return heroesReadyPromise;
+}
+
+
+
+async function cargarBasePreparada() {
+  const response = await fetch(
+    LOCAL_HERO_DATA_URL,
+    {
+      cache: "no-store"
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP ${response.status} cargando ${LOCAL_HERO_DATA_URL}`
+    );
+  }
+
+  const data = await response.json();
+
+  aplicarDatosDeHeroes(data);
+
+  localStorage.setItem(
+    HERO_CACHE_KEY,
+    JSON.stringify({
+      savedAt: Date.now(),
+      data
+    })
+  );
+
+  console.info(
+    "CounterBro: base estática local cargada.",
+    {
+      heroes: HERO_DATABASE.length,
+      source: data.source || null,
+      syncedAt: data.syncedAt || null
+    }
+  );
+
+  return true;
+}
+
+async function inicializarBaseDeHeroes() {
+  mostrarStartupOverlay();
+  iniciarAnimacionStartup();
+
+  actualizarEstadoStartup(
+    "Verificando la base de héroes"
+  );
+
+  const inicio = performance.now();
+
+  try {
+    const cacheValida =
+      await cargarHeroesDesdeCache();
+
+    if (cacheValida) {
+      actualizarEstadoStartup(
+        "Base local encontrada. Confirmando datos preparados..."
+      );
+    }
+
+    await cargarBasePreparada();
+
+    const tiempo =
+      Math.round(performance.now() - inicio);
+
+    const loader =
+      document.getElementById("startupLoader");
+
+    if (loader) {
+      loader.classList.add("is-ready");
+    }
+
+    actualizarEstadoStartup(
+      `Base lista · ${HERO_DATABASE.length} héroes disponibles`
+    );
+
+    const progressText =
+      document.getElementById("startupProgressText");
+
+    if (progressText) {
+      progressText.textContent =
+        `SISTEMA LISTO · ${tiempo} MS`;
+    }
+
+    await activarBotonEntradaStartup();
+
+    return true;
+
+  } catch (error) {
+    console.error(
+      "CounterBro: no fue posible cargar la base local.",
+      error
+    );
+
+    if (
+      HERO_DATABASE.length > 0 &&
+      Object.values(HERO_LANES).every(
+        heroes =>
+          Array.isArray(heroes) &&
+          heroes.length >= 5
+      )
+    ) {
+      actualizarEstadoStartup(
+        "Usando la última copia válida guardada localmente..."
+      );
+
+      await activarBotonEntradaStartup();
+
+      return true;
+    }
+
+    mostrarErrorStartup();
+    return false;
+  }
+}
+
+function asegurarHeroesListos() {
+  if (heroesReady) {
+    return Promise.resolve(true);
+  }
+
+  if (!heroesReadyPromise) {
+    heroesReadyPromise =
+      inicializarBaseDeHeroes();
+  }
+
+  return heroesReadyPromise;
+}
 
 /* =======================================================
    IDIOMAS
