@@ -548,6 +548,34 @@ async function consultarCountersRone(heroName, linea) {
 const SKILL_COMBO_CACHE = new Map();
 const MAX_SKILL_COMBOS_PER_HERO = 2;
 
+function obtenerIdiomaRone() {
+  const idioma = String(
+    navigator?.language ||
+    navigator?.languages?.[0] ||
+    "en"
+  )
+    .toLowerCase()
+    .split("-")[0]
+    .trim();
+
+  const idiomasRone = new Set([
+    "en",
+    "es",
+    "pt",
+    "fr",
+    "de",
+    "it",
+    "ru",
+    "ja",
+    "ko",
+    "zh"
+  ]);
+
+  return idiomasRone.has(idioma)
+    ? idioma
+    : "en";
+}
+
 async function consultarSkillCombosRone(heroName) {
   const normalized =
     normalizarNombreHeroe(heroName);
@@ -569,7 +597,7 @@ async function consultarSkillCombosRone(heroName) {
     encodeURIComponent(identifier) +
     "/skill-combos?size=" +
     MAX_SKILL_COMBOS_PER_HERO +
-    "&index=1&lang=en";
+    "&index=1&lang=" + obtenerIdiomaRone();
 
   const payload =
     await fetchJsonWithRetry(
