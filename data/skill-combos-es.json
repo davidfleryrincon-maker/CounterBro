@@ -2404,10 +2404,6 @@
             "icon": "https://akmweb.youngjoygame.com/web/svnres/img/test/homepage_2_2_16_1232_1/100_6ad5e6561bec9562a72584c18191a76a.png"
           },
           {
-            "skillId": null,
-            "icon": ""
-          },
-          {
             "skillId": 8010,
             "icon": "https://akmweb.youngjoygame.com/web/svnres/img/test/homepage_2_2_16_1232_1/100_193275791eb7f707158fc5e277a29016.png"
           }
@@ -3285,7 +3281,7 @@
     "combos": [
       {
         "title": "COMBOS DE PELEA EN EQUIPO",
-        "description": "Kagura debe colocar su paraguas entre los enemigos con su primera habilidad, luego usar su habilidad definitiva para restablecer el tiempo de reutilización de su primera habilidad y poder ajustar la ubicación del paraguas antes de teletransportarse a la ubicación del paraguas para aturdir a los enemigos cercanos. Luego debería usar su combo habilidad definitiva + 2nd Skill para escapar de la zona de combate.",
+        "description": "Kagura debe colocar su paraguas entre los enemigos con su primera habilidad, luego usar su habilidad definitiva para restablecer el tiempo de reutilización de su primera habilidad y poder ajustar la ubicación del paraguas antes de teletransportarse a la ubicación del paraguas para aturdir a los enemigos cercanos. Luego debería usar su combo habilidad definitiva + segunda habilidad para escapar de la zona de combate.",
         "skills": [
           {
             "skillId": 2510,
