@@ -2686,6 +2686,18 @@ async function buscarCounter() {
         .forEach(
           (counter, index) => {
 
+            const skillComboSlot =
+              index < 2
+                ? `
+                  <div
+                    class="skill-combo-slot"
+                    data-skill-combo-hero="${escapeHtml(
+                      counter.name
+                    )}"
+                  ></div>
+                  `
+                : "";
+
             const reasonHtml =
               counter.reason
 
