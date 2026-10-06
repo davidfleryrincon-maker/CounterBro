@@ -547,6 +547,7 @@ async function consultarCountersRone(heroName, linea) {
 
 const SKILL_COMBO_CACHE = new Map();
 const MAX_SKILL_COMBOS_PER_HERO = 2;
+let SKILL_COMBO_DATA_PROMISE = null;
 
 function obtenerIdiomaRone() {
   const idioma = String(
@@ -577,43 +578,54 @@ function obtenerIdiomaRone() {
 }
 
 async function consultarSkillCombosRone(heroName) {
+  if (!SKILL_COMBO_DATA_PROMISE) {
+    SKILL_COMBO_DATA_PROMISE =
+      fetchJsonWithRetry(
+        "/data/skill-combos-es.json",
+        "Skill Combos locales"
+      );
+  }
+
+  const skillComboData =
+    await SKILL_COMBO_DATA_PROMISE;
+
   const normalized =
     normalizarNombreHeroe(heroName);
 
-  const catalogHero =
-    HERO_CATALOG.find(
-      hero =>
-        normalizarNombreHeroe(hero.name) ===
+  const entryKey =
+    Object.keys(skillComboData || {}).find(
+      key =>
+        normalizarNombreHeroe(key) ===
         normalized
     );
 
-  const identifier =
-    catalogHero?.id ||
-    heroName;
+  const entry =
+    entryKey
+      ? skillComboData[entryKey]
+      : null;
 
-  const combosUrl =
-    RONE_API_BASE +
-    "/heroes/" +
-    encodeURIComponent(identifier) +
-    "/skill-combos?size=" +
-    MAX_SKILL_COMBOS_PER_HERO +
-    "&index=1&lang=" + obtenerIdiomaRone();
-
-  const payload =
-    await fetchJsonWithRetry(
-      combosUrl,
-      "Skill Combos de " + heroName
-    );
-
-  const records =
-    Array.isArray(payload?.data?.records)
-      ? payload.data.records
+  const combos =
+    Array.isArray(entry?.combos)
+      ? entry.combos
       : [];
 
-  return records
-    .slice(0, MAX_SKILL_COMBOS_PER_HERO);
+  return combos
+    .slice(0, MAX_SKILL_COMBOS_PER_HERO)
+    .map(combo => ({
+      data: {
+        title: combo?.title || "",
+        desc: combo?.description || "",
+        skill_id: Array.isArray(combo?.skills)
+          ? combo.skills.map(skill => ({
+              data: {
+                skillid: skill?.skillId,
+                skillicon: skill?.icon || ""
+              }
+            }))
+          : []
+      }
+    }));
 }
-
 function obtenerSkillCombosCacheados(heroName) {
   const key = normalizarNombreHeroe(heroName);
 
