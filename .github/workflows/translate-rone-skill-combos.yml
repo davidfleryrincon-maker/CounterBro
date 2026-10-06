@@ -1,0 +1,103 @@
+name: Translate Rone skill combos to Spanish
+
+on:
+  push:
+    branches:
+      - data/skill-combos-rone-import
+
+permissions:
+  contents: write
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Translate descriptions
+        env:
+          FILE: data/skill-combos-es.json
+        run: |
+          python - <<'PY'
+          import json, re, time, urllib.parse, urllib.request, subprocess
+
+          path = "data/skill-combos-es.json"
+          with open(path, "r", encoding="utf-8") as f:
+              data = json.load(f)
+
+          def translate(text):
+              protected = {}
+              counter = 0
+
+              def protect(pattern, replacement):
+                  nonlocal text, counter
+                  def repl(m):
+                      nonlocal counter
+                      key = f"CBTERM{counter}X"
+                      counter += 1
+                      protected[key] = replacement
+                      return key
+                  text = re.sub(pattern, repl, text, flags=re.I)
+
+              protect(r"come out ahead in the trade", "salir favorecido en el intercambio")
+              protect(r"chip away(?: at)?", "desgastar")
+              protect(r"harass(?:es|ed|ing)?", "hostigar")
+              protect(r"poke(?:s|d|ing)?", "pokear")
+              protect(r"pressure", "presión")
+              protect(r"trade", "intercambio")
+
+              q = urllib.parse.quote(text, safe="")
+              url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=" + q
+              for attempt in range(5):
+                  try:
+                      with urllib.request.urlopen(url, timeout=30) as response:
+                          raw = response.read().decode("utf-8")
+                      parts = json.loads(raw)[0]
+                      result = "".join(part[0] for part in parts if part[0])
+                      break
+                  except Exception:
+                      if attempt == 4:
+                          raise
+                      time.sleep(2 ** attempt)
+
+              for key, value in protected.items():
+                  result = result.replace(key, value)
+
+              result = re.sub(r"zonificar", "Zonear", result, flags=re.I)
+              result = re.sub(r"\s+([,.!?;:])", r"\1", result)
+              return result
+
+          for hero in data.values():
+              for combo in hero["combos"]:
+                  title = combo["title"].strip().upper()
+                  if title == "TEAMFIGHT COMBOS":
+                      combo["title"] = "COMBOS DE PELEA EN EQUIPO"
+                  elif title == "LANING COMBOS":
+                      combo["title"] = "COMBOS EN LÍNEA"
+                  else:
+                      combo["title"] = translate(combo["title"])
+
+                  combo["description"] = translate(combo["description"])
+                  time.sleep(0.35)
+
+          with open(path, "w", encoding="utf-8", newline="\n") as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+              f.write("\n")
+          PY
+
+      - name: Validate and commit
+        run: |
+          python - <<'PY'
+          import json
+          p="data/skill-combos-es.json"
+          with open(p,encoding="utf-8") as f: d=json.load(f)
+          assert len(d)==133, len(d)
+          assert sum(len(v["combos"]) for v in d.values())==266
+          assert all(v["totalFromRone"]==2 for v in d.values())
+          print("VALID JSON:", len(d), "heroes;", sum(len(v["combos"]) for v in d.values()), "combos")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/skill-combos-es.json
+          git commit -m "Translate Rone skill combos to Spanish"
+          git push
