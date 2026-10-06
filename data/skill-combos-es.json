@@ -159,7 +159,7 @@
     "combos": [
       {
         "title": "COMBOS DE PELEA EN EQUIPO",
-        "description": "Usa la primera habilidad de Alice para pokear al oponente y vuelve a lanzarla para desplazarse instantáneamente encima de ellos, luego continúa con su segunda habilidad para aplicar control de masas a los enemigos y termina con su habilidad definitiva para continuar el ataque.",
+        "description": "Usa la primera habilidad de Alice para pokear/hostigar al oponente y vuelve a lanzarla para desplazarse instantáneamente encima de ellos, luego continúa con su segunda habilidad para aplicar control de masas a los enemigos y termina con su habilidad definitiva para continuar el ataque.",
         "skills": [
           {
             "skillId": 410,
@@ -181,7 +181,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Usa la primera habilidad de Alice para pokear al oponente y vuelve a lanzarla para desplazarse instantáneamente encima de ellos, luego continúa con su segunda habilidad para aplicar control de masas a los enemigos y termina con su habilidad definitiva para continuar el ataque.",
+        "description": "Usa la primera habilidad de Alice para pokear/hostigar al oponente y vuelve a lanzarla para desplazarse instantáneamente encima de ellos, luego continúa con su segunda habilidad para aplicar control de masas a los enemigos y termina con su habilidad definitiva para continuar el ataque.",
         "skills": [
           {
             "skillId": 410,
@@ -339,7 +339,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, usa la primera habilidad de Angela para pokear constantemente al enemigo. Cuando su vida sea baja, usa su segunda habilidad para aplicar control de masas al objetivo, luego continúa infligiendo daño con su primera habilidad.",
+        "description": "En la fase de líneas, usa la primera habilidad de Angela para pokear/hostigar constantemente al enemigo. Cuando su vida sea baja, usa su segunda habilidad para aplicar control de masas al objetivo, luego continúa infligiendo daño con su primera habilidad.",
         "skills": [
           {
             "skillId": 5510,
@@ -905,7 +905,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de calles, recomendamos usar a Renner como arma principal de Beatrix y a Wesker como arma secundaria. Puede usar el ataque básico a distancia de Renner para pokear al enemigo y su segunda habilidad para recargar y disparar nuevamente. Luego puede cambiar a Wesker para acabar con el enemigo objetivo.",
+        "description": "En la fase de calles, recomendamos usar a Renner como arma principal de Beatrix y a Wesker como arma secundaria. Puede usar el ataque básico a distancia de Renner para pokear/hostigar al enemigo y su segunda habilidad para recargar y disparar nuevamente. Luego puede cambiar a Wesker para acabar con el enemigo objetivo.",
         "skills": [
           {
             "skillId": 10500,
@@ -1059,7 +1059,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Brody puede usar regularmente su primera habilidad y sus ataques básicos para despejar carriles y pokear a los héroes enemigos. Una vez que los héroes enemigos tienen poca vida, Brody puede usar su segunda habilidad para acercarse y aturdirlos, luego lanzar su habilidad definitiva para intentar acabar con ellos.",
+        "description": "Brody puede usar regularmente su primera habilidad y sus ataques básicos para despejar carriles y pokear/hostigar a los héroes enemigos. Una vez que los héroes enemigos tienen poca vida, Brody puede usar su segunda habilidad para acercarse y aturdirlos, luego lanzar su habilidad definitiva para intentar acabar con ellos.",
         "skills": [
           {
             "skillId": 10010,
@@ -1225,7 +1225,7 @@
     "combos": [
       {
         "title": "COMBOS DE PELEA EN EQUIPO",
-        "description": "En las peleas en equipo, obtén el escudo de la segunda habilidad de Chang'e, luego usa su primera habilidad para pokear enemigos y continúa con su habilidad definitiva si la primera habilidad estaba en el objetivo. Chang'e necesita moverse durante su habilidad definitiva para mantenerse a salvo y asegurarse de que los meteoros puedan alcanzar el objetivo.",
+        "description": "En las peleas en equipo, obtén el escudo de la segunda habilidad de Chang'e, luego usa su primera habilidad para pokear/hostigar enemigos y continúa con su habilidad definitiva si la primera habilidad estaba en el objetivo. Chang'e necesita moverse durante su habilidad definitiva para mantenerse a salvo y asegurarse de que los meteoros puedan alcanzar el objetivo.",
         "skills": [
           {
             "skillId": 6120,
@@ -1431,7 +1431,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, Claude puede usar su primera habilidad para pokear al enemigo, y usar su segunda habilidad para acercarse a ellos cuando su vida es baja, luego usar su habilidad definitiva para matarlos.",
+        "description": "En la fase de líneas, Claude puede usar su primera habilidad para pokear/hostigar al enemigo, y usar su segunda habilidad para acercarse a ellos cuando su vida es baja, luego usar su habilidad definitiva para matarlos.",
         "skills": [
           {
             "skillId": 6510,
@@ -1555,7 +1555,7 @@
     "combos": [
       {
         "title": "COMBOS DE PELEA EN EQUIPO",
-        "description": "En las peleas en equipo, usa la primera habilidad de Diggie para pokear al enemigo. Si un enemigo intenta iniciarlo, hazlo retroceder con su segunda habilidad. Si un compañero de equipo recibe control de masas o sufre demasiado daño, usa la habilidad definitiva de Diggie para salvarlo.",
+        "description": "En las peleas en equipo, usa la primera habilidad de Diggie para pokear/hostigar al enemigo. Si un enemigo intenta iniciarlo, hazlo retroceder con su segunda habilidad. Si un compañero de equipo recibe control de masas o sufre demasiado daño, usa la habilidad definitiva de Diggie para salvarlo.",
         "skills": [
           {
             "skillId": 4810,
@@ -1619,7 +1619,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, Dyrroth puede usar su segunda habilidad para acercarse al enemigo y lanzarla nuevamente para reducir su defensa física. Luego puede continuar con sus ataques básicos y su primera habilidad para pokear.",
+        "description": "En la fase de líneas, Dyrroth puede usar su segunda habilidad para acercarse al enemigo y lanzarla nuevamente para reducir su defensa física. Luego puede continuar con sus ataques básicos y su primera habilidad para pokear/hostigar.",
         "skills": [
           {
             "skillId": 8520,
@@ -1777,7 +1777,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Estes puede usar su segunda habilidad para ralentizar y pokear a los enemigos, y curar a los aliados con su primera habilidad.",
+        "description": "Estes puede usar su segunda habilidad para ralentizar y pokear/hostigar a los enemigos, y curar a los aliados con su primera habilidad.",
         "skills": [
           {
             "skillId": 3420,
@@ -2285,7 +2285,7 @@
     "combos": [
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, usa la primera habilidad de Granger para pokear al enemigo. Cuando su energía esté baja, usa su segunda habilidad para reponerla y continúa pokear con su primera habilidad.",
+        "description": "En la fase de líneas, usa la primera habilidad de Granger para pokear/hostigar al enemigo. Cuando su energía esté baja, usa su segunda habilidad para reponerla y continúa pokear/hostigar con su primera habilidad.",
         "skills": [
           {
             "skillId": 7910,
@@ -2303,7 +2303,7 @@
       },
       {
         "title": "COMBOS DE PELEA EN EQUIPO",
-        "description": "En peleas en equipo, usa la habilidad definitiva de Granger para pokear desde una distancia segura y continúa el ataque con su primera habilidad. Cuando termine la primera habilidad, usa su habilidad definitiva nuevamente para causar más daño y reposicionarse. Si los enemigos se acercan, usa su segunda habilidad para crear distancia y continúa infligiendo daño con su primera habilidad.",
+        "description": "En peleas en equipo, usa la habilidad definitiva de Granger para pokear/hostigar desde una distancia segura y continúa el ataque con su primera habilidad. Cuando termine la primera habilidad, usa su habilidad definitiva nuevamente para causar más daño y reposicionarse. Si los enemigos se acercan, usa su segunda habilidad para crear distancia y continúa infligiendo daño con su primera habilidad.",
         "skills": [
           {
             "skillId": 7930,
@@ -2415,7 +2415,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, Guinevere debería usar su primera habilidad y sus ataques básicos mejorados para eliminar a los súbditos y pokear a los héroes enemigos. Cuando la vida de los héroes enemigos es baja, usa la segunda habilidad de Guinevere para acercarte a ellos y lanzarlos por el aire. Continúe con su habilidad definitiva para intentar acabar con ellos.",
+        "description": "En la fase de líneas, Guinevere debería usar su primera habilidad y sus ataques básicos mejorados para eliminar a los súbditos y pokear/hostigar a los héroes enemigos. Cuando la vida de los héroes enemigos es baja, usa la segunda habilidad de Guinevere para acercarte a ellos y lanzarlos por el aire. Continúe con su habilidad definitiva para intentar acabar con ellos.",
         "skills": [
           {
             "skillId": 8010,
@@ -2535,7 +2535,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, usa la segunda habilidad de Hanabi para pokear al enemigo y márcalo, y continúa desgastar su vida con rebotes de ataque básico antes de usar su primera habilidad y atacarlos de frente.",
+        "description": "En la fase de líneas, usa la segunda habilidad de Hanabi para pokear/hostigar al enemigo y márcalo, y continúa desgastar su vida con rebotes de ataque básico antes de usar su primera habilidad y atacarlos de frente.",
         "skills": [
           {
             "skillId": 6020,
@@ -3315,7 +3315,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Kagura puede usar su primera habilidad para pokear al enemigo con su paraguas, luego su segunda habilidad para teletransportarse a la ubicación del paraguas, causando más daño a los enemigos y retroceder lanzando su segunda habilidad nuevamente.",
+        "description": "Kagura puede usar su primera habilidad para pokear/hostigar al enemigo con su paraguas, luego su segunda habilidad para teletransportarse a la ubicación del paraguas, causando más daño a los enemigos y retroceder lanzando su segunda habilidad nuevamente.",
         "skills": [
           {
             "skillId": 2510,
@@ -3357,7 +3357,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, usa la primera habilidad de Kaja para pokear y recupera vida. Si el enemigo ataca, usa su segunda habilidad para despegar y luego cometa con sus ataques básicos aéreos. Mantén la distancia cuando te ataquen y ataca cuando el enemigo esté debilitado.",
+        "description": "En la fase de líneas, usa la primera habilidad de Kaja para pokear/hostigar y recupera vida. Si el enemigo ataca, usa su segunda habilidad para despegar y luego cometa con sus ataques básicos aéreos. Mantén la distancia cuando te ataquen y ataca cuando el enemigo esté debilitado.",
         "skills": [
           {
             "skillId": 6210,
@@ -3511,7 +3511,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Usa su primera habilidad para pokear enemigos y ralentizarlos. \r\n\r\nluego continúa con ataques básicos.\r\n\r\nLuego puede usar su segunda habilidad para perseguirse o reposicionarse.",
+        "description": "Usa su primera habilidad para pokear/hostigar enemigos y ralentizarlos. \r\n\r\nluego continúa con ataques básicos.\r\n\r\nLuego puede usar su segunda habilidad para perseguirse o reposicionarse.",
         "skills": [
           {
             "skillId": 4010,
@@ -3749,7 +3749,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, usa la primera habilidad de Lapu-Lapu para pokear a los enemigos. Cuando Bravery Blessing esté lleno, usa su segunda habilidad y sus ataques básicos mejorados.",
+        "description": "En la fase de líneas, usa la primera habilidad de Lapu-Lapu para pokear/hostigar a los enemigos. Cuando Bravery Blessing esté lleno, usa su segunda habilidad y sus ataques básicos mejorados.",
         "skills": [
           {
             "skillId": 3710,
@@ -3849,7 +3849,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "pokear y eliminar enemigos con su primera habilidad mientras elimina súbditos.\r\nCuando la vida del enemigo está cerca del umbral de su Pasiva,\r\ncarga con su segunda habilidad y remata con ataques básicos.",
+        "description": "pokear/hostigar y eliminar enemigos con su primera habilidad mientras elimina súbditos.\r\nCuando la vida del enemigo está cerca del umbral de su Pasiva,\r\ncarga con su segunda habilidad y remata con ataques básicos.",
         "skills": [
           {
             "skillId": 6710,
@@ -4089,7 +4089,7 @@
     "combos": [
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, usa la tercera habilidad de Lunox para ralentizar al oponente y su segunda habilidad para pokear. Cuando reciba daño, use su primera habilidad para recuperarse.",
+        "description": "En la fase de líneas, usa la tercera habilidad de Lunox para ralentizar al oponente y su segunda habilidad para pokear/hostigar. Cuando reciba daño, use su primera habilidad para recuperarse.",
         "skills": [
           {
             "skillId": 6830,
@@ -4623,7 +4623,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la línea, inmoviliza al oponente con la segunda habilidad de Miya y usa su primera habilidad para pokear y eliminar a los súbditos al mismo tiempo.",
+        "description": "En la línea, inmoviliza al oponente con la segunda habilidad de Miya y usa su primera habilidad para pokear/hostigar y eliminar a los súbditos al mismo tiempo.",
         "skills": [
           {
             "skillId": 120,
@@ -4711,7 +4711,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, Nana puede usar su segunda habilidad para hostigar a los héroes enemigos y su primera habilidad para dañar tanto a los súbditos como a los héroes enemigos, lo que le permite pokear a los enemigos mientras cultiva.",
+        "description": "En la fase de líneas, Nana puede usar su segunda habilidad para hostigar a los héroes enemigos y su primera habilidad para dañar tanto a los súbditos como a los héroes enemigos, lo que le permite pokear/hostigar a los enemigos mientras cultiva.",
         "skills": [
           {
             "skillId": 520,
@@ -4951,7 +4951,7 @@
     "combos": [
       {
         "title": "COMBOS DE PELEA EN EQUIPO",
-        "description": "Durante las peleas en equipo, usa los ataques básicos y la primera habilidad de Obsidia para pokear al enemigo, y su segunda habilidad para reposicionarse. Busca oportunidades para acercarte a un objetivo con su habilidad definitiva y elimínalo con tu equipo. Finalmente, usa su movilidad y sus poderosos ataques básicos para acabar con los enemigos restantes.",
+        "description": "Durante las peleas en equipo, usa los ataques básicos y la primera habilidad de Obsidia para pokear/hostigar al enemigo, y su segunda habilidad para reposicionarse. Busca oportunidades para acercarte a un objetivo con su habilidad definitiva y elimínalo con tu equipo. Finalmente, usa su movilidad y sus poderosos ataques básicos para acabar con los enemigos restantes.",
         "skills": [
           {
             "skillId": 13000,
@@ -5223,7 +5223,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, pokear a los enemigos con la primera habilidad\r\ny obtén más velocidad de ataque con su habilidad definitiva cuando los enemigos tienen poca vida. Luego controla y mata a los enemigos con la primera habilidad mejorada.",
+        "description": "En la fase de líneas, pokear/hostigar a los enemigos con la primera habilidad\r\ny obtén más velocidad de ataque con su habilidad definitiva cuando los enemigos tienen poca vida. Luego controla y mata a los enemigos con la primera habilidad mejorada.",
         "skills": [
           {
             "skillId": 9410,
@@ -5273,7 +5273,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Usa la primera habilidad para pokear enemigos y la segunda para curar y crear distancia.",
+        "description": "Usa la primera habilidad para pokear/hostigar enemigos y la segunda para curar y crear distancia.",
         "skills": [
           {
             "skillId": 1410,
@@ -5319,7 +5319,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, Roger debería pokear al enemigo mientras está en su forma humana. Usa su segunda habilidad para obtener velocidad de movimiento adicional y obtener un ángulo para golpear con su primera habilidad. Usa su habilidad definitiva para acercarse al enemigo, seguido de su segunda habilidad para velocidad de ataque y destrozalos con ataques básicos antes de acabar con ellos con su primera habilidad.",
+        "description": "En la fase de líneas, Roger debería pokear/hostigar al enemigo mientras está en su forma humana. Usa su segunda habilidad para obtener velocidad de movimiento adicional y obtener un ángulo para golpear con su primera habilidad. Usa su habilidad definitiva para acercarse al enemigo, seguido de su segunda habilidad para velocidad de ataque y destrozalos con ataques básicos antes de acabar con ellos con su primera habilidad.",
         "skills": [
           {
             "skillId": 3920,
@@ -5401,7 +5401,7 @@
     "combos": [
       {
         "title": "COMBOS DE PELEA EN EQUIPO",
-        "description": "Sabre puede usar su primera habilidad para pokear y debilitar al enemigo, seguir con su segunda habilidad para acercarse y luego usar su habilidad definitiva para acabar con ellos.",
+        "description": "Sabre puede usar su primera habilidad para pokear/hostigar y debilitar al enemigo, seguir con su segunda habilidad para acercarse y luego usar su habilidad definitiva para acabar con ellos.",
         "skills": [
           {
             "skillId": 310,
@@ -5419,7 +5419,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Sabre puede usar su primera habilidad para pokear y debilitar al enemigo, seguir con su segunda habilidad para acercarse y luego usar su habilidad definitiva para acabar con ellos.",
+        "description": "Sabre puede usar su primera habilidad para pokear/hostigar y debilitar al enemigo, seguir con su segunda habilidad para acercarse y luego usar su habilidad definitiva para acabar con ellos.",
         "skills": [
           {
             "skillId": 310,
@@ -5473,7 +5473,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Elven Form Selena puede usar su segunda habilidad para aturdir al enemigo, luego usar su primera habilidad para pokear enemigos e infligir daño.",
+        "description": "Elven Form Selena puede usar su segunda habilidad para aturdir al enemigo, luego usar su primera habilidad para pokear/hostigar enemigos e infligir daño.",
         "skills": [
           {
             "skillId": 6320,
@@ -5515,7 +5515,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Silvanna puede pokear enemigos con su [segunda habilidad]\r\ny usa su primera habilidad para acortar la distancia una vez que tengan poca vida.\r\nLuego, podrá controlarlos y acabar con ellos con su [DEFINITIVA].",
+        "description": "Silvanna puede pokear/hostigar enemigos con su [segunda habilidad]\r\ny usa su primera habilidad para acortar la distancia una vez que tengan poca vida.\r\nLuego, podrá controlarlos y acabar con ellos con su [DEFINITIVA].",
         "skills": [
           {
             "skillId": 9020,
@@ -5577,7 +5577,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Cuando el oponente se concentra en eliminar súbditos, pokear con la primera habilidad de Sora, luego usa su segunda habilidad para crear distancia. Usa la movilidad de su primera y segunda habilidad para atacar eficazmente a los enemigos. El daño de Sora depende de golpear con su primera habilidad.",
+        "description": "Cuando el oponente se concentra en eliminar súbditos, pokear/hostigar con la primera habilidad de Sora, luego usa su segunda habilidad para crear distancia. Usa la movilidad de su primera y segunda habilidad para atacar eficazmente a los enemigos. El daño de Sora depende de golpear con su primera habilidad.",
         "skills": [
           {
             "skillId": 13120,
@@ -5671,7 +5671,7 @@
     "combos": [
       {
         "title": "COMBOS DE PELEA EN EQUIPO",
-        "description": "Mantén presionada la Habilidad 3 para pokear antes de la pelea en equipo, luego mantén presionada la Habilidad 1 para atacar y controlar al enemigo detrás de él, luego mantén presionada la Habilidad 2 para causar un daño masivo. Luego, toca la Habilidad 3 para mantenerte alejado del enemigo, y cuando se acabe el tiempo de reutilización de la habilidad, toca la Habilidad 1 y la Habilidad 2 para matar rápidamente al objetivo.",
+        "description": "Mantén presionada la Habilidad 3 para pokear/hostigar antes de la pelea en equipo, luego mantén presionada la Habilidad 1 para atacar y controlar al enemigo detrás de él, luego mantén presionada la Habilidad 2 para causar un daño masivo. Luego, toca la Habilidad 3 para mantenerte alejado del enemigo, y cuando se acabe el tiempo de reutilización de la habilidad, toca la Habilidad 1 y la Habilidad 2 para matar rápidamente al objetivo.",
         "skills": [
           {
             "skillId": 12650,
@@ -5893,7 +5893,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Uranus puede usar su primera habilidad para pokear al enemigo, luego usar el combo de segunda habilidad y primera habilidad cuando su vida sea baja para acabar con ellos.",
+        "description": "Uranus puede usar su primera habilidad para pokear/hostigar al enemigo, luego usar el combo de segunda habilidad y primera habilidad cuando su vida sea baja para acabar con ellos.",
         "skills": [
           {
             "skillId": 5910,
@@ -5985,7 +5985,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "Usa la primera habilidad para pokear, luego la segunda habilidad para actualizar su CD y la primera habilidad en el mismo enemigo nuevamente para causar Aterror.",
+        "description": "Usa la primera habilidad para pokear/hostigar, luego la segunda habilidad para actualizar su CD y la primera habilidad en el mismo enemigo nuevamente para causar Aterror.",
         "skills": [
           {
             "skillId": 11010,
@@ -6119,7 +6119,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, Wanwan puede pokear enemigos con su primera habilidad.\r\ny luego usa ataques básicos para correr con su pasiva y ajustar los caminos de Swallow Daggers para controlar a los enemigos. Después de atacar las tres debilidades de un enemigo, puede acabar con él con su habilidad definitiva.",
+        "description": "En la fase de líneas, Wanwan puede pokear/hostigar enemigos con su primera habilidad.\r\ny luego usa ataques básicos para correr con su pasiva y ajustar los caminos de Swallow Daggers para controlar a los enemigos. Después de atacar las tres debilidades de un enemigo, puede acabar con él con su habilidad definitiva.",
         "skills": [
           {
             "skillId": 8900,
@@ -6207,7 +6207,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, Xavier posee una excelente herramienta para pokear con su primera habilidad y puede utilizar la ralentización de su segunda habilidad para hacer que los objetivos sean más fáciles de alcanzar. Esta combinación le permite alcanzar rápidamente la Trascendencia. Cuando surja la oportunidad, usa su habilidad definitiva para acabar con un enemigo y mientras estás en estado de Trascendencia.",
+        "description": "En la fase de líneas, Xavier posee una excelente herramienta para pokear/hostigar con su primera habilidad y puede utilizar la ralentización de su segunda habilidad para hacer que los objetivos sean más fáciles de alcanzar. Esta combinación le permite alcanzar rápidamente la Trascendencia. Cuando surja la oportunidad, usa su habilidad definitiva para acabar con un enemigo y mientras estás en estado de Trascendencia.",
         "skills": [
           {
             "skillId": 11510,
@@ -6551,7 +6551,7 @@
     "combos": [
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, usa la primera habilidad de Zhuxin para ralentizar al oponente y aumentar su propia velocidad de movimiento, luego usa su segunda habilidad desde una posición segura e intenta golpear a los súbditos y al oponente al mismo tiempo para pokear y despejar el carril. Una vez que el enemigo tenga suficientes acumulaciones, tíralas a los súbditos para causar daño adicional.",
+        "description": "En la fase de líneas, usa la primera habilidad de Zhuxin para ralentizar al oponente y aumentar su propia velocidad de movimiento, luego usa su segunda habilidad desde una posición segura e intenta golpear a los súbditos y al oponente al mismo tiempo para pokear/hostigar y despejar el carril. Una vez que el enemigo tenga suficientes acumulaciones, tíralas a los súbditos para causar daño adicional.",
         "skills": [
           {
             "skillId": 12550,
