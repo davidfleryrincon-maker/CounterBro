@@ -2415,7 +2415,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, Guinevere debería usar su primera habilidad y sus ataques básicos mejorados para eliminar a los súbditos y a pokear a los héroes enemigos. Cuando la vida de los héroes enemigos es bajo, usa la segunda habilidad de Guinevere para acercarte a ellos y lanzarlos por el aire. Continúe con su habilidad definitiva para intentar acabar con ellos.",
+        "description": "En la fase de líneas, Guinevere debería usar su primera habilidad y sus ataques básicos mejorados para eliminar a los súbditos y pokear a los héroes enemigos. Cuando la vida de los héroes enemigos es baja, usa la segunda habilidad de Guinevere para acercarte a ellos y lanzarlos por el aire. Continúe con su habilidad definitiva para intentar acabar con ellos.",
         "skills": [
           {
             "skillId": 8010,
@@ -4819,7 +4819,7 @@
       },
       {
         "title": "COMBOS EN LÍNEA",
-        "description": "En la fase de líneas, usa la primera habilidad y los ataques básicos de Natan para desgastar al enemigo. Cuando su vida sea lo suficientemente bajo, usa su segunda habilidad para derribar al enemigo y acabar con él con ataques básicos.",
+        "description": "En la fase de líneas, usa la primera habilidad y los ataques básicos de Natan para desgastar al enemigo. Cuando su vida sea lo suficientemente baja, usa su segunda habilidad para derribar al enemigo y acabar con él con ataques básicos.",
         "skills": [
           {
             "skillId": 10710,
