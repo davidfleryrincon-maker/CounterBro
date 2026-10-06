@@ -541,6 +541,312 @@ async function consultarCountersRone(heroName, linea) {
   };
 }
 
+/* =======================================================
+   SKILL COMBOS — RONE ARENA
+   ======================================================= */
+
+const SKILL_COMBO_CACHE = new Map();
+const MAX_SKILL_COMBOS_PER_HERO = 2;
+
+async function consultarSkillCombosRone(heroName) {
+  const normalized =
+    normalizarNombreHeroe(heroName);
+
+  const catalogHero =
+    HERO_CATALOG.find(
+      hero =>
+        normalizarNombreHeroe(hero.name) ===
+        normalized
+    );
+
+  const identifier =
+    catalogHero?.id ||
+    heroName;
+
+  const combosUrl =
+    RONE_API_BASE +
+    "/heroes/" +
+    encodeURIComponent(identifier) +
+    "/skill-combos?size=" +
+    MAX_SKILL_COMBOS_PER_HERO +
+    "&index=1&lang=en";
+
+  const payload =
+    await fetchJsonWithRetry(
+      combosUrl,
+      "Skill Combos de " + heroName
+    );
+
+  const records =
+    Array.isArray(payload?.data?.records)
+      ? payload.data.records
+      : [];
+
+  return records
+    .slice(0, MAX_SKILL_COMBOS_PER_HERO);
+}
+
+function obtenerSkillCombosCacheados(heroName) {
+  const key = normalizarNombreHeroe(heroName);
+
+  if (!key) {
+    return Promise.resolve([]);
+  }
+
+  if (!SKILL_COMBO_CACHE.has(key)) {
+    const request =
+      consultarSkillCombosRone(heroName)
+        .catch(error => {
+          SKILL_COMBO_CACHE.delete(key);
+          throw error;
+        });
+
+    SKILL_COMBO_CACHE.set(key, request);
+  }
+
+  return SKILL_COMBO_CACHE.get(key);
+}
+
+function renderizarSkillCombos(combos) {
+  if (!Array.isArray(combos)) {
+    return "";
+  }
+
+  const validCombos =
+    combos
+      .slice(0, MAX_SKILL_COMBOS_PER_HERO)
+      .filter(
+        combo =>
+          combo &&
+          (
+            combo?.data?.title ||
+            combo?.caption ||
+            combo?.data?.desc
+          )
+      );
+
+  if (validCombos.length === 0) {
+    return "";
+  }
+
+  let html =
+    `
+    <section class="skill-combo-section">
+
+      <div class="skill-combo-heading">
+        ⚔️ RECOMENDACIÓN PARA LA BATALLA
+      </div>
+    `;
+
+  validCombos.forEach(
+    (combo, index) => {
+
+      const title =
+        String(
+          combo?.data?.title ||
+          combo?.caption ||
+          ("Combo " + (index + 1))
+        ).trim();
+
+      const description =
+        String(
+          combo?.data?.desc ||
+          ""
+        ).trim();
+
+      const skills =
+        Array.isArray(
+          combo?.data?.skill_id
+        )
+          ? combo.data.skill_id
+          : [];
+
+      const skillIcons =
+        skills
+          .map(
+            skill =>
+              String(
+                skill?.data?.skillicon ||
+                skill?.skillicon ||
+                ""
+              ).trim()
+          )
+          .filter(
+            icon =>
+              icon.startsWith("https://") ||
+              icon.startsWith("http://")
+          );
+
+      html +=
+        `
+        <div class="skill-combo-item">
+
+          <div class="skill-combo-title">
+            ${escapeHtml(title)}
+          </div>
+
+          ${
+            description
+              ? `
+                <div class="skill-combo-description">
+                  ${escapeHtml(description)}
+                </div>
+                `
+              : ""
+          }
+
+          ${
+            skillIcons.length > 0
+              ? `
+                <div class="skill-combo-sequence">
+                  ${skillIcons
+                    .map(
+                      (icon, iconIndex) =>
+                        `
+                        ${
+                          iconIndex > 0
+                            ? `
+                              <span class="skill-combo-arrow">
+                                →
+                              </span>
+                              `
+                            : ""
+                        }
+
+                        <img
+                          class="skill-combo-icon"
+                          src="${escapeHtml(icon)}"
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        >
+                        `
+                    )
+                    .join("")
+                  }
+                </div>
+                `
+              : ""
+          }
+
+        </div>
+        `;
+    }
+  );
+
+  html +=
+    `
+    </section>
+    `;
+
+  return html;
+}
+
+function cargarSkillCombosDeResultados() {
+  const slots =
+    Array.from(
+      document.querySelectorAll(
+        ".skill-combo-slot"
+      )
+    );
+
+  if (slots.length === 0) {
+    return;
+  }
+
+  const heroes =
+    Array.from(
+      new Set(
+        slots
+          .map(
+            slot =>
+              String(
+                slot.dataset.skillComboHero ||
+                ""
+              ).trim()
+          )
+          .filter(Boolean)
+      )
+    );
+
+  heroes.forEach(
+    heroName => {
+
+      obtenerSkillCombosCacheados(heroName)
+        .then(
+          combos => {
+
+            const html =
+              renderizarSkillCombos(
+                combos
+              );
+
+            document
+              .querySelectorAll(
+                ".skill-combo-slot"
+              )
+              .forEach(
+                slot => {
+
+                  if (
+                    String(
+                      slot.dataset.skillComboHero ||
+                      ""
+                    ).trim() !==
+                    heroName
+                  ) {
+                    return;
+                  }
+
+                  if (html) {
+                    slot.innerHTML = html;
+                  } else {
+                    slot.remove();
+                  }
+
+                }
+              );
+
+          }
+        )
+        .catch(
+          error => {
+
+            console.warn(
+              "CounterBro: no se pudieron cargar Skill Combos de " +
+              heroName +
+              ". La recomendación principal no se verá afectada.",
+              error
+            );
+
+            document
+              .querySelectorAll(
+                ".skill-combo-slot"
+              )
+              .forEach(
+                slot => {
+
+                  if (
+                    String(
+                      slot.dataset.skillComboHero ||
+                      ""
+                    ).trim() ===
+                    heroName
+                  ) {
+                    slot.remove();
+                  }
+
+                }
+              );
+
+          }
+        );
+
+    }
+  );
+}
+
+
 const STARTUP_THOUGHTS = [
   "Despertando a Nana de su quinta siesta",
   "Contratando al primer Lord de esta partida",
@@ -2419,6 +2725,8 @@ async function buscarCounter() {
 
                   ${reasonHtml}
 
+                  ${skillComboSlot}
+
                 </div>
 
               </div>
@@ -2606,6 +2914,13 @@ async function buscarCounter() {
                 : ""
             }
 
+            <div
+              class="skill-combo-slot"
+              data-skill-combo-hero="${escapeHtml(
+                mejor.name
+              )}"
+            ></div>
+
           </div>
           `;
 
@@ -2662,6 +2977,13 @@ async function buscarCounter() {
                         : ""
                     }
 
+                    <div
+                      class="skill-combo-slot"
+                      data-skill-combo-hero="${escapeHtml(
+                        alternativa.name
+                      )}"
+                    ></div>
+
                   </div>
 
                 </div>
@@ -2710,6 +3032,13 @@ async function buscarCounter() {
       }
 
     }
+
+    /*
+       Los Skill Combos son información adicional.
+       Si Rone Arena falla aquí, las recomendaciones
+       principales ya renderizadas permanecen intactas.
+    */
+    cargarSkillCombosDeResultados();
 
   } catch (error) {
 
