@@ -2928,6 +2928,83 @@ body.startup-open {
 }
 
 
+.skill-combo-slot {
+  margin-top: 14px;
+}
+
+
+.skill-combo-section {
+  padding-top: 12px;
+  border-top: 1px solid rgba(148, 163, 184, .08);
+}
+
+
+.skill-combo-heading {
+  color: var(--cyan);
+  font-size: .56rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  line-height: 1.2;
+}
+
+
+.skill-combo-item {
+  margin-top: 10px;
+  padding: 10px 11px;
+  border: 1px solid rgba(0, 229, 255, .08);
+  border-radius: 10px;
+  background: rgba(0, 163, 255, .025);
+}
+
+
+.skill-combo-item + .skill-combo-item {
+  margin-top: 7px;
+}
+
+
+.skill-combo-title {
+  color: var(--text);
+  font-size: .7rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+
+.skill-combo-description {
+  margin-top: 5px;
+  color: #9db2c5;
+  font-size: .65rem;
+  line-height: 1.45;
+}
+
+
+.skill-combo-sequence {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+
+.skill-combo-icon {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 7px;
+  background: rgba(0,0,0,.18);
+}
+
+
+.skill-combo-arrow {
+  color: #617990;
+  font-size: .72rem;
+  font-weight: 900;
+}
+
+
 .meta-result-intro {
   display: flex;
   align-items: flex-end;
