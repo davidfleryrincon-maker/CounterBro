@@ -1,8 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 
-const RONE_API_URL =
-  "https://arena.rone.dev/api/heroes/positions?size=200&index=1&order=asc&lang=en";
+const RONE_API_URLS = [
+  "https://arena-hv.fastapicloud.dev/api/heroes/positions?size=200&index=1&order=asc&lang=en",
+  "https://arena.rone.dev/api/heroes/positions?size=200&index=1&order=asc&lang=en"
+];
 
 const OUTPUT_PATH =
   path.join(
@@ -80,19 +82,50 @@ async function main() {
     "CounterBro: sincronizando catálogo Rone Arena..."
   );
 
-  const response = await fetch(
-    RONE_API_URL,
-    {
-      headers: {
-        Accept: "application/json"
-      }
-    }
-  );
+  let response = null;
+  let lastRequestError = null;
 
-  if (!response.ok) {
+  for (const url of RONE_API_URLS) {
+    try {
+      const candidate = await fetch(url, {
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      if (candidate.ok) {
+        response = candidate;
+        console.log(
+          "CounterBro: catálogo recibido desde " +
+          new URL(url).host
+        );
+        break;
+      }
+
+      lastRequestError = new Error(
+        new URL(url).host +
+        " respondió HTTP " +
+        candidate.status
+      );
+      console.warn(
+        "CounterBro: " +
+        lastRequestError.message +
+        "; probando el siguiente host."
+      );
+    } catch (error) {
+      lastRequestError = error;
+      console.warn(
+        "CounterBro: fallo de conexión con " +
+        new URL(url).host +
+        "; probando el siguiente host."
+      );
+    }
+  }
+
+  if (!response) {
     throw new Error(
-      "Rone Arena respondió HTTP " +
-      response.status
+      "No se pudo obtener el catálogo de Rone Arena desde ninguno de los hosts. " +
+      (lastRequestError?.message || "Error desconocido")
     );
   }
 
