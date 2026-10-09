@@ -36,8 +36,7 @@ function laneKey(value) {
   ) return "gold";
 
   if (
-    text === "mid" ||
-    text.includes("midlane") ||
+    text.includes("mid") ||
     text.includes("middle")
   ) return "mid";
 
@@ -236,17 +235,12 @@ async function main() {
       );
 
     if (lanes[lane].length < 5) {
-      const laneSamples = records.slice(0, 8).map(record => ({
-        hero: record?.data?.hero?.data?.name,
-        roadsort: record?.data?.hero?.data?.roadsort
-      }));
       throw new Error(
         "La línea " +
         lane +
         " tiene solo " +
         lanes[lane].length +
-        " héroes. Muestra de roadsort: " +
-        JSON.stringify(laneSamples)
+        " héroes."
       );
     }
   });
