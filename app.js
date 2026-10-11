@@ -542,9 +542,15 @@ async function consultarCountersRone(heroName, linea) {
         heroWinRate:
           row.heroWinRate,
         reason:
-          "Ventaja estadística del matchup en " +
-          linea.toUpperCase() +
-          " según Rone Arena."
+          "Rone estima un impacto estadístico positivo de +" +
+          (row.edge * 100).toFixed(2) +
+          " puntos porcentuales para este counter frente a " +
+          heroName +
+          (row.heroWinRate !== null
+            ? ". Su tasa de victoria general es " +
+              (row.heroWinRate * 100).toFixed(1) +
+              "%."
+            : ".")
       }));
 
   if (counters.length === 0) {
