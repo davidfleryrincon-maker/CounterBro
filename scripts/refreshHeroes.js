@@ -127,10 +127,13 @@ async function main() {
   }
 
   if (!response) {
-    throw new Error(
-      "No se pudo obtener el catálogo de Rone Arena desde ninguno de los hosts. " +
-      (lastRequestError?.message || "Error desconocido")
+    console.warn(
+      "CounterBro: AVISO: Rone Arena no está disponible desde GitHub Actions. " +
+      "No se actualizó data/heroes.json y se conserva intacto el último catálogo válido. " +
+      "Detalle: " +
+      (lastRequestError?.message || "error desconocido")
     );
+    return;
   }
 
   const payload =
