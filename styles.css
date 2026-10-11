@@ -2774,6 +2774,38 @@ body.startup-open {
 }
 
 
+.counter-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+
+.counter-hero-image {
+  display: block;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(0, 229, 255, .22);
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+
+
+.counter-title-row > strong {
+  display: block;
+  min-width: 0;
+  color: var(--text);
+  font:
+    800 clamp(1.15rem, 2vw, 1.55rem)/1.05
+    "Space Grotesk",
+    sans-serif;
+  letter-spacing: -.025em;
+}
+
+
 .counter-content > strong {
   display: block;
   color: var(--text);
