@@ -2938,7 +2938,10 @@ async function buscarCounter() {
 
               reason:
                 coincidencia.reason ||
-                null
+                null,
+
+              imageUrl:
+                coincidencia.imageUrl || ""
 
             });
 
@@ -2981,10 +2984,21 @@ async function buscarCounter() {
               🏆 TU MEJOR PICK
             </div>
 
-            <div class="recommendation-hero">
-              ${escapeHtml(
-                mejor.name
-              )}
+            <div class="pool-best-hero-row">
+              ${mejor.imageUrl ? `
+                <img
+                  class="counter-hero-image"
+                  src="${escapeHtml(mejor.imageUrl)}"
+                  alt="${escapeHtml(mejor.name)}"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                >
+              ` : ""}
+              <div class="recommendation-hero">
+                ${escapeHtml(
+                  mejor.name
+                )}
+              </div>
             </div>
 
             <div class="recommendation-meta">
@@ -3055,11 +3069,22 @@ async function buscarCounter() {
 
                   <div class="counter-content">
 
-                    <strong>
-                      ${escapeHtml(
-                        alternativa.name
-                      )}
-                    </strong>
+                    <div class="counter-title-row">
+                      ${alternativa.imageUrl ? `
+                        <img
+                          class="counter-hero-image"
+                          src="${escapeHtml(alternativa.imageUrl)}"
+                          alt="${escapeHtml(alternativa.name)}"
+                          loading="lazy"
+                          referrerpolicy="no-referrer"
+                        >
+                      ` : ""}
+                      <strong>
+                        ${escapeHtml(
+                          alternativa.name
+                        )}
+                      </strong>
+                    </div>
 
                     <span class="counter-winrate">
                       ${escapeHtml(
