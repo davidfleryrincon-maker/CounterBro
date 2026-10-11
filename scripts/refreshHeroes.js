@@ -101,6 +101,7 @@ async function main() {
         break;
       }
 
+      const responseBody = (await candidate.text()).slice(0, 400);
       lastRequestError = new Error(
         new URL(url).host +
         " respondió HTTP " +
@@ -109,6 +110,10 @@ async function main() {
       console.warn(
         "CounterBro: " +
         lastRequestError.message +
+        "; content-type=" +
+        (candidate.headers.get("content-type") || "desconocido") +
+        "; respuesta=" +
+        JSON.stringify(responseBody) +
         "; probando el siguiente host."
       );
     } catch (error) {
