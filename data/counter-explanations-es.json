@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "language": "es",
+  "instructions": "Añade solo explicaciones tácticas verificadas. Una entrada por combinación de héroe counter y héroe enemigo. counterHero y enemyHero deben coincidir con los nombres del catálogo de CounterBro. explanation debe explicar una interacción concreta de habilidad y sus condiciones, sin inventar efectos.",
+  "explanations": []
+}
