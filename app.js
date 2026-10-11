@@ -2795,21 +2795,21 @@ async function buscarCounter() {
                 <div class="counter-content">
 
                   <div class="counter-title-row">
-                    \${
+                    ${
                       counter.imageUrl
-                        ? \`
+                        ? `
                           <img
                             class="counter-hero-image"
-                            src="\${escapeHtml(counter.imageUrl)}"
-                            alt="\${escapeHtml(counter.name)}"
+                            src="${escapeHtml(counter.imageUrl)}"
+                            alt="${escapeHtml(counter.name)}"
                             loading="lazy"
                             referrerpolicy="no-referrer"
                           >
-                          \`
+                          `
                         : ""
                     }
                     <strong>
-                      \${escapeHtml(
+                      ${escapeHtml(
                         counter.name
                       )}
                     </strong>
