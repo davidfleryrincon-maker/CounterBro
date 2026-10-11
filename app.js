@@ -402,6 +402,7 @@ async function consultarCountersRone(heroName, linea) {
 
     const imageUrl =
       String(
+        record?.data?.head ||
         heroData?.head ||
         heroData?.image ||
         record?.data?.hero?.head ||
@@ -483,6 +484,8 @@ async function consultarCountersRone(heroName, linea) {
       const embeddedImage =
         String(
           counter?.hero?.data?.head ||
+          counter?.hero?.data?.hero?.data?.head ||
+          counter?.hero?.data?.hero?.data?.squarehead ||
           counter?.hero?.data?.image ||
           counter?.hero?.head ||
           ""
