@@ -1,6 +1,30 @@
 const LOCAL_HERO_DATA_URL = "/data/heroes.json";
 const RONE_API_BASE = "https://arena.rone.dev/api";
 
+let COUNTER_EXPLANATIONS_PROMISE = null;
+
+async function buscarExplicacionTactica(counterName, enemyName) {
+  if (!COUNTER_EXPLANATIONS_PROMISE) {
+    COUNTER_EXPLANATIONS_PROMISE = fetchJsonWithRetry(
+      "/data/counter-explanations-es.json",
+      "Explicaciones tácticas locales"
+    ).catch(error => {
+      COUNTER_EXPLANATIONS_PROMISE = null;
+      throw error;
+    });
+  }
+  const database = await COUNTER_EXPLANATIONS_PROMISE;
+  const entries = Array.isArray(database?.explanations) ? database.explanations : [];
+  const counterKey = normalizarNombreHeroe(counterName);
+  const enemyKey = normalizarNombreHeroe(enemyName);
+  const match = entries.find(entry =>
+    normalizarNombreHeroe(entry?.counterHero) === counterKey &&
+    normalizarNombreHeroe(entry?.enemyHero) === enemyKey &&
+    String(entry?.explanation || "").trim()
+  );
+  return match ? String(match.explanation).trim() : null;
+}
+
 const HERO_CACHE_KEY = "counterbro_local_heroes_v2";
 const HERO_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
@@ -575,6 +599,15 @@ async function consultarCountersRone(heroName, linea) {
       .find(Boolean) ||
     heroName;
 
+  for (const counter of counters) {
+    try {
+      counter.tacticalReason = await buscarExplicacionTactica(counter.name, targetName);
+    } catch (error) {
+      console.warn("CounterBro: no se pudo cargar la base de explicaciones tácticas.", error);
+      counter.tacticalReason = null;
+      break;
+    }
+  }
   return {
     hero: targetName,
     source: "Rone Arena Academy",
@@ -2780,18 +2813,16 @@ async function buscarCounter() {
                 : "";
 
             const reasonHtml =
-              counter.reason
-
-                ? `
-                  <div class="hero-reason">
-                    💡 ${escapeHtml(
-                      counter.reason
-                    )}
-                  </div>
-                  `
-
-                : "";
-
+              (counter.reason ? `
+                <div class="hero-reason">
+                  💡 ${escapeHtml(counter.reason)}
+                </div>
+              ` : "") +
+              (counter.tacticalReason ? `
+                <div class="hero-reason">
+                  🎯 <strong>Ventaja de habilidad:</strong> ${escapeHtml(counter.tacticalReason)}
+                </div>
+              ` : "");
 
             htmlBloque +=
               `
