@@ -382,14 +382,29 @@ async function consultarCountersRone(heroName, linea) {
 
   const laneNames = new Map();
 
+  const laneImages = new Map();
+
   laneRecords.forEach(record => {
     const id =
       Number(record?.data?.hero_id);
 
+    const heroData =
+      record?.data?.hero?.data ||
+      record?.data?.hero ||
+      {};
+
     const name =
       String(
-        record?.data?.hero?.data?.name ||
+        heroData?.name ||
         record?.data?.hero?.name ||
+        ""
+      ).trim();
+
+    const imageUrl =
+      String(
+        heroData?.head ||
+        heroData?.image ||
+        record?.data?.hero?.head ||
         ""
       ).trim();
 
@@ -399,6 +414,10 @@ async function consultarCountersRone(heroName, linea) {
 
     if (Number.isFinite(id) && name) {
       laneNames.set(id, name);
+    }
+
+    if (Number.isFinite(id) && imageUrl) {
+      laneImages.set(id, imageUrl);
     }
   });
 
@@ -461,9 +480,21 @@ async function consultarCountersRone(heroName, linea) {
         return;
       }
 
+      const embeddedImage =
+        String(
+          counter?.hero?.data?.head ||
+          counter?.hero?.data?.image ||
+          counter?.hero?.head ||
+          ""
+        ).trim();
+
       rows.push({
         id: heroId,
         name,
+        imageUrl:
+          embeddedImage ||
+          laneImages.get(heroId) ||
+          "",
         edge,
         heroWinRate:
           Number.isFinite(heroWinRate)
@@ -498,6 +529,7 @@ async function consultarCountersRone(heroName, linea) {
       .slice(0, 20)
       .map(row => ({
         name: row.name,
+        imageUrl: row.imageUrl || "",
         winRate:
           "+" +
           (row.edge * 100).toFixed(2) +
@@ -2762,11 +2794,26 @@ async function buscarCounter() {
 
                 <div class="counter-content">
 
-                  <strong>
-                    ${escapeHtml(
-                      counter.name
-                    )}
-                  </strong>
+                  <div class="counter-title-row">
+                    \${
+                      counter.imageUrl
+                        ? \`
+                          <img
+                            class="counter-hero-image"
+                            src="\${escapeHtml(counter.imageUrl)}"
+                            alt="\${escapeHtml(counter.name)}"
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                          >
+                          \`
+                        : ""
+                    }
+                    <strong>
+                      \${escapeHtml(
+                        counter.name
+                      )}
+                    </strong>
+                  </div>
 
                   <span class="counter-winrate">
                     ${escapeHtml(
