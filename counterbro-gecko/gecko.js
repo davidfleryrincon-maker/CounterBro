@@ -6,6 +6,7 @@
  const img=document.createElement('img');
  const baseSprite='counterbro-gecko/gecko.svg',sleepSprites={base:'counterbro-gecko/gecko-sleep.svg',gold:'counterbro-gecko/gecko-gold-sleep.svg',exp:'counterbro-gecko/gecko-exp-sleep.svg',mid:'counterbro-gecko/gecko-mid-sleep.svg',roam:'counterbro-gecko/gecko-roam-sleep.svg',jungle:'counterbro-gecko/gecko-jungle-sleep.svg',spectral:'counterbro-gecko/gecko-spectral-sleep.svg'};
  const evolutionSprites={gold:'counterbro-gecko/gecko-gold.svg',exp:'counterbro-gecko/gecko-exp.svg',mid:'counterbro-gecko/gecko-mid.svg',roam:'counterbro-gecko/gecko-roam.svg',jungle:'counterbro-gecko/gecko-jungle.svg',spectral:'counterbro-gecko/gecko-spectral.svg'};
+ const walkingSprites={gold:'counterbro-gecko/gecko-gold-walk.svg',exp:'counterbro-gecko/gecko-exp-walk.svg',mid:'counterbro-gecko/gecko-mid-walk.svg',roam:'counterbro-gecko/gecko-roam-walk.svg',jungle:'counterbro-gecko/gecko-jungle-walk.svg',spectral:'counterbro-gecko/gecko-spectral-walk.svg'};
  let awakeSprite=baseSprite,activeEvolution=null,previousEvolution=null,isSleeping=false;
  img.src=awakeSprite;img.alt='';root.appendChild(img);document.body.appendChild(root);
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -15,6 +16,7 @@
  const laneSearchCounts={gold:0,exp:0,mid:0,roam:0,jungle:0};
  let activityTimer=0,transformTimer=0,spectralActive=false;
  function currentSprite(){return activeEvolution?evolutionSprites[activeEvolution]:baseSprite}
+ function setWalking(on){const was=root.classList.contains('is-walking');if(was===on)return;root.classList.toggle('is-walking',on);if(!isSleeping)img.src=on&&activeEvolution?walkingSprites[activeEvolution]:currentSprite();}
  function currentSleepSprite(){return activeEvolution?sleepSprites[activeEvolution]:sleepSprites.base}
  function wakeUp(){if(!isSleeping)return;root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();clearTimeout(napTimer);}
  function wakeSprite(){awakeSprite=currentSprite();if(!isSleeping)img.src=awakeSprite}
@@ -59,9 +61,9 @@
   if(dist>1){
    const step=Math.min(dist,reduce?dist:Math.min(mood==='startled'?4.2:2.35,Math.max(.48,dist*.035)));
    x+=dx/dist*step;y+=dy/dist*step;
-   root.classList.toggle('is-walking',dist>7);root.classList.toggle('faces-right',dx>0);place();
+   setWalking(dist>7);root.classList.toggle('faces-right',dx>0);place();
   }
-  if(dist>1)raf=requestAnimationFrame(frame);else{raf=0;root.classList.remove('is-walking')}
+  if(dist>1)raf=requestAnimationFrame(frame);else{raf=0;setWalking(false)}
  }
  function go(px,py){if(isSleeping)return;const s=size();tx=clamp(px,8,innerWidth-s.w-8);ty=clamp(py,8,innerHeight-s.h-8);if(!raf)raf=requestAnimationFrame(frame)}
  function hop(kind='playful'){
@@ -147,10 +149,10 @@
  addEventListener('keydown',markActivity,{passive:true});
  addEventListener('scroll',()=>{
   markActivity();
-  const delta=scrollY-previousScroll;previousScroll=scrollY;scrolling=true;root.classList.add('is-lagging','is-walking');
+  const delta=scrollY-previousScroll;previousScroll=scrollY;scrolling=true;root.classList.add('is-lagging');setWalking(true);
   const s=size();tx=clamp(x-delta*.25,8,innerWidth-s.w-8);ty=clamp(y+Math.sign(delta)*Math.min(16,Math.abs(delta)*.1),8,innerHeight-s.h-8);
   if(!raf)raf=requestAnimationFrame(frame);clearTimeout(scrollTimer);
-  scrollTimer=setTimeout(()=>{scrolling=false;root.classList.remove('is-lagging','is-walking');if(isSleeping)return;if(peeking){peekAtResults();return}const p=perch();go(p.x,p.y);scheduleWander(1800)},220);
+  scrollTimer=setTimeout(()=>{scrolling=false;root.classList.remove('is-lagging');setWalking(false);if(isSleeping)return;if(peeking){peekAtResults();return}const p=perch();go(p.x,p.y);scheduleWander(1800)},220);
  },{passive:true});
  addEventListener('resize',()=>{const s=size();tx=clamp(tx,8,innerWidth-s.w-8);ty=clamp(ty,8,innerHeight-s.h-8);if(!raf)raf=requestAnimationFrame(frame)},{passive:true});
  const results=document.getElementById('resultadosCounter');
