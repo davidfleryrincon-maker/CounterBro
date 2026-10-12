@@ -203,22 +203,26 @@
    const inv=1/md;sparkVX=(-mx*inv)*2.8;sparkVY=(-my*inv)*2.8;
   }else if(now>sparkFleeUntil){
    spark.classList.remove('is-fleeing');
-   if(now>=sparkNextTurn){
-    sparkTargetHeading=sparkHeading+(Math.random()-.5)*Math.PI*1.65;
-    sparkNextTurn=now+650+Math.random()*1600;
+   // Gentle Brownian drift: tiny continuous nudges create irregular, dust-like motion.
+   sparkVX+=(Math.random()-.5)*.018*dt;
+   sparkVY+=(Math.random()-.5)*.018*dt;
+   sparkVX*=Math.pow(.992,dt);sparkVY*=Math.pow(.992,dt);
+   const speed=Math.hypot(sparkVX,sparkVY);
+   if(speed>.34){sparkVX=sparkVX/speed*.34;sparkVY=sparkVY/speed*.34}
+   else if(speed<.055){
+    const a=Math.random()*Math.PI*2;
+    sparkVX+=Math.cos(a)*.025;sparkVY+=Math.sin(a)*.025;
    }
-   let delta=((sparkTargetHeading-sparkHeading+Math.PI*3)%(Math.PI*2))-Math.PI;
-   sparkHeading+=delta*Math.min(1,.018*dt);
-   const speed=.24+Math.sin(now/1700)*.045;
-   sparkVX=Math.cos(sparkHeading)*speed;
-   sparkVY=Math.sin(sparkHeading)*speed;
+   // A barely perceptible air-current sway prevents rigid straight-line travel.
+   sparkVX+=Math.sin(now/930)*.0015*dt;
+   sparkVY+=Math.cos(now/1170)*.0015*dt;
   }
   sparkX+=sparkVX*dt;sparkY+=sparkVY*dt;
   const minX=8,maxX=Math.max(8,innerWidth-22),minY=30,maxY=Math.max(30,innerHeight-28);
-  if(sparkX<=minX){sparkX=minX;sparkVX=Math.abs(sparkVX);sparkHeading=Math.atan2(sparkVY,sparkVX);sparkTargetHeading=sparkHeading;sparkNextTurn=now+300+Math.random()*500}
-  else if(sparkX>=maxX){sparkX=maxX;sparkVX=-Math.abs(sparkVX);sparkHeading=Math.atan2(sparkVY,sparkVX);sparkTargetHeading=sparkHeading;sparkNextTurn=now+300+Math.random()*500}
-  if(sparkY<=minY){sparkY=minY;sparkVY=Math.abs(sparkVY);sparkHeading=Math.atan2(sparkVY,sparkVX);sparkTargetHeading=sparkHeading;sparkNextTurn=now+300+Math.random()*500}
-  else if(sparkY>=maxY){sparkY=maxY;sparkVY=-Math.abs(sparkVY);sparkHeading=Math.atan2(sparkVY,sparkVX);sparkTargetHeading=sparkHeading;sparkNextTurn=now+300+Math.random()*500}
+  if(sparkX<=minX){sparkX=minX;sparkVX=Math.abs(sparkVX);sparkFleeUntil=Math.min(sparkFleeUntil,now)}
+  else if(sparkX>=maxX){sparkX=maxX;sparkVX=-Math.abs(sparkVX);sparkFleeUntil=Math.min(sparkFleeUntil,now)}
+  if(sparkY<=minY){sparkY=minY;sparkVY=Math.abs(sparkVY);sparkFleeUntil=Math.min(sparkFleeUntil,now)}
+  else if(sparkY>=maxY){sparkY=maxY;sparkVY=-Math.abs(sparkVY);sparkFleeUntil=Math.min(sparkFleeUntil,now)}
   sparkX=clamp(sparkX,minX,maxX);sparkY=clamp(sparkY,minY,maxY);
   sparkPlace();sparkRAF=requestAnimationFrame(moveSpark);
  }
