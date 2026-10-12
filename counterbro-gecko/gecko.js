@@ -164,14 +164,15 @@
  spark.setAttribute('aria-hidden','true');
  document.body.appendChild(spark);
  let sparkVisible=false,sparkX=0,sparkY=0,sparkVX=.42,sparkVY=.25,sparkRAF=0,sparkSpawnTimer=0,sparkRespawnTimer=0,sparkFleeUntil=0;
- let pointerX=-9999,pointerY=-9999,lastSparkTime=0;
+ let pointerX=-9999,pointerY=-9999,lastSparkTime=0,sparkHeading=0,sparkNextTurn=0,sparkTargetHeading=0;
  function sparkPlace(){spark.style.transform='translate3d('+sparkX+'px,'+sparkY+'px,0)'}
  function spawnSpark(){
   clearTimeout(sparkRespawnTimer);
   sparkX=28+Math.random()*Math.max(1,innerWidth-56);
   sparkY=45+Math.random()*Math.max(1,innerHeight-100);
-  const a=Math.random()*Math.PI*2,speed=.055+Math.random()*.055;
-  sparkVX=Math.cos(a)*speed;sparkVY=Math.sin(a)*speed;
+  sparkHeading=Math.random()*Math.PI*2;sparkTargetHeading=sparkHeading;sparkNextTurn=performance.now()+650+Math.random()*1400;
+  const speed=.24+Math.random()*.12;
+  sparkVX=Math.cos(sparkHeading)*speed;sparkVY=Math.sin(sparkHeading)*speed;
   sparkVisible=true;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
   sparkPlace();lastSparkTime=performance.now();
   if(!sparkRAF)sparkRAF=requestAnimationFrame(moveSpark);
@@ -198,19 +199,27 @@
   if(Math.hypot(dx,dy)<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
   const mx=pointerX-(sparkX+7),my=pointerY-(sparkY+7),md=Math.hypot(mx,my);
   if(md<118&&md>0){
-   sparkFleeUntil=now+720;spark.classList.add('is-fleeing');
-   const inv=1/md;sparkVX=(-mx*inv)*4.2;sparkVY=(-my*inv)*4.2;
+   sparkFleeUntil=now+520;spark.classList.add('is-fleeing');
+   const inv=1/md;sparkVX=(-mx*inv)*2.8;sparkVY=(-my*inv)*2.8;
   }else if(now>sparkFleeUntil){
    spark.classList.remove('is-fleeing');
-   sparkVX=sparkVX*.995+(Math.random()-.5)*.008;
-   sparkVY=sparkVY*.995+(Math.random()-.5)*.008;
-   const speed=Math.hypot(sparkVX,sparkVY)||.08,cap=.15;
-   if(speed>cap){sparkVX=sparkVX/speed*cap;sparkVY=sparkVY/speed*cap}
+   if(now>=sparkNextTurn){
+    sparkTargetHeading=sparkHeading+(Math.random()-.5)*Math.PI*1.65;
+    sparkNextTurn=now+650+Math.random()*1600;
+   }
+   let delta=((sparkTargetHeading-sparkHeading+Math.PI*3)%(Math.PI*2))-Math.PI;
+   sparkHeading+=delta*Math.min(1,.018*dt);
+   const speed=.24+Math.sin(now/1700)*.045;
+   sparkVX=Math.cos(sparkHeading)*speed;
+   sparkVY=Math.sin(sparkHeading)*speed;
   }
   sparkX+=sparkVX*dt;sparkY+=sparkVY*dt;
-  if(sparkX<8||sparkX>innerWidth-22)sparkVX*=-1;
-  if(sparkY<30||sparkY>innerHeight-28)sparkVY*=-1;
-  sparkX=clamp(sparkX,8,innerWidth-22);sparkY=clamp(sparkY,30,innerHeight-28);
+  const minX=8,maxX=Math.max(8,innerWidth-22),minY=30,maxY=Math.max(30,innerHeight-28);
+  if(sparkX<=minX){sparkX=minX;sparkVX=Math.abs(sparkVX);sparkHeading=Math.atan2(sparkVY,sparkVX);sparkTargetHeading=sparkHeading;sparkNextTurn=now+300+Math.random()*500}
+  else if(sparkX>=maxX){sparkX=maxX;sparkVX=-Math.abs(sparkVX);sparkHeading=Math.atan2(sparkVY,sparkVX);sparkTargetHeading=sparkHeading;sparkNextTurn=now+300+Math.random()*500}
+  if(sparkY<=minY){sparkY=minY;sparkVY=Math.abs(sparkVY);sparkHeading=Math.atan2(sparkVY,sparkVX);sparkTargetHeading=sparkHeading;sparkNextTurn=now+300+Math.random()*500}
+  else if(sparkY>=maxY){sparkY=maxY;sparkVY=-Math.abs(sparkVY);sparkHeading=Math.atan2(sparkVY,sparkVX);sparkTargetHeading=sparkHeading;sparkNextTurn=now+300+Math.random()*500}
+  sparkX=clamp(sparkX,minX,maxX);sparkY=clamp(sparkY,minY,maxY);
   sparkPlace();sparkRAF=requestAnimationFrame(moveSpark);
  }
  addEventListener('mousemove',e=>{pointerX=e.clientX;pointerY=e.clientY},{passive:true});
