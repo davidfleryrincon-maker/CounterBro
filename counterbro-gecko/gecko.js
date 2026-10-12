@@ -6,7 +6,7 @@
  const img=document.createElement('img');img.src='counterbro-gecko/gecko.svg';img.alt='';root.appendChild(img);document.body.appendChild(root);
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  let x=0,y=0,tx=0,ty=0,raf=0,scrollTimer=0,previousScroll=scrollY,scrolling=false;
- let mouseTimer=0,lastReact=0,mouseX=null,mouseY=null,resultTimer=0,resultReturnTimer=0,peeking=false,wanderTimer=0;
+ let mouseTimer=0,lastReact=0,mouseX=null,mouseY=null,resultTimer=0,resultReturnTimer=0,peeking=false,wanderTimer=0,jumpTimer=0;
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  function size(){return {w:root.offsetWidth||100,h:root.offsetHeight||74}}
  function place(){root.style.left=x+'px';root.style.top=y+'px';root.style.right='auto';root.style.bottom='auto'}
@@ -21,6 +21,14 @@
   if(dist>1)raf=requestAnimationFrame(frame);else{raf=0;root.classList.remove('is-walking')}
  }
  function go(px,py){const s=size();tx=clamp(px,8,innerWidth-s.w-8);ty=clamp(py,8,innerHeight-s.h-8);if(!raf)raf=requestAnimationFrame(frame)}
+ function jump(){
+  root.classList.remove('is-jumping');
+  // Restart the CSS keyframes for every click without toggling mouse curiosity.
+  void root.offsetWidth;root.classList.add('is-jumping');
+  clearTimeout(jumpTimer);jumpTimer=setTimeout(()=>root.classList.remove('is-jumping'),620);
+  scheduleWander(900);
+ }
+ root.addEventListener('click',jump);
  function rectsToAvoid(){
   const selectors='header,nav,button,input,textarea,select,[role="button"],.hero-card,.hero-card-container,#resultadosCounter,.result-card,.counter-card,.step-card';
   return [...document.querySelectorAll(selectors)].filter(el=>el!==root&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>el.getBoundingClientRect()).filter(r=>r.width>0&&r.height>0);
@@ -61,7 +69,6 @@
  function noticeMouse(e){
   mouseX=e.clientX;mouseY=e.clientY;clearTimeout(mouseTimer);
   mouseTimer=setTimeout(()=>{
-   // Cursor curiosity is continuous; clicks never toggle tracking on/off.
    if(scrolling||mouseX==null)return;
    const s=size(),cx=x+s.w/2,cy=y+s.h/2,d=Math.hypot(mouseX-cx,mouseY-cy);
    if(d>340)return;const now=Date.now();if(now-lastReact<900)return;lastReact=now;
