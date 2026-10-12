@@ -455,13 +455,14 @@ async function consultarCountersRone(heroName, linea) {
   }
 
   /*
-     Los counters de Academy ya contienen la métrica
-     increase_win_rate para cada matchup.
+     En esta respuesta, increase_win_rate mide el cambio
+     de rendimiento del héroe principal (el enemigo elegido)
+     frente al sub_hero.
 
-     Conservamos únicamente héroes pertenecientes
-     a la línea seleccionada y únicamente ventajas
-     positivas. Así B significa realmente:
-     "mejor counter disponible en esta línea".
+     Un valor NEGATIVO significa que el sub_hero reduce
+     el rendimiento del héroe principal: ese sub_hero es
+     un counter del enemigo. Por eso invertimos el signo
+     para mostrar la magnitud positiva de la ventaja del counter.
   */
   const rows = [];
 
@@ -485,7 +486,7 @@ async function consultarCountersRone(heroName, linea) {
         !Number.isFinite(heroId) ||
         !Number.isFinite(edge) ||
         !laneIds.has(heroId) ||
-        edge <= 0
+        edge >= 0
       ) {
         return;
       }
@@ -522,7 +523,7 @@ async function consultarCountersRone(heroName, linea) {
           embeddedImage ||
           laneImages.get(heroId) ||
           "",
-        edge,
+        edge: -edge,
         heroWinRate:
           Number.isFinite(heroWinRate)
             ? heroWinRate
@@ -566,9 +567,11 @@ async function consultarCountersRone(heroName, linea) {
         heroWinRate:
           row.heroWinRate,
         reason:
-          "Rone estima un impacto estadístico positivo de +" +
+          "Rone estima que este héroe reduce el rendimiento de " +
+          heroName +
+          " en " +
           (row.edge * 100).toFixed(2) +
-          " puntos porcentuales para este counter frente a " +
+          " puntos porcentuales, lo que representa una ventaja estadística para el counter frente a " +
           heroName +
           (row.heroWinRate !== null
             ? ". Su tasa de victoria general es " +
