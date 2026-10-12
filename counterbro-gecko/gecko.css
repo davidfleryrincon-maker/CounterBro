@@ -28,3 +28,17 @@
 @keyframes geckoEvolutionRing{0%,10%{opacity:0;transform:scale(.2)}35%{opacity:.9;transform:scale(1)}70%{opacity:.65;transform:scale(1.35)}100%{opacity:0;transform:scale(1.7)}}
 @keyframes geckoEvolutionReveal{0%,28%{opacity:1;filter:brightness(1)}45%{opacity:.08;filter:brightness(3)}68%{opacity:1;filter:brightness(2.2)}100%{opacity:1;filter:brightness(1)}}
 @media(prefers-reduced-motion:reduce){#counterbro-gecko-widget.is-evolving::before,#counterbro-gecko-widget.is-evolving::after,#counterbro-gecko-widget.is-evolving img{animation:none;opacity:0}}
+
+/* Free-floating light particle */
+#counterbro-gecko-spark{position:fixed;left:0;top:0;width:14px;height:14px;z-index:49;pointer-events:none;opacity:0;visibility:hidden;border-radius:50%;background:radial-gradient(circle at 50% 50%,#fff 0 12%,#fff9c9 20%,#ffe98b 36%,#ffc94a 48%,#ffb62c22 72%,transparent 74%);filter:drop-shadow(0 0 4px #fff3a8) drop-shadow(0 0 9px #ffd65a);will-change:transform,opacity}
+#counterbro-gecko-spark::before,#counterbro-gecko-spark::after{content:"";position:absolute;left:50%;top:50%;background:#fff9d8;transform:translate(-50%,-50%);border-radius:100%}
+#counterbro-gecko-spark::before{width:3px;height:20px;box-shadow:0 0 5px #fff}
+#counterbro-gecko-spark::after{width:20px;height:3px;box-shadow:0 0 5px #fff}
+#counterbro-gecko-spark.is-visible{visibility:visible;opacity:.95;animation:sparkTwinkle 1.4s ease-in-out infinite}
+#counterbro-gecko-spark.is-fleeing{filter:drop-shadow(0 0 7px #fff7c5) drop-shadow(0 0 13px #ffcf4b);animation:sparkDash .16s ease-in-out infinite alternate}
+#counterbro-gecko-spark.is-eaten{opacity:0;visibility:hidden;scale:.1;transition:opacity .18s,scale .18s}
+#counterbro-gecko-widget.is-eating-spark{animation:geckoSnack .52s steps(4,end)}
+@keyframes sparkTwinkle{0%,100%{opacity:.65;scale:.78}50%{opacity:1;scale:1.12}}
+@keyframes sparkDash{from{scale:1;opacity:.9}to{scale:1.28;opacity:1}}
+@keyframes geckoSnack{0%,100%{translate:0 0}25%{translate:0 -7px}48%{translate:0 1px}68%{translate:0 -3px}}
+@media(prefers-reduced-motion:reduce){#counterbro-gecko-spark.is-visible,#counterbro-gecko-spark.is-fleeing,#counterbro-gecko-widget.is-eating-spark{animation:none}}
