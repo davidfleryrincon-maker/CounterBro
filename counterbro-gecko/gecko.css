@@ -1,7 +1,9 @@
-#counterbro-gecko-widget{position:fixed;left:auto;top:auto;width:124px;height:92px;z-index:50;pointer-events:none;opacity:.99;filter:drop-shadow(0 4px 5px #0008);transition:opacity .2s ease;will-change:left,top}
+#counterbro-gecko-widget{position:fixed;left:auto;top:auto;width:124px;height:92px;z-index:50;pointer-events:none;opacity:.99;filter:drop-shadow(0 4px 5px #0008);transition:opacity .12s ease;will-change:left,top}
 #counterbro-gecko-widget img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 #counterbro-gecko-widget.is-hidden{opacity:0}
 #counterbro-gecko-widget.is-walking img{filter:brightness(1.06)}
 #counterbro-gecko-widget.faces-right img{transform:scaleX(-1)}
+#counterbro-gecko-widget.is-lagging{filter:drop-shadow(0 4px 5px #0008) blur(.25px)}
+#counterbro-gecko-widget.catching-up{filter:drop-shadow(0 4px 5px #0008)}
 @media(max-width:600px){#counterbro-gecko-widget{width:94px;height:70px}}
 @media(prefers-reduced-motion:reduce){#counterbro-gecko-widget{transition:none}}
