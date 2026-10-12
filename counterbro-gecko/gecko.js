@@ -54,6 +54,7 @@
  function perch(){const s=size();return {x:innerWidth-s.w-12,y:innerHeight-s.h-12}}
  function setMood(next,duration=0){mood=next;root.dataset.mood=next;clearTimeout(idleTimer);if(duration)idleTimer=setTimeout(()=>{if(!scrolling&&!peeking)setMood('curious')},duration)}
  function frame(){
+  if(isSleeping){raf=0;return}
   const dx=tx-x,dy=ty-y,dist=Math.hypot(dx,dy);
   if(dist>1){
    const step=Math.min(dist,reduce?dist:Math.min(mood==='startled'?4.2:2.35,Math.max(.48,dist*.035)));
@@ -71,7 +72,7 @@
  function reactToClick(){
   markActivity();
   const now=Date.now();lastClick=now;clearTimeout(napTimer);clearTimeout(wanderTimer);if(root.classList.contains('is-resting')){root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();}
-  wakeUp();const r=root.getBoundingClientRect(),s=size();
+  wakeUp();wakeUp();const r=root.getBoundingClientRect(),s=size();
   const roll=Math.random();
   if(roll<.2){setMood('aloof',2200);go(x+(Math.random()<.5?-1:1)*(55+Math.random()*55),y+(Math.random()-.5)*35);return}
   if(roll<.48){setMood('playful',900);hop('playful');scheduleWander(750);return}
