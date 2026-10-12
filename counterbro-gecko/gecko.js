@@ -77,6 +77,7 @@
   setMood('curious',1000);hop('playful');go(x+(Math.random()-.5)*90,y+(Math.random()-.5)*55);scheduleWander(1200);
  }
  root.addEventListener('click',reactToClick);
+ document.addEventListener('click',markActivity,{passive:true});
  function rectsToAvoid(){
   const selectors='header,nav,button,input,textarea,select,[role="button"],.hero-card,.hero-card-container,#resultadosCounter,.result-card,.counter-card,.step-card';
   return [...document.querySelectorAll(selectors)].filter(el=>el!==root&&el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden').map(el=>el.getBoundingClientRect()).filter(r=>r.width>0&&r.height>0);
