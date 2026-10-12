@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" shape-rendering="crispEdges">
  <ellipse cx="64" cy="85" rx="43" ry="4" fill="#080713" opacity=".45"/>
- <g stroke="#393a3a" stroke-width="3" stroke-linejoin="round"><path d="M78 59h13v-7h9v-8h7v-8h7v-7h6v13h-5v8h-7v8h-8v7h-9v6H78z" id="tail-walk" fill="#77766f"/><path d="M83 60h10v-6h8v-7h7v-8h5v7h-5v7h-7v7h-8v5h-8z" fill="#b7b4ac" stroke="none"/></g>
+ <g stroke="#393a3a" stroke-width="3" stroke-linejoin="round"><path d="M78 59h13v-7h9v-8h7v-8h7v-7h6v13h-5v8h-7v8h-8v7h-9v6H78z" fill="#77766f"/><path d="M83 60h10v-6h8v-7h7v-8h5v7h-5v7h-7v7h-8v5h-8z" fill="#b7b4ac" stroke="none"/></g>
  
  <g stroke="#393a3a" stroke-width="3" stroke-linejoin="round">
- <path d="M40 64h12v9l-4 5v5H34v-5h6z" id="leg-0" fill="#77766f"/><path d="M35 79h12v4H35z" fill="#b7b4ac"/>
- <path d="M69 65h12v9l-4 5v5H63v-5h6z" id="leg-1" fill="#77766f"/><path d="M64 79h12v4H64z" fill="#b7b4ac"/>
- <path d="M29 61h10v8l-4 4v5H24v-5h5z" id="leg-2" fill="#77766f"/><path d="M24 74h11v4H24z" fill="#b7b4ac"/>
- <path d="M79 61h10v8l-4 4v5H74v-5h5z" id="leg-3" fill="#77766f"/><path d="M74 74h11v4H74z" fill="#b7b4ac"/>
+ <path d="M40 64h12v9l-4 5v5H34v-5h6z" fill="#77766f"/><path d="M35 79h12v4H35z" fill="#b7b4ac"/>
+ <path d="M69 65h12v9l-4 5v5H63v-5h6z" fill="#77766f"/><path d="M64 79h12v4H64z" fill="#b7b4ac"/>
+ <path d="M29 61h10v8l-4 4v5H24v-5h5z" fill="#77766f"/><path d="M24 74h11v4H24z" fill="#b7b4ac"/>
+ <path d="M79 61h10v8l-4 4v5H74v-5h5z" id="tail-walk" fill="#77766f"/><path d="M74 74h11v4H74z" fill="#b7b4ac"/>
  </g>
  <!-- clearly separated torso -->
  <path d="M35 57V48h9v-6h13v-4h18v4h11v6h8v9h5v11H88v7H75v4H50v-4H40v-5h-7v-8h-4v-5z" fill="#77766f" stroke="#393a3a" stroke-width="3" stroke-linejoin="round"/>
