@@ -3,11 +3,49 @@
  const settings=window.COUNTERBRO_GECKO||{enabled:false};
  if(!settings.enabled||document.getElementById('counterbro-gecko-widget'))return;
  const root=document.createElement('div');root.id='counterbro-gecko-widget';root.setAttribute('aria-hidden','true');
- const img=document.createElement('img');const awakeSprite='counterbro-gecko/gecko.svg',sleepSprite='counterbro-gecko/gecko-sleep.svg';img.src=awakeSprite;img.alt='';root.appendChild(img);document.body.appendChild(root);
+ const img=document.createElement('img');
+ const baseSprite='counterbro-gecko/gecko.svg',sleepSprite='counterbro-gecko/gecko-sleep.svg';
+ const evolutionSprites={gold:'counterbro-gecko/gecko-gold.svg',exp:'counterbro-gecko/gecko-exp.svg',mid:'counterbro-gecko/gecko-mid.svg',roam:'counterbro-gecko/gecko-roam.svg',jungle:'counterbro-gecko/gecko-jungle.svg',spectral:'counterbro-gecko/gecko-spectral.svg'};
+ let awakeSprite=baseSprite,activeEvolution=null,previousEvolution=null,isSleeping=false;
+ img.src=awakeSprite;img.alt='';root.appendChild(img);document.body.appendChild(root);
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  let x=0,y=0,tx=0,ty=0,raf=0,scrollTimer=0,previousScroll=scrollY,scrolling=false;
  let mouseTimer=0,lastReact=0,mouseX=null,mouseY=null,resultTimer=0,resultReturnTimer=0,peeking=false,wanderTimer=0,jumpTimer=0,idleTimer=0,napTimer=0;
  let mood='curious',lastClick=0,curiosityUntil=0;
+ const laneSearchCounts={gold:0,exp:0,mid:0,roam:0,jungle:0};
+ let activityTimer=0,transformTimer=0,spectralActive=false;
+ function currentSprite(){return activeEvolution?evolutionSprites[activeEvolution]:baseSprite}
+ function wakeSprite(){awakeSprite=currentSprite();if(!isSleeping)img.src=awakeSprite}
+ function transformTo(evolution){
+  if(!evolution||activeEvolution===evolution)return;
+  activeEvolution=evolution;wakeSprite();
+  root.classList.remove('is-resting');isSleeping=false;clearTimeout(napTimer);
+  root.classList.remove('is-evolving');void root.offsetWidth;root.classList.add('is-evolving');
+  clearTimeout(transformTimer);transformTimer=setTimeout(()=>root.classList.remove('is-evolving'),1250);
+ }
+ function completeSearch(lane){
+  if(!Object.prototype.hasOwnProperty.call(laneSearchCounts,lane))return;
+  laneSearchCounts[lane]++;
+  if(laneSearchCounts[lane]>=2&&laneSearchCounts[lane]%2===0&&activeEvolution!==lane){
+   spectralActive=false;previousEvolution=null;transformTo(lane);
+  }
+ }
+ function markActivity(){
+  clearTimeout(activityTimer);
+  if(spectralActive){
+   spectralActive=false;const restore=previousEvolution;previousEvolution=null;
+   root.classList.remove('is-spectral');
+   activeEvolution=restore;wakeSprite();
+   root.classList.remove('is-evolving');void root.offsetWidth;root.classList.add('is-evolving');
+   clearTimeout(transformTimer);transformTimer=setTimeout(()=>root.classList.remove('is-evolving'),1250);
+  }
+  activityTimer=setTimeout(()=>{
+   if(spectralActive)return;
+   previousEvolution=activeEvolution;spectralActive=true;
+   transformTo('spectral');root.classList.add('is-spectral');
+  },180000);
+ }
+ window.CounterBroGecko={completeSearch};
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  function size(){return {w:root.offsetWidth||100,h:root.offsetHeight||74}}
  function place(){root.style.left=x+'px';root.style.top=y+'px';root.style.right='auto';root.style.bottom='auto'}
@@ -29,7 +67,8 @@
   clearTimeout(jumpTimer);jumpTimer=setTimeout(()=>root.classList.remove('is-jumping','is-pouncing'),700);
  }
  function reactToClick(){
-  const now=Date.now();lastClick=now;clearTimeout(napTimer);clearTimeout(wanderTimer);if(root.classList.contains('is-resting')){root.classList.remove('is-resting');img.src=awakeSprite;}
+  markActivity();
+  const now=Date.now();lastClick=now;clearTimeout(napTimer);clearTimeout(wanderTimer);if(root.classList.contains('is-resting')){root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();}
   const r=root.getBoundingClientRect(),s=size();
   const roll=Math.random();
   if(roll<.2){setMood('aloof',2200);go(x+(Math.random()<.5?-1:1)*(55+Math.random()*55),y+(Math.random()-.5)*35);return}
@@ -50,8 +89,8 @@
  function wander(){
   if(scrolling||peeking){scheduleWander(1200);return}
   const s=size(),rects=rectsToAvoid(),roll=Math.random();
-  if(roll<.16){setMood('resting',0);root.classList.add('is-resting');img.src=sleepSprite;napTimer=setTimeout(()=>{root.classList.remove('is-resting');img.src=awakeSprite;setMood('curious');scheduleWander(500)},3800+Math.random()*3600);scheduleWander(8200+Math.random()*4200);return}
-  if(root.classList.contains('is-resting')){root.classList.remove('is-resting');img.src=awakeSprite;clearTimeout(napTimer)}
+  if(roll<.16){setMood('resting',0);isSleeping=true;root.classList.add('is-resting');img.src=sleepSprite;napTimer=setTimeout(()=>{root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();setMood('curious');scheduleWander(500)},3800+Math.random()*3600);scheduleWander(8200+Math.random()*4200);return}
+  if(root.classList.contains('is-resting')){root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();clearTimeout(napTimer)}
   if(roll<.36)setMood('watchful',1300);else setMood('curious',1800);
   let best=null,bestScore=Infinity;
   for(let i=0;i<24;i++){
@@ -63,7 +102,7 @@
   if(best)go(best.x,best.y);scheduleWander(3200+Math.random()*4200);
  }
  function scheduleWander(delay){clearTimeout(wanderTimer);wanderTimer=setTimeout(wander,delay)}
- const start=perch();x=tx=start.x;y=ty=start.y;place();scheduleWander(1800);
+ const start=perch();x=tx=start.x;y=ty=start.y;place();markActivity();scheduleWander(1800);
  function peekAtResults(){
   const results=document.getElementById('resultadosCounter');
   if(!results||getComputedStyle(results).display==='none'||!results.getClientRects().length)return;
@@ -98,9 +137,12 @@
    if(!peeking)scheduleWander(3800+Math.random()*2500);
   },380);
  }
- addEventListener('mousemove',noticeMouse,{passive:true});
- addEventListener('touchmove',e=>{if(e.touches&&e.touches[0])noticeMouse(e.touches[0])},{passive:true});
+ addEventListener('mousemove',e=>{markActivity();noticeMouse(e)},{passive:true});
+ addEventListener('touchstart',markActivity,{passive:true});
+ addEventListener('touchmove',e=>{markActivity();if(e.touches&&e.touches[0])noticeMouse(e.touches[0])},{passive:true});
+ addEventListener('keydown',markActivity,{passive:true});
  addEventListener('scroll',()=>{
+  markActivity();
   const delta=scrollY-previousScroll;previousScroll=scrollY;scrolling=true;root.classList.add('is-lagging','is-walking');
   const s=size();tx=clamp(x-delta*.25,8,innerWidth-s.w-8);ty=clamp(y+Math.sign(delta)*Math.min(16,Math.abs(delta)*.1),8,innerHeight-s.h-8);
   if(!raf)raf=requestAnimationFrame(frame);clearTimeout(scrollTimer);
