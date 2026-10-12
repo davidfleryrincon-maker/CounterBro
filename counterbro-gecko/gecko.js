@@ -171,7 +171,8 @@
   sparkX=28+Math.random()*Math.max(1,innerWidth-56);
   sparkY=45+Math.random()*Math.max(1,innerHeight-100);
   sparkHeading=Math.random()*Math.PI*2;sparkTargetHeading=sparkHeading;sparkNextTurn=performance.now()+650+Math.random()*1400;
-  const speed=.24+Math.random()*.12;
+  // Start almost still; airflow nudges the particle instead of pushing it in a straight line.
+  const speed=.018+Math.random()*.025;
   sparkVX=Math.cos(sparkHeading)*speed;sparkVY=Math.sin(sparkHeading)*speed;
   sparkVisible=true;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
   sparkPlace();lastSparkTime=performance.now();
@@ -203,22 +204,23 @@
    const inv=1/md;sparkVX=(-mx*inv)*2.8;sparkVY=(-my*inv)*2.8;
   }else if(now>sparkFleeUntil){
    spark.classList.remove('is-fleeing');
-   // Gentle Brownian drift: tiny continuous nudges create irregular, dust-like motion.
-   sparkVX+=(Math.random()-.5)*.018*dt;
-   sparkVY+=(Math.random()-.5)*.018*dt;
-   sparkVX*=Math.pow(.992,dt);sparkVY*=Math.pow(.992,dt);
+   // Dust-like Brownian motion: very slow, frequent random nudges and strong damping.
+   sparkVX+=(Math.random()-.5)*.006*dt;
+   sparkVY+=(Math.random()-.5)*.006*dt;
+   sparkVX*=Math.pow(.94,dt);sparkVY*=Math.pow(.94,dt);
    const speed=Math.hypot(sparkVX,sparkVY);
-   if(speed>.34){sparkVX=sparkVX/speed*.34;sparkVY=sparkVY/speed*.34}
-   else if(speed<.055){
+   if(speed>.075){sparkVX=sparkVX/speed*.075;sparkVY=sparkVY/speed*.075}
+   else if(speed<.008){
     const a=Math.random()*Math.PI*2;
-    sparkVX+=Math.cos(a)*.025;sparkVY+=Math.sin(a)*.025;
+    sparkVX+=Math.cos(a)*.008;sparkVY+=Math.sin(a)*.008;
    }
-   // A barely perceptible air-current sway prevents rigid straight-line travel.
-   sparkVX+=Math.sin(now/930)*.0015*dt;
-   sparkVY+=Math.cos(now/1170)*.0015*dt;
+   // Slow, differently timed air currents create a soft wandering path.
+   sparkVX+=Math.sin(now/1450)*.00035*dt;
+   sparkVY+=Math.cos(now/1830)*.00035*dt;
   }
   sparkX+=sparkVX*dt;sparkY+=sparkVY*dt;
-  const minX=8,maxX=Math.max(8,innerWidth-22),minY=30,maxY=Math.max(30,innerHeight-28);
+  // Keep the entire 20px sparkle cross inside the viewport, then reverse velocity at impact.
+  const minX=3,maxX=Math.max(3,innerWidth-17),minY=10,maxY=Math.max(10,innerHeight-17);
   if(sparkX<=minX){sparkX=minX;sparkVX=Math.abs(sparkVX);sparkFleeUntil=Math.min(sparkFleeUntil,now)}
   else if(sparkX>=maxX){sparkX=maxX;sparkVX=-Math.abs(sparkVX);sparkFleeUntil=Math.min(sparkFleeUntil,now)}
   if(sparkY<=minY){sparkY=minY;sparkVY=Math.abs(sparkVY);sparkFleeUntil=Math.min(sparkFleeUntil,now)}
