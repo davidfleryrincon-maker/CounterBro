@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" shape-rendering="crispEdges">
+<style>
+@keyframes sleepy-breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(1px) scaleY(.97)}}
+@keyframes sleepy-tail{0%,100%{transform:rotate(0)}50%{transform:rotate(-2deg)}}
+.coil{animation:sleepy-breathe 2.8s steps(3,end) infinite;transform-box:fill-box;transform-origin:50% 85%}
+.tail{animation:sleepy-tail 3.5s steps(2,end) infinite;transform-box:fill-box;transform-origin:20% 80%}
+@media(prefers-reduced-motion:reduce){.coil,.tail{animation:none}}
+</style>
+<ellipse cx="65" cy="84" rx="39" ry="4" fill="#080713" opacity=".55"/>
+<g stroke="#393a3a" stroke-width="3" stroke-linejoin="round">
+<!-- tail curled around the sleeping body like a protective ring -->
+<g class="tail">
+ <path fill="#77766f" d="M82 68H95V62H103V54H109V45H116V38H121V45H118V54H112V63H105V71H95V77H83V81H70V76H80Z"/>
+ <path fill="#a98a6a" stroke="none" d="M84 70h10v-6h8v-8h6v-9h6v-5h4v8h-5v8h-6v8h-8v6h-9v4h-9v-4h3z"/>
+ <path fill="#b7b4ac" stroke="none" d="M112 47h5v7h-5v6h-5v5h-5v-5h5v-7h5z"/>
+</g>
+<!-- tucked paws -->
+<path fill="#77766f" d="M39 70h12v7h-5v5H34v-5h5z"/>
+<path fill="#a98a6a" stroke="none" d="M35 78h10v3h-7v3h-6v-3h3z"/>
+<path fill="#77766f" d="M70 71h12v7h-5v5H65v-5h5z"/>
+<path fill="#a98a6a" stroke="none" d="M66 79h10v3h-7v3h-6v-3h3z"/>
+<g class="coil">
+ <!-- compact curled body -->
+ <path fill="#77766f" d="M31 59H36V50H44V44H57V41H73V45H84V51H91V61H96V71H89V77H78V81H53V77H41V73H33V67H29V62H31Z"/>
+ <path fill="#77766f" stroke="none" d="M36 59h7v-9h9v-4h16v4h12v4h7v8h5v9h-9v5H76v3H54v-4H43v-4h-7z"/>
+ <path fill="#b7b4ac" stroke="none" d="M47 52h10v-4h8v4h-8v4H47zM68 52h9v4h-9zM78 62h8v4h-8z"/>
+ <path fill="#d3bca4" stroke="none" d="M47 62h4v4h-4zM59 57h4v4h-4zM68 68h5v4h-5z"/>
+ <!-- head tucked onto its curled tail -->
+ <path fill="#77766f" d="M21 57V48H25V39H32V33H44V36H52V41H57V49H62V57H57V64H49V68H36V65H27V62H22Z"/>
+ <path fill="#a98a6a" stroke="none" d="M26 49h5v-8h6v-5h9v4h7v5h4v7h4v6h-6v5H47v4H36v-4h-8v-4h-2z"/>
+ <path fill="#b7b4ac" stroke="none" d="M31 43h6v-4h7v4h-7v4h-6z"/>
+ <!-- closed sleepy eye and small smile -->
+ <path fill="none" stroke="#393a3a" stroke-width="3" d="M35 53h7l3 3h4M47 61h6"/>
+ <path fill="#a98a6a" stroke="none" d="M27 57h3v3h-3z"/>
+</g>
+</g></svg>
