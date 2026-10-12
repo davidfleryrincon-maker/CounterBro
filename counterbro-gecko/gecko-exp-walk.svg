@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" shape-rendering="crispEdges">
+ <ellipse cx="64" cy="85" rx="43" ry="4" fill="#080713" opacity=".45"/>
+ <g stroke="#393a3a" stroke-width="3" stroke-linejoin="round"><path d="M78 59h13v-7h9v-8h7v-8h7v-7h6v13h-5v8h-7v8h-8v7h-9v6H78z" id="tail-walk" fill="#77766f"/><path d="M83 60h10v-6h8v-7h7v-8h5v7h-5v7h-7v7h-8v5h-8z" fill="#b7b4ac" stroke="none"/></g>
+ 
+ <g stroke="#393a3a" stroke-width="3" stroke-linejoin="round">
+ <path d="M40 64h12v9l-4 5v5H34v-5h6z" id="leg-0" fill="#77766f"/><path d="M35 79h12v4H35z" fill="#b7b4ac"/>
+ <path d="M69 65h12v9l-4 5v5H63v-5h6z" id="leg-1" fill="#77766f"/><path d="M64 79h12v4H64z" fill="#b7b4ac"/>
+ <path d="M29 61h10v8l-4 4v5H24v-5h5z" id="leg-2" fill="#77766f"/><path d="M24 74h11v4H24z" fill="#b7b4ac"/>
+ <path d="M79 61h10v8l-4 4v5H74v-5h5z" id="leg-3" fill="#77766f"/><path d="M74 74h11v4H74z" fill="#b7b4ac"/>
+ </g>
+ <!-- clearly separated torso -->
+ <path d="M35 57V48h9v-6h13v-4h18v4h11v6h8v9h5v11H88v7H75v4H50v-4H40v-5h-7v-8h-4v-5z" fill="#77766f" stroke="#393a3a" stroke-width="3" stroke-linejoin="round"/>
+ <path d="M43 54h12v-5h14v4h12v5h7v7h-7v6H68v4H51v-4H41v-7h-4v-5h6z" fill="#b7b4ac"/>
+ <path d="M36 42l6-8 8 5 8-7 8 6 9-4 9 8-6 6-9-2-8 4-8-3-9 2z" fill="#c2a184" stroke="#393a3a" stroke-width="2"/><path d="M28 62l-5 10 13-4M82 63l9 9-13-3" fill="#c2a184" stroke="#393a3a" stroke-width="2"/>
+ <!-- distinct neck and oversized head -->
+ <path d="M32 51h10v9H32z" fill="#77766f" stroke="#393a3a" stroke-width="2"/>
+ <path d="M18 49v-9h5v-8h8v-6h13v4h8v5h5v8h4v9h-5v7H45v4H32v-4h-8v-5h-6z" fill="#77766f" stroke="#393a3a" stroke-width="3" stroke-linejoin="round"/>
+ <path d="M24 42h6v-7h7v-4h8v4h7v5h4v7h4v6h-6v5H44v4H32v-4h-6v-5h-2z" fill="#b7b4ac"/>
+ <!-- paired visible eyes, pupils and nostril/smile -->
+ <path d="M26 42h9v7h-9zM43 40h9v7h-9z" fill="#f5f1ff"/>
+ <path d="M29 44h4v5h-4zM46 42h4v5h-4z" fill="#171126"/>
+ <path d="M21 52h3v3h-3zM37 56h9v3h-6v2h-3z" fill="#393a3a"/>
+ <path d="M25 57h4v3h-4zM53 53h3v3h-3z" fill="#c2a184"/>
+ 
+ <style>
+  #leg-0,#leg-2{transform-box:fill-box;transform-origin:center;animation:stepA .34s steps(2,end) infinite alternate}
+  #leg-1,#leg-3{transform-box:fill-box;transform-origin:center;animation:stepB .34s steps(2,end) infinite alternate}
+  #tail-walk{transform-box:fill-box;transform-origin:5% 50%;animation:tailSwing .34s ease-in-out infinite alternate}
+  @keyframes stepA{from{transform:translate(-2px,-1px)}to{transform:translate(2px,1px)}}
+  @keyframes stepB{from{transform:translate(2px,1px)}to{transform:translate(-2px,-1px)}}
+  @keyframes tailSwing{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+  </style></svg>
