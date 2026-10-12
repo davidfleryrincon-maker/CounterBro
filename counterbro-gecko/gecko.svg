@@ -1,16 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" shape-rendering="crispEdges">
-<g stroke="#24124d" stroke-width="3" stroke-linejoin="round">
-<path fill="#8d52d9" d="M19 80h8V68h8V56h12V48h20V42h16V48h12v8h8v12h-8v8H83v8H65v8H47v-8H35v-8H27v8H19z"/>
-<path fill="#a96bf0" d="M35 58h12v-8h16v8H51v8H35zM65 50h14v8h-8v8H59v-8h6z"/>
-<path fill="#7c42c7" d="M44 82h12v8H44zM68 82h12v8H68z"/>
-<path fill="#8d52d9" d="M84 77h10v8h-8v8h-8v-8h6zM35 76h-8v8h-8v8h12v-8h4z"/>
-<path fill="#b984ff" d="M25 89h8v6h-8zM75 90h8v6h-8zM91 84h8v6h-8z"/>
-<path fill="#a96bf0" d="M83 42h12v6h8v8h-8v8H83v-8h-8v-8h8z"/>
-<path fill="#f8f1ff" d="M82 45h8v8h-8zM94 50h8v8h-8z"/>
-<path fill="#25124a" d="M84 47h4v5h-4zM96 52h4v5h-4z"/>
-<path fill="#f4d6ff" d="M82 44h3v3h-3zM94 49h3v3h-3z"/>
-<path fill="#8d52d9" d="M16 82h12v6h-6v6H10v-6h6zM53 90h10v6h-4v6h-8v-6h2z"/>
-<path fill="#b984ff" d="M10 90h8v4h-8zM51 98h8v4h-8zM76 94h8v4h-8z"/>
-<path fill="none" stroke="#d9b4ff" stroke-width="2" d="M39 68h8m5 8h8m8-8h6"/>
+<g stroke="#28134f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+  <!-- curled tail -->
+  <path fill="#8d52d9" d="M82 72h13V62h10V49h-8V39h8V31h9v8h8v13h-8v11h-8v10h-9v8H82z"/>
+  <path fill="#b984ff" d="M105 34h8v7h7v10h-7v10h-8v8h-8v-8h8V50h-8v-8h8z"/>
+  <!-- back legs -->
+  <g fill="#7c42c7">
+    <path d="M82 78h11v8h-5v8h-8v-8h2z"><animateTransform attributeName="transform" type="rotate" values="0 86 82;12 86 82;0 86 82;-10 86 82;0 86 82" dur=".65s" repeatCount="indefinite"/></path>
+    <path d="M91 91h8v5h7v5h-12v-5h-3z"/>
+    <path d="M43 78h11v8h-5v8h-8v-8h2z"><animateTransform attributeName="transform" type="rotate" values="0 47 82;-10 47 82;0 47 82;12 47 82;0 47 82" dur=".65s" repeatCount="indefinite"/></path>
+    <path d="M42 91h8v5h7v5H45v-5h-3z"/>
+  </g>
+  <!-- body -->
+  <path fill="#8d52d9" d="M25 68h8V57h11V49h22V45h16v7h10v8h8v12H88v8H69v5H47v-5H35v-6h-10z"/>
+  <path fill="#a96bf0" d="M43 57h12v-6h13v7H56v7H43zM68 55h13v7H68zM57 69h15v6H57z"/>
+  <path fill="#c99aff" stroke="none" d="M45 62h8v4h-8zM65 65h8v4h-8zM78 58h6v4h-6zM51 75h8v4h-8z"/>
+  <!-- front legs -->
+  <g fill="#a96bf0">
+    <path d="M35 75h10v8h-4v8h-7v-8h1z"><animateTransform attributeName="transform" type="rotate" values="0 39 79;-14 39 79;0 39 79;12 39 79;0 39 79" dur=".65s" repeatCount="indefinite"/></path>
+    <path d="M31 89h7v5h7v5H33v-5h-5z"/>
+    <path d="M66 78h10v8h-4v8h-7v-8h1z"><animateTransform attributeName="transform" type="rotate" values="0 70 82;12 70 82;0 70 82;-14 70 82;0 70 82" dur=".65s" repeatCount="indefinite"/></path>
+    <path d="M65 91h7v5h7v5H67v-5h-5z"/>
+  </g>
+  <!-- head -->
+  <path fill="#a96bf0" d="M17 58h8V49h10V41h20v5h10v8h7v15H64v8H44v-4H31v-5h-9v-5h-5z"/>
+  <path fill="#c99aff" stroke="none" d="M30 48h8v4h-8zM43 45h8v4h-8zM24 57h7v4h-7z"/>
+  <!-- big expressive eye and tiny second eye -->
+  <path fill="#28134f" d="M39 49h12v4h4v12h-4v4H39v-4h-4V53h4z"/>
+  <path fill="#fff7ff" d="M39 52h8v8h-8z"/>
+  <path fill="#28134f" stroke="none" d="M43 56h4v4h-4z"/>
+  <path fill="#fff7ff" d="M58 56h5v5h-5z"/>
+  <path fill="#28134f" stroke="none" d="M60 58h3v3h-3z"/>
+  <!-- smile -->
+  <path fill="none" stroke="#4a2177" stroke-width="2" d="M27 67h7v3h7"/>
+  <!-- toes -->
+  <path fill="#d9b4ff" stroke="none" d="M29 97h5v3h-5zM39 97h5v3h-5zM63 97h5v3h-5zM73 97h5v3h-5zM91 97h5v3h-5zM101 98h5v3h-5z"/>
 </g>
 </svg>
