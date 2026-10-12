@@ -170,7 +170,7 @@
   clearTimeout(sparkRespawnTimer);
   sparkX=28+Math.random()*Math.max(1,innerWidth-56);
   sparkY=45+Math.random()*Math.max(1,innerHeight-100);
-  const a=Math.random()*Math.PI*2,speed=.22+Math.random()*.35;
+  const a=Math.random()*Math.PI*2,speed=.055+Math.random()*.055;
   sparkVX=Math.cos(a)*speed;sparkVY=Math.sin(a)*speed;
   sparkVisible=true;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
   sparkPlace();lastSparkTime=performance.now();
@@ -202,9 +202,9 @@
    const inv=1/md;sparkVX=(-mx*inv)*4.2;sparkVY=(-my*inv)*4.2;
   }else if(now>sparkFleeUntil){
    spark.classList.remove('is-fleeing');
-   sparkVX=sparkVX*.985+(Math.random()-.5)*.045;
-   sparkVY=sparkVY*.985+(Math.random()-.5)*.045;
-   const speed=Math.hypot(sparkVX,sparkVY)||.3,cap=.62;
+   sparkVX=sparkVX*.995+(Math.random()-.5)*.008;
+   sparkVY=sparkVY*.995+(Math.random()-.5)*.008;
+   const speed=Math.hypot(sparkVX,sparkVY)||.08,cap=.15;
    if(speed>cap){sparkVX=sparkVX/speed*cap;sparkVY=sparkVY/speed*cap}
   }
   sparkX+=sparkVX*dt;sparkY+=sparkVY*dt;
