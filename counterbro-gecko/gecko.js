@@ -171,7 +171,7 @@
   const minX=10,maxX=Math.max(10,innerWidth-10),minY=10,maxY=Math.max(10,innerHeight-10);
   sparkX=minX+Math.random()*Math.max(1,maxX-minX);
   sparkY=minY+Math.random()*Math.max(1,maxY-minY);
-  sparkVX=(Math.random()-.5)*.22;sparkVY=(Math.random()-.5)*.22;
+  sparkVX=(Math.random()-.5)*.35;sparkVY=(Math.random()-.5)*.35;
   sparkVisible=true;sparkFleeUntil=0;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
   sparkPlace();lastSparkTime=performance.now();
   if(!sparkRAF)sparkRAF=requestAnimationFrame(moveSpark);
@@ -202,20 +202,20 @@
    const away=Math.atan2(-my,-mx),current=Math.atan2(sparkVY||.001,sparkVX||.001);
    let turn=Math.atan2(Math.sin(away-current),Math.cos(away-current));
    const angle=current+clamp(turn,-.11*dt,.11*dt);
-   const speed=clamp(Math.hypot(sparkVX,sparkVY)+.012*dt,.12,.36);
+   const speed=clamp(Math.hypot(sparkVX,sparkVY)+.025*dt,.35,.65);
    sparkVX=Math.cos(angle)*speed;sparkVY=Math.sin(angle)*speed;
   }else{
    if(now>sparkFleeUntil)spark.classList.remove('is-fleeing');
    // Random, independent nudges on both axes make the path meander in every direction.
-   sparkVX+=(Math.random()-.5)*.055*dt;
-   sparkVY+=(Math.random()-.5)*.055*dt;
+   sparkVX+=(Math.random()-.5)*.18*dt;
+   sparkVY+=(Math.random()-.5)*.18*dt;
    // Air resistance smooths each nudge without locking the particle to a heading.
-   sparkVX*=Math.pow(.90,dt);sparkVY*=Math.pow(.90,dt);
+   sparkVX*=Math.pow(.92,dt);sparkVY*=Math.pow(.92,dt);
    const speed=Math.hypot(sparkVX,sparkVY);
-   if(speed>.42){sparkVX=sparkVX/speed*.42;sparkVY=sparkVY/speed*.42}
+   if(speed>.65){sparkVX=sparkVX/speed*.65;sparkVY=sparkVY/speed*.65}
    if(speed<.025){
-    sparkVX+=(Math.random()-.5)*.10;
-    sparkVY+=(Math.random()-.5)*.10;
+    sparkVX+=(Math.random()-.5)*.18;
+    sparkVY+=(Math.random()-.5)*.18;
    }
   }
   sparkX+=sparkVX*dt;sparkY+=sparkVY*dt;
