@@ -17,3 +17,14 @@
 #counterbro-gecko-widget.is-pouncing img{animation:geckoPounce .62s steps(5,end)}
 @media(max-width:600px){#counterbro-gecko-widget{width:94px;height:70px}}
 @media(prefers-reduced-motion:reduce){#counterbro-gecko-widget{transition:none}#counterbro-gecko-widget.is-jumping img,#counterbro-gecko-widget.is-pouncing img,#counterbro-gecko-widget.is-resting img{animation:none}}
+/* Evolution transformation: a brief luminous cocoon, then reveal the new sprite. */
+#counterbro-gecko-widget.is-evolving::after{content:"";position:absolute;inset:8% 12%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,#fff 0 8%,#fff9cf 16%,#9b6cff 38%,#6d40ff66 58%,transparent 72%);transform:scale(.12);filter:blur(1px);z-index:2}
+#counterbro-gecko-widget.is-evolving::before{content:"";position:absolute;inset:3% 7%;border:2px solid #fff4c8;border-radius:50%;pointer-events:none;opacity:0;transform:scale(.2);z-index:1;box-shadow:0 0 10px #a97aff,0 0 22px #fff}
+#counterbro-gecko-widget.is-evolving::after{animation:geckoEvolutionOrb 1.15s ease-in-out both}
+#counterbro-gecko-widget.is-evolving::before{animation:geckoEvolutionRing 1.15s ease-in-out both}
+#counterbro-gecko-widget.is-evolving img{animation:geckoEvolutionReveal 1.15s steps(5,end) both}
+#counterbro-gecko-widget.is-spectral{filter:drop-shadow(0 0 7px #b9a8e6aa)}
+@keyframes geckoEvolutionOrb{0%{opacity:0;transform:scale(.12)}20%{opacity:1;transform:scale(.7)}48%{opacity:1;transform:scale(1.35)}70%{opacity:.92;transform:scale(1.18)}100%{opacity:0;transform:scale(1.7)}}
+@keyframes geckoEvolutionRing{0%,10%{opacity:0;transform:scale(.2)}35%{opacity:.9;transform:scale(1)}70%{opacity:.65;transform:scale(1.35)}100%{opacity:0;transform:scale(1.7)}}
+@keyframes geckoEvolutionReveal{0%,28%{opacity:1;filter:brightness(1)}45%{opacity:.08;filter:brightness(3)}68%{opacity:1;filter:brightness(2.2)}100%{opacity:1;filter:brightness(1)}}
+@media(prefers-reduced-motion:reduce){#counterbro-gecko-widget.is-evolving::before,#counterbro-gecko-widget.is-evolving::after,#counterbro-gecko-widget.is-evolving img{animation:none;opacity:0}}
