@@ -1,11 +1,19 @@
-#counterbro-gecko-widget{position:fixed;left:auto;top:auto;width:124px;height:92px;z-index:50;pointer-events:auto;cursor:pointer;opacity:.99;filter:drop-shadow(0 4px 5px #0008);transition:opacity .12s ease;will-change:left,top}
+#counterbro-gecko-widget{position:fixed;left:auto;top:auto;width:124px;height:92px;z-index:50;pointer-events:auto;cursor:pointer;opacity:.99;filter:drop-shadow(0 4px 5px #0008);transition:opacity .18s ease,filter .18s ease;will-change:left,top}
 #counterbro-gecko-widget img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;transform-origin:50% 100%}
 #counterbro-gecko-widget.is-hidden{opacity:0}
 #counterbro-gecko-widget.is-walking img{filter:brightness(1.06)}
 #counterbro-gecko-widget.faces-right img{transform:scaleX(-1)}
 #counterbro-gecko-widget.is-lagging{filter:drop-shadow(0 4px 5px #0008) blur(.25px)}
 #counterbro-gecko-widget.catching-up{filter:drop-shadow(0 4px 5px #0008)}
+#counterbro-gecko-widget[data-mood="watchful"]{filter:drop-shadow(0 4px 5px #0008) brightness(1.08)}
+#counterbro-gecko-widget[data-mood="interested"]{filter:drop-shadow(0 4px 6px #0009) brightness(1.12)}
+#counterbro-gecko-widget[data-mood="aloof"]{filter:drop-shadow(0 4px 5px #0008) saturate(.78)}
+#counterbro-gecko-widget[data-mood="startled"]{filter:drop-shadow(0 4px 5px #0008) brightness(1.18)}
+#counterbro-gecko-widget.is-resting img{animation:geckoCatRest 1.4s steps(2,end) infinite}
+@keyframes geckoCatRest{0%,100%{translate:0 0;scale:1}50%{translate:0 2px;scale:1 .97}}
 @keyframes geckoClickHop{0%,100%{translate:0 0}18%{translate:0 1px}42%{translate:0 -24px}62%{translate:0 -25px}82%{translate:0 0}}
+@keyframes geckoPounce{0%,100%{translate:0 0}25%{translate:0 2px}48%{translate:0 -30px}68%{translate:0 -27px}85%{translate:0 0}}
 #counterbro-gecko-widget.is-jumping img{animation:geckoClickHop .58s steps(5,end)}
+#counterbro-gecko-widget.is-pouncing img{animation:geckoPounce .62s steps(5,end)}
 @media(max-width:600px){#counterbro-gecko-widget{width:94px;height:70px}}
-@media(prefers-reduced-motion:reduce){#counterbro-gecko-widget{transition:none}#counterbro-gecko-widget.is-jumping img{animation:none}}
+@media(prefers-reduced-motion:reduce){#counterbro-gecko-widget{transition:none}#counterbro-gecko-widget.is-jumping img,#counterbro-gecko-widget.is-pouncing img,#counterbro-gecko-widget.is-resting img{animation:none}}
