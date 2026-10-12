@@ -1,23 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" shape-rendering="crispEdges">
-<ellipse cx="64" cy="84" rx="42" ry="4" fill="#080713" opacity=".45"/>
-<!-- tail -->
-<path d="M83 63h13v-7h9v-7h7v-8h7v-6h5v12h-5v8h-7v8h-8v7h-9v6H82z" fill="#102c67" stroke="#07152f" stroke-width="3" stroke-linejoin="round"/>
-<path d="M87 65h10v-6h8v-7h7v-8h5v7h-5v7h-7v7h-8v5h-8z" fill="#315caa"/>
-<!-- body -->
-<path d="M32 59V49h9v-7h12v-4h19v4h12v6h9v9h5v13H87v7H74v4H49v-4H39v-5h-7v-8h-4v-5z" fill="#102c67" stroke="#07152f" stroke-width="3" stroke-linejoin="round"/>
-<path d="M42 54h12v-5h14v4h14v5h7v8h-7v6H69v4H50v-4H40v-7h-4v-6h6z" fill="#315caa"/>
-<!-- legs -->
-<path d="M39 70h12v7h-5v5H33v-5h6zM72 71h12v7h-5v5H66v-5h6z" fill="#102c67" stroke="#07152f" stroke-width="3" stroke-linejoin="round"/>
-<path d="M35 78h9v3h-6v3h-5zM68 79h9v3h-6v3h-5z" fill="#315caa"/>
-<!-- oversized head -->
-<path d="M21 55v-9h5v-8h8v-6h13v4h8v5h5v9h4v9h-5v7H48v4H34v-4h-8v-5h-5z" fill="#102c67" stroke="#07152f" stroke-width="3" stroke-linejoin="round"/>
-<path d="M27 47h6v-7h7v-4h8v4h7v5h4v7h4v6h-6v5H48v4H36v-4h-8v-5h-2z" fill="#315caa"/>
-<!-- eyes and markings -->
-<path d="M31 49h8v5h-8zM47 47h8v5h-8z" fill="#f5f1ff"/>
-<path d="M34 50h4v4h-4zM50 48h4v4h-4z" fill="#171126"/>
-<path d="M39 60h10v3h-7v2h-3z" fill="#07152f"/>
-<path d="M29 58h4v4h-4zM55 58h4v4h-4z" fill="#315caa"/>
-<!-- sleek fins and constellations -->
-<path d="M31 39l4-8 5 8 8-5 4 8M65 42l5-8 5 8 7-4 3 9" fill="#234a94" stroke="#07152f" stroke-width="2"/>
-<g fill="#fff"><path d="M42 51h3v3h-3zM57 58h3v3h-3zM73 51h3v3h-3zM81 64h3v3h-3zM48 69h3v3h-3zM99 57h3v3h-3zM31 58h3v3h-3z"/><path d="M44 48h1v1h-1zM76 61h1v1h-1zM58 68h1v1h-1z"/></g>
-</svg>
+ <ellipse cx="64" cy="85" rx="43" ry="4" fill="#080713" opacity=".45"/>
+ <g stroke="#07152f" stroke-width="3" stroke-linejoin="round"><path d="M78 59h13v-7h9v-8h7v-8h7v-7h6v13h-5v8h-7v8h-8v7h-9v6H78z" fill="#102c67"/><path d="M83 60h10v-6h8v-7h7v-8h5v7h-5v7h-7v7h-8v5h-8z" fill="#315caa" stroke="none"/></g>
+ 
+ <g stroke="#07152f" stroke-width="3" stroke-linejoin="round">
+ <path d="M40 64h12v9l-4 5v5H34v-5h6z" fill="#102c67"/><path d="M35 79h12v4H35z" fill="#315caa"/>
+ <path d="M69 65h12v9l-4 5v5H63v-5h6z" fill="#102c67"/><path d="M64 79h12v4H64z" fill="#315caa"/>
+ <path d="M29 61h10v8l-4 4v5H24v-5h5z" fill="#102c67"/><path d="M24 74h11v4H24z" fill="#315caa"/>
+ <path d="M79 61h10v8l-4 4v5H74v-5h5z" fill="#102c67"/><path d="M74 74h11v4H74z" fill="#315caa"/>
+ </g>
+ <!-- clearly separated torso -->
+ <path d="M35 57V48h9v-6h13v-4h18v4h11v6h8v9h5v11H88v7H75v4H50v-4H40v-5h-7v-8h-4v-5z" fill="#102c67" stroke="#07152f" stroke-width="3" stroke-linejoin="round"/>
+ <path d="M43 54h12v-5h14v4h12v5h7v7h-7v6H68v4H51v-4H41v-7h-4v-5h6z" fill="#315caa"/>
+ <path d="M28 38l5-10 5 10 8-5 4 8M66 39l5-9 5 9 8-4 4 8" fill="#102c67" stroke="#07152f" stroke-width="2"/><g fill="#b5d5ff"><path d="M58 58h3v3h-3zM75 54h3v3h-3zM95 52h3v3h-3zM48 68h3v3h-3z"/></g>
+ <!-- distinct neck and oversized head -->
+ <path d="M32 51h10v9H32z" fill="#102c67" stroke="#07152f" stroke-width="2"/>
+ <path d="M18 49v-9h5v-8h8v-6h13v4h8v5h5v8h4v9h-5v7H45v4H32v-4h-8v-5h-6z" fill="#102c67" stroke="#07152f" stroke-width="3" stroke-linejoin="round"/>
+ <path d="M24 42h6v-7h7v-4h8v4h7v5h4v7h4v6h-6v5H44v4H32v-4h-6v-5h-2z" fill="#315caa"/>
+ <!-- paired visible eyes, pupils and nostril/smile -->
+ <path d="M26 42h9v7h-9zM43 40h9v7h-9z" fill="#f5f1ff"/>
+ <path d="M29 44h4v5h-4zM46 42h4v5h-4z" fill="#ffffff"/>
+ <path d="M21 52h3v3h-3zM37 56h9v3h-6v2h-3z" fill="#07152f"/>
+ <path d="M25 57h4v3h-4zM53 53h3v3h-3z" fill="#76aaff"/>
+ 
+ </svg>
