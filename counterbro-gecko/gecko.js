@@ -4,7 +4,7 @@
  if(!settings.enabled||document.getElementById('counterbro-gecko-widget'))return;
  const root=document.createElement('div');root.id='counterbro-gecko-widget';root.setAttribute('aria-hidden','true');
  const img=document.createElement('img');
- const baseSprite='counterbro-gecko/gecko.svg',sleepSprite='counterbro-gecko/gecko-sleep.svg';
+ const baseSprite='counterbro-gecko/gecko.svg',sleepSprites={base:'counterbro-gecko/gecko-sleep.svg',gold:'counterbro-gecko/gecko-gold-sleep.svg',exp:'counterbro-gecko/gecko-exp-sleep.svg',mid:'counterbro-gecko/gecko-mid-sleep.svg',roam:'counterbro-gecko/gecko-roam-sleep.svg',jungle:'counterbro-gecko/gecko-jungle-sleep.svg',spectral:'counterbro-gecko/gecko-spectral-sleep.svg'};
  const evolutionSprites={gold:'counterbro-gecko/gecko-gold.svg',exp:'counterbro-gecko/gecko-exp.svg',mid:'counterbro-gecko/gecko-mid.svg',roam:'counterbro-gecko/gecko-roam.svg',jungle:'counterbro-gecko/gecko-jungle.svg',spectral:'counterbro-gecko/gecko-spectral.svg'};
  let awakeSprite=baseSprite,activeEvolution=null,previousEvolution=null,isSleeping=false;
  img.src=awakeSprite;img.alt='';root.appendChild(img);document.body.appendChild(root);
@@ -14,7 +14,7 @@
  let mood='curious',lastClick=0,curiosityUntil=0;
  const laneSearchCounts={gold:0,exp:0,mid:0,roam:0,jungle:0};
  let activityTimer=0,transformTimer=0,spectralActive=false;
- function currentSprite(){return activeEvolution?evolutionSprites[activeEvolution]:baseSprite}
+ function currentSprite(){return activeEvolution?evolutionSprites[activeEvolution]:baseSprite}\n function currentSleepSprite(){return activeEvolution?sleepSprites[activeEvolution]:sleepSprites.base}\n function wakeUp(){if(!isSleeping)return;root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();clearTimeout(napTimer);}
  function wakeSprite(){awakeSprite=currentSprite();if(!isSleeping)img.src=awakeSprite}
  function transformTo(evolution){
   if(!evolution||activeEvolution===evolution)return;
@@ -60,7 +60,7 @@
   }
   if(dist>1)raf=requestAnimationFrame(frame);else{raf=0;root.classList.remove('is-walking')}
  }
- function go(px,py){const s=size();tx=clamp(px,8,innerWidth-s.w-8);ty=clamp(py,8,innerHeight-s.h-8);if(!raf)raf=requestAnimationFrame(frame)}
+ function go(px,py){if(isSleeping)return;const s=size();tx=clamp(px,8,innerWidth-s.w-8);ty=clamp(py,8,innerHeight-s.h-8);if(!raf)raf=requestAnimationFrame(frame)}
  function hop(kind='playful'){
   root.classList.remove('is-jumping','is-pouncing');void root.offsetWidth;
   root.classList.add(kind==='pounce'?'is-pouncing':'is-jumping');
@@ -69,7 +69,7 @@
  function reactToClick(){
   markActivity();
   const now=Date.now();lastClick=now;clearTimeout(napTimer);clearTimeout(wanderTimer);if(root.classList.contains('is-resting')){root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();}
-  const r=root.getBoundingClientRect(),s=size();
+  wakeUp();const r=root.getBoundingClientRect(),s=size();
   const roll=Math.random();
   if(roll<.2){setMood('aloof',2200);go(x+(Math.random()<.5?-1:1)*(55+Math.random()*55),y+(Math.random()-.5)*35);return}
   if(roll<.48){setMood('playful',900);hop('playful');scheduleWander(750);return}
@@ -90,7 +90,7 @@
  function wander(){
   if(scrolling||peeking){scheduleWander(1200);return}
   const s=size(),rects=rectsToAvoid(),roll=Math.random();
-  if(roll<.16){setMood('resting',0);isSleeping=true;root.classList.add('is-resting');img.src=sleepSprite;napTimer=setTimeout(()=>{root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();setMood('curious');scheduleWander(500)},3800+Math.random()*3600);scheduleWander(8200+Math.random()*4200);return}
+  if(roll<.08){setMood('resting',0);isSleeping=true;root.classList.add('is-resting');img.src=currentSleepSprite();clearTimeout(napTimer);napTimer=setTimeout(()=>{root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();setMood('curious');scheduleWander(500)},2800+Math.random()*1200);scheduleWander(16000+Math.random()*4000);return}
   if(root.classList.contains('is-resting')){root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();clearTimeout(napTimer)}
   if(roll<.36)setMood('watchful',1300);else setMood('curious',1800);
   let best=null,bestScore=Infinity;
@@ -100,14 +100,14 @@
    const cost=score(px,py,rects,s)+d*.12+Math.random()*900;
    if(cost<bestScore){bestScore=cost;best={x:px,y:py}}
   }
-  if(best)go(best.x,best.y);scheduleWander(3200+Math.random()*4200);
+  if(best)go(best.x,best.y);scheduleWander(5200+Math.random()*4200);
  }
  function scheduleWander(delay){clearTimeout(wanderTimer);wanderTimer=setTimeout(wander,delay)}
  const start=perch();x=tx=start.x;y=ty=start.y;place();markActivity();scheduleWander(1800);
  function peekAtResults(){
   const results=document.getElementById('resultadosCounter');
   if(!results||getComputedStyle(results).display==='none'||!results.getClientRects().length)return;
-  clearTimeout(resultReturnTimer);peeking=true;root.classList.remove('is-resting');setMood('interested',3200);root.classList.add('is-curious');
+  clearTimeout(resultReturnTimer);peeking=true;wakeUp();setMood('interested',3200);root.classList.add('is-curious');
   const r=results.getBoundingClientRect(),s=size(),candidates=[
    {x:r.left-s.w-10,y:r.top+12},{x:r.right+10,y:r.top+12},
    {x:r.left-s.w-10,y:r.bottom-s.h-8},{x:r.right+10,y:r.bottom-s.h-8},
@@ -127,7 +127,7 @@
    if(d>360)return;const now=Date.now();if(now-lastReact<1100)return;lastReact=now;
    // Cats may investigate, lose interest, or hop away when something gets too close.
    if(d<62&&Math.random()<.58){
-    setMood('startled',900);root.classList.remove('is-resting');img.src=awakeSprite;const angle=Math.atan2(cy-mouseY,cx-mouseX)+(Math.random()-.5)*.65;
+    setMood('startled',900);wakeUp();const angle=Math.atan2(cy-mouseY,cx-mouseX)+(Math.random()-.5)*.65;
     go(x+Math.cos(angle)*(70+Math.random()*50),y+Math.sin(angle)*(50+Math.random()*35));hop('pounce');scheduleWander(1700);return;
    }
    if(Math.random()<.24){setMood('aloof',1300);return}
@@ -147,7 +147,7 @@
   const delta=scrollY-previousScroll;previousScroll=scrollY;scrolling=true;root.classList.add('is-lagging','is-walking');
   const s=size();tx=clamp(x-delta*.25,8,innerWidth-s.w-8);ty=clamp(y+Math.sign(delta)*Math.min(16,Math.abs(delta)*.1),8,innerHeight-s.h-8);
   if(!raf)raf=requestAnimationFrame(frame);clearTimeout(scrollTimer);
-  scrollTimer=setTimeout(()=>{scrolling=false;root.classList.remove('is-lagging');if(peeking){peekAtResults();return}const p=perch();go(p.x,p.y);scheduleWander(1800)},220);
+  scrollTimer=setTimeout(()=>{scrolling=false;root.classList.remove('is-lagging','is-walking');if(isSleeping)return;if(peeking){peekAtResults();return}const p=perch();go(p.x,p.y);scheduleWander(1800)},220);
  },{passive:true});
  addEventListener('resize',()=>{const s=size();tx=clamp(tx,8,innerWidth-s.w-8);ty=clamp(ty,8,innerHeight-s.h-8);if(!raf)raf=requestAnimationFrame(frame)},{passive:true});
  const results=document.getElementById('resultadosCounter');
