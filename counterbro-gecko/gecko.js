@@ -158,23 +158,21 @@
  const results=document.getElementById('resultadosCounter');
  if(results)new MutationObserver(schedulePeek).observe(results,{attributes:true,attributeFilter:['style','class','hidden'],childList:true,subtree:true});
 
- // A tiny free-floating light: slow drifting dust, cursor escape, edge bounce, Gecko snack.
+ // Floating sparkle: continuous random drift in every direction, with cursor escape and Gecko interaction.
  const spark=document.createElement('div');
  spark.id='counterbro-gecko-spark';
  spark.setAttribute('aria-hidden','true');
  document.body.appendChild(spark);
  let sparkVisible=false,sparkX=0,sparkY=0,sparkVX=0,sparkVY=0,sparkRAF=0,sparkRespawnTimer=0,sparkFleeUntil=0;
- let pointerX=-9999,pointerY=-9999,lastSparkTime=0,lastSparkTurn=0,wasNearPointer=false;
+ let pointerX=-9999,pointerY=-9999,lastSparkTime=0;
  function sparkPlace(){spark.style.transform='translate3d('+sparkX+'px,'+sparkY+'px,0)'}
  function spawnSpark(){
   clearTimeout(sparkRespawnTimer);
   const minX=10,maxX=Math.max(10,innerWidth-10),minY=10,maxY=Math.max(10,innerHeight-10);
   sparkX=minX+Math.random()*Math.max(1,maxX-minX);
   sparkY=minY+Math.random()*Math.max(1,maxY-minY);
-  const a=Math.random()*Math.PI*2,speed=.10+Math.random()*.07;
-  sparkVX=Math.cos(a)*speed;sparkVY=Math.sin(a)*speed;
-  sparkVisible=true;wasNearPointer=false;sparkFleeUntil=0;lastSparkTurn=performance.now()+500+Math.random()*1100;
-  spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
+  sparkVX=(Math.random()-.5)*.22;sparkVY=(Math.random()-.5)*.22;
+  sparkVisible=true;sparkFleeUntil=0;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
   sparkPlace();lastSparkTime=performance.now();
   if(!sparkRAF)sparkRAF=requestAnimationFrame(moveSpark);
  }
@@ -198,38 +196,35 @@
   if(Math.hypot(cx-(sparkX+7),cy-(sparkY+7))<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
   const mx=pointerX-(sparkX+7),my=pointerY-(sparkY+7),md=Math.hypot(mx,my);
   if(md<118&&md>0){
-   sparkFleeUntil=now+700;
+   sparkFleeUntil=now+550;
    spark.classList.add('is-fleeing');
-   // Gently steer away from the pointer; never assign a huge per-frame velocity.
-   const away=Math.atan2(-my,-mx),current=Math.atan2(sparkVY,sparkVX);
+   // Escape by steering away gradually; avoid a sudden straight-line launch.
+   const away=Math.atan2(-my,-mx),current=Math.atan2(sparkVY||.001,sparkVX||.001);
    let turn=Math.atan2(Math.sin(away-current),Math.cos(away-current));
-   const angle=current+clamp(turn,-.10*dt,.10*dt);
-   const speed=clamp(Math.hypot(sparkVX,sparkVY)+.012*dt,.16,.42);
+   const angle=current+clamp(turn,-.11*dt,.11*dt);
+   const speed=clamp(Math.hypot(sparkVX,sparkVY)+.012*dt,.12,.36);
    sparkVX=Math.cos(angle)*speed;sparkVY=Math.sin(angle)*speed;
   }else{
    if(now>sparkFleeUntil)spark.classList.remove('is-fleeing');
-   // Air currents slowly change direction at irregular intervals, like floating dust.
-   if(now>=lastSparkTurn){
-    const current=Math.atan2(sparkVY,sparkVX);
-    const angle=current+(Math.random()-.5)*1.45;
-    const speed=.095+Math.random()*.085;
-    sparkVX=Math.cos(angle)*speed;sparkVY=Math.sin(angle)*speed;
-    lastSparkTurn=now+450+Math.random()*1250;
-   }
-   sparkVX+=Math.sin(now/1700)*.0008*dt;
-   sparkVY+=Math.cos(now/2100)*.0008*dt;
-   sparkVX*=Math.pow(.985,dt);sparkVY*=Math.pow(.985,dt);
+   // Random, independent nudges on both axes make the path meander in every direction.
+   sparkVX+=(Math.random()-.5)*.055*dt;
+   sparkVY+=(Math.random()-.5)*.055*dt;
+   // Air resistance smooths each nudge without locking the particle to a heading.
+   sparkVX*=Math.pow(.90,dt);sparkVY*=Math.pow(.90,dt);
    const speed=Math.hypot(sparkVX,sparkVY);
-   if(speed>.22){sparkVX=sparkVX/speed*.22;sparkVY=sparkVY/speed*.22}
-   else if(speed<.07){const a=Math.random()*Math.PI*2;sparkVX+=Math.cos(a)*.035;sparkVY+=Math.sin(a)*.035}
+   if(speed>.42){sparkVX=sparkVX/speed*.42;sparkVY=sparkVY/speed*.42}
+   if(speed<.025){
+    sparkVX+=(Math.random()-.5)*.10;
+    sparkVY+=(Math.random()-.5)*.10;
+   }
   }
   sparkX+=sparkVX*dt;sparkY+=sparkVY*dt;
-  // Bounds account for the full 20px sparkle arms, so they remain visible at every edge.
+  // Keep the entire sparkle cross inside the viewport and reverse at the edges.
   const minX=10,maxX=Math.max(10,innerWidth-10),minY=10,maxY=Math.max(10,innerHeight-10);
-  if(sparkX<=minX){sparkX=minX;sparkVX=Math.abs(sparkVX);lastSparkTurn=now+250}
-  else if(sparkX>=maxX){sparkX=maxX;sparkVX=-Math.abs(sparkVX);lastSparkTurn=now+250}
-  if(sparkY<=minY){sparkY=minY;sparkVY=Math.abs(sparkVY);lastSparkTurn=now+250}
-  else if(sparkY>=maxY){sparkY=maxY;sparkVY=-Math.abs(sparkVY);lastSparkTurn=now+250}
+  if(sparkX<=minX){sparkX=minX;sparkVX=Math.abs(sparkVX)}
+  else if(sparkX>=maxX){sparkX=maxX;sparkVX=-Math.abs(sparkVX)}
+  if(sparkY<=minY){sparkY=minY;sparkVY=Math.abs(sparkVY)}
+  else if(sparkY>=maxY){sparkY=maxY;sparkVY=-Math.abs(sparkVY)}
   sparkPlace();sparkRAF=requestAnimationFrame(moveSpark);
  }
  addEventListener('mousemove',e=>{pointerX=e.clientX;pointerY=e.clientY},{passive:true});
