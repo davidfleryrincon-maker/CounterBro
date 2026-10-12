@@ -157,4 +157,65 @@
  addEventListener('resize',()=>{const s=size();tx=clamp(tx,8,innerWidth-s.w-8);ty=clamp(ty,8,innerHeight-s.h-8);if(!raf)raf=requestAnimationFrame(frame)},{passive:true});
  const results=document.getElementById('resultadosCounter');
  if(results)new MutationObserver(schedulePeek).observe(results,{attributes:true,attributeFilter:['style','class','hidden'],childList:true,subtree:true});
+
+ // A tiny free-floating light: it flees nearby pointers and can be eaten by Gecko.
+ const spark=document.createElement('div');
+ spark.id='counterbro-gecko-spark';
+ spark.setAttribute('aria-hidden','true');
+ document.body.appendChild(spark);
+ let sparkVisible=false,sparkX=0,sparkY=0,sparkVX=.42,sparkVY=.25,sparkRAF=0,sparkSpawnTimer=0,sparkRespawnTimer=0,sparkFleeUntil=0;
+ let pointerX=-9999,pointerY=-9999,lastSparkTime=0;
+ function sparkPlace(){spark.style.transform='translate3d('+sparkX+'px,'+sparkY+'px,0)'}
+ function spawnSpark(){
+  clearTimeout(sparkRespawnTimer);
+  sparkX=28+Math.random()*Math.max(1,innerWidth-56);
+  sparkY=45+Math.random()*Math.max(1,innerHeight-100);
+  const a=Math.random()*Math.PI*2,speed=.22+Math.random()*.35;
+  sparkVX=Math.cos(a)*speed;sparkVY=Math.sin(a)*speed;
+  sparkVisible=true;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
+  sparkPlace();lastSparkTime=performance.now();
+  if(!sparkRAF)sparkRAF=requestAnimationFrame(moveSpark);
+ }
+ function hideSpark(){
+  sparkVisible=false;spark.classList.remove('is-visible','is-fleeing');spark.classList.add('is-eaten');
+  sparkRespawnTimer=setTimeout(spawnSpark,9000+Math.random()*11000);
+ }
+ function eatSpark(){
+  if(!sparkVisible)return;
+  const r=root.getBoundingClientRect();
+  const mouthX=r.left+r.width*.35,mouthY=r.top+r.height*.47;
+  sparkX=mouthX;sparkY=mouthY;sparkPlace();
+  root.classList.remove('is-eating-spark');void root.offsetWidth;root.classList.add('is-eating-spark');
+  setTimeout(()=>root.classList.remove('is-eating-spark'),650);
+  if(!isSleeping){wakeUp();hop('pounce');}
+  hideSpark();
+ }
+ function moveSpark(now){
+  sparkRAF=0;if(!sparkVisible)return;
+  const dt=Math.min(2,(now-lastSparkTime)/16.67||1);lastSparkTime=now;
+  const r=root.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const dx=cx-(sparkX+7),dy=cy-(sparkY+7);
+  if(Math.hypot(dx,dy)<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
+  const mx=pointerX-(sparkX+7),my=pointerY-(sparkY+7),md=Math.hypot(mx,my);
+  if(md<118&&md>0){
+   sparkFleeUntil=now+720;spark.classList.add('is-fleeing');
+   const inv=1/md;sparkVX=(-mx*inv)*4.2;sparkVY=(-my*inv)*4.2;
+  }else if(now>sparkFleeUntil){
+   spark.classList.remove('is-fleeing');
+   sparkVX=sparkVX*.985+(Math.random()-.5)*.045;
+   sparkVY=sparkVY*.985+(Math.random()-.5)*.045;
+   const speed=Math.hypot(sparkVX,sparkVY)||.3,cap=.62;
+   if(speed>cap){sparkVX=sparkVX/speed*cap;sparkVY=sparkVY/speed*cap}
+  }
+  sparkX+=sparkVX*dt;sparkY+=sparkVY*dt;
+  if(sparkX<8||sparkX>innerWidth-22)sparkVX*=-1;
+  if(sparkY<30||sparkY>innerHeight-28)sparkVY*=-1;
+  sparkX=clamp(sparkX,8,innerWidth-22);sparkY=clamp(sparkY,30,innerHeight-28);
+  sparkPlace();sparkRAF=requestAnimationFrame(moveSpark);
+ }
+ addEventListener('mousemove',e=>{pointerX=e.clientX;pointerY=e.clientY},{passive:true});
+ addEventListener('touchmove',e=>{if(e.touches&&e.touches[0]){pointerX=e.touches[0].clientX;pointerY=e.touches[0].clientY}},{passive:true});
+ addEventListener('resize',()=>{if(sparkVisible){sparkX=clamp(sparkX,8,innerWidth-22);sparkY=clamp(sparkY,30,innerHeight-28);sparkPlace()}},{passive:true});
+ sparkSpawnTimer=setTimeout(spawnSpark,9000+Math.random()*13000);
+
 })();
