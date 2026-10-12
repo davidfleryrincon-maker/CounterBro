@@ -2699,6 +2699,13 @@ async function buscarCounter() {
         )
       ).counters;
 
+    // Gecko registra únicamente búsquedas que llegaron a consultar la API.
+    // El progreso vive en memoria y se reinicia al recargar la página.
+    if (window.CounterBroGecko &&
+        typeof window.CounterBroGecko.completeSearch === "function") {
+      window.CounterBroGecko.completeSearch(linea);
+    }
+
 
     const resultsEnemy =
       document.getElementById(
