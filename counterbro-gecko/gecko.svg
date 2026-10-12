@@ -1,37 +1,57 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 112" shape-rendering="crispEdges">
 <style>
-@keyframes step1{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,-5px)}}
-@keyframes step2{0%,100%{transform:translate(0,0)}50%{transform:translate(-3px,2px)}}
-@keyframes tail{0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)}}
-@keyframes idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
-.leg1{animation:step1 .32s steps(2,end) infinite;transform-box:fill-box;transform-origin:top center}
-.leg2{animation:step2 .32s steps(2,end) infinite;transform-box:fill-box;transform-origin:top center}
-.tail{animation:tail .7s steps(2,end) infinite;transform-box:fill-box;transform-origin:left center}
-.body{animation:idle .7s steps(2,end) infinite}
-@media(prefers-reduced-motion:reduce){.leg1,.leg2,.tail,.body{animation:none}}
+@keyframes stepA{0%,100%{transform:translate(0,0)}50%{transform:translate(2px,-4px)}}
+@keyframes stepB{0%,100%{transform:translate(0,0)}50%{transform:translate(-2px,2px)}}
+@keyframes tailSway{0%,100%{transform:rotate(0)}50%{transform:rotate(-5deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+.legA{animation:stepA .34s steps(2,end) infinite;transform-box:fill-box;transform-origin:top center}
+.legB{animation:stepB .34s steps(2,end) infinite;transform-box:fill-box;transform-origin:top center}
+.tail{animation:tailSway .8s steps(2,end) infinite;transform-box:fill-box;transform-origin:left center}
+.body{animation:bob .8s steps(2,end) infinite}
+@media(prefers-reduced-motion:reduce){.legA,.legB,.tail,.body{animation:none}}
 </style>
+<!-- tail: thick at the base, tapering into a curl -->
 <g stroke="#28134f" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
-<!-- curled, tapering tail -->
-<g class="tail"><path fill="#7d43c7" d="M111 67h12V55h10V43h-8V32h8V23h9v8h7v12h-7v12h-8v12h-11v8h-12z"/><path fill="#b984ff" d="M135 27h6v8h6v8h-6v10h-7v7h-6v-7h6V43h-6v-7h7z"/></g>
-<!-- rear splayed feet -->
-<g class="leg2" fill="#7b3ebd"><path d="M103 68h11v8h-3v9h-7v-8z"/><path d="M101 84h8v4h6v4h-7v3h-4v-4h-5v-3h5z" fill="#d9b4ff" stroke="none"/></g>
-<g class="leg1" fill="#7b3ebd"><path d="M61 68h11v8h-3v9h-7v-8z"/><path d="M59 84h8v4h6v4h-7v3h-4v-4h-5v-3h5z" fill="#d9b4ff" stroke="none"/></g>
-<!-- long, low gecko body -->
-<g class="body"><path fill="#8d52d9" d="M31 62h10V51h13V43h24V39h22v7h13v9h9v12h-9v9h-20v6H66v-5H48v-7H31z"/>
-<path fill="#b984ff" d="M53 49h15v-5h14v7H68v7H53zM81 49h15v7H81zM70 64h17v5H70z"/>
-<!-- distinctive pixel spots -->
-<path fill="#d9b4ff" stroke="none" d="M56 58h5v4h-5zM72 53h4v4h-4zM84 61h5v4h-5zM96 53h5v4h-5zM48 67h5v4h-5zM62 72h5v4h-5z"/></g>
-<!-- front legs with gecko toe pads -->
-<g class="leg1" fill="#a96bf0"><path d="M40 68h12v9h-4v9h-8v-8z"/><path d="M37 84h8v4h7v3h-5v3h-4v-3h-6v-3h-4v-3h4z" fill="#d9b4ff" stroke="none"/></g>
-<g class="leg2" fill="#a96bf0"><path d="M76 71h12v9h-4v9h-8v-8z"/><path d="M73 87h8v4h7v3h-5v3h-4v-3h-6v-3h-4v-3h4z" fill="#d9b4ff" stroke="none"/></g>
-<!-- broad triangular gecko head -->
-<path fill="#a96bf0" d="M14 53h9V42h12V32h21v5h11v8h8v16H65v8H43v-4H29v-5H17z"/>
-<path fill="#d0a2ff" stroke="none" d="M29 40h8v4h-8zM43 36h8v4h-8zM21 51h8v4h-8z"/>
-<!-- large alert eye with vertical gecko pupil -->
-<path fill="#28134f" d="M37 39h15v4h5v15h-5v5H37v-5h-5V43h5z"/>
-<path fill="#fff7ff" d="M38 42h10v10H38z"/><path fill="#54268f" stroke="none" d="M42 42h4v10h-4z"/><path fill="#fff" stroke="none" d="M39 43h3v3h-3z"/>
-<path fill="#fff7ff" d="M60 46h6v6h-6z"/><path fill="#28134f" stroke="none" d="M62 47h3v5h-3z"/>
-<!-- little nostril and curious smile -->
-<path fill="#54268f" stroke="none" d="M24 56h3v3h-3z"/>
-<path fill="none" stroke="#4a2177" stroke-width="2" d="M23 61h8v3h8"/>
+ <g class="tail">
+  <path fill="#8043c9" d="M108 67h12V56h12V45h-8V34h8V24h10v9h8v12h-8v12h-8v12h-12v7h-14z"/>
+  <path fill="#c49aff" stroke="none" d="M135 28h5v8h7v7h-7v10h-7v7h-5v-7h5V43h-5v-7h7z"/>
+  <path fill="#a66be9" stroke="none" d="M115 68h10v-7h7v-7h6v7h-6v8h-8v6h-9z"/>
+ </g>
+ <!-- far-side legs, with wide gecko toe pads -->
+ <g class="legB" stroke="#28134f" stroke-width="3">
+  <path fill="#7940bc" d="M91 68h10v8h-3v9h-7v-8z"/>
+  <path fill="#b77df0" d="M91 83h6v4h6v3h-5v3h-4v-3h-5v-3h2z"/>
+  <path fill="#7940bc" d="M48 65h10v8h-3v9h-7v-8z"/>
+  <path fill="#b77df0" d="M47 80h6v4h6v3h-5v3h-4v-3h-5v-3h2z"/>
+ </g>
+ <!-- body, long and low with a soft belly -->
+ <g class="body">
+  <path fill="#8b4bd0" d="M34 59h12V49h14V44h22V40h20v6h12v8h9v12h-9v9H94v6H67v-5H49v-6H34z"/>
+  <path fill="#c18aff" stroke="none" d="M51 52h14v-5h13v5H66v6H51zM78 49h14v6H78z"/>
+  <path fill="#e0bdff" stroke="none" d="M53 62h8v4h-8zM68 57h5v4h-5zM82 62h7v4h-7zM96 54h5v4h-5zM61 70h7v4h-7zM89 70h6v4h-6z"/>
+  <path fill="#7135b2" stroke="none" d="M49 76h44v4H67v-3H49z"/>
+ </g>
+ <!-- near-side legs: bent elbows and clearly separated splayed toes -->
+ <g class="legA" stroke="#28134f" stroke-width="3" stroke-linejoin="round">
+  <path fill="#a86beb" d="M43 67h11v8h-4v8h-7v-7h-3z"/>
+  <path fill="#c99aff" d="M42 81h6v4h7v3h-5v3h-4v-3h-5v-3h-4v-3h5z"/>
+  <path fill="#a86beb" d="M74 71h11v8h-4v8h-7v-7h-3z"/>
+  <path fill="#c99aff" d="M73 85h6v4h7v3h-5v3h-4v-3h-5v-3h-4v-3h5z"/>
+ </g>
+ <!-- head with broad gecko cheeks and a tapered snout -->
+ <path fill="#a96bf0" stroke="#28134f" stroke-width="3" d="M14 52h8V42h11V34h18V38h10v6h9v10h8v8H66v7H47v-4H31v-5H19v-4h-5z"/>
+ <!-- face highlights -->
+ <path fill="#d9b4ff" stroke="none" d="M25 42h8v-4h8v4h-8v4h-8zM19 52h7v4h-7zM48 40h6v4h-6z"/>
+ <!-- large lively eye and vertical slit pupil -->
+ <path fill="#57228c" stroke="#28134f" stroke-width="3" d="M34 39h13v4h4v13h-4v4H34v-4h-4V43h4z"/>
+ <path fill="#fff6ff" stroke="none" d="M35 42h9v9h-9z"/>
+ <path fill="#482071" stroke="none" d="M39 42h4v9h-4z"/>
+ <path fill="#fff" stroke="none" d="M36 43h3v3h-3z"/>
+ <!-- second eye, visible over the snout -->
+ <path fill="#57228c" stroke="#28134f" stroke-width="2" d="M54 44h8v3h3v8h-3v3h-8v-3h-3v-8h3z"/>
+ <path fill="#fff6ff" stroke="none" d="M55 47h5v5h-5z"/>
+ <path fill="#482071" stroke="none" d="M58 47h2v5h-2z"/>
+ <!-- nostrils and friendly, curious mouth -->
+ <path fill="#482071" stroke="none" d="M20 56h3v3h-3zM28 58h3v3h-3z"/>
+ <path fill="none" stroke="#482071" stroke-width="2" d="M22 63h7v3h8"/>
 </g></svg>
