@@ -14,7 +14,9 @@
  let mood='curious',lastClick=0,curiosityUntil=0;
  const laneSearchCounts={gold:0,exp:0,mid:0,roam:0,jungle:0};
  let activityTimer=0,transformTimer=0,spectralActive=false;
- function currentSprite(){return activeEvolution?evolutionSprites[activeEvolution]:baseSprite}\n function currentSleepSprite(){return activeEvolution?sleepSprites[activeEvolution]:sleepSprites.base}\n function wakeUp(){if(!isSleeping)return;root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();clearTimeout(napTimer);}
+ function currentSprite(){return activeEvolution?evolutionSprites[activeEvolution]:baseSprite}
+ function currentSleepSprite(){return activeEvolution?sleepSprites[activeEvolution]:sleepSprites.base}
+ function wakeUp(){if(!isSleeping)return;root.classList.remove('is-resting');isSleeping=false;img.src=currentSprite();clearTimeout(napTimer);}
  function wakeSprite(){awakeSprite=currentSprite();if(!isSleeping)img.src=awakeSprite}
  function transformTo(evolution){
   if(!evolution||activeEvolution===evolution)return;
