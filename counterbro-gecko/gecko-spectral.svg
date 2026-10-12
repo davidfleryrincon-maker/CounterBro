@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" shape-rendering="crispEdges">
+<ellipse cx="64" cy="84" rx="42" ry="4" fill="#080713" opacity=".4"/>
+<path d="M83 63h13v-7h9v-7h7v-8h7v-6h5v12h-5v8h-7v8h-8v7h-9v6H82z" fill="#77718c" stroke="#29223c" stroke-width="3" stroke-linejoin="round"/>
+<path d="M32 59V49h9v-7h12v-4h19v4h12v6h9v9h5v13H87v7H74v4H49v-4H39v-5h-7v-8h-4v-5z" fill="#81798f" stroke="#29223c" stroke-width="3" stroke-linejoin="round"/>
+<path d="M42 54h12v-5h14v4h14v5h7v8h-7v6H69v4H50v-4H40v-7h-4v-6h6z" fill="#b7b1c2"/>
+<path d="M39 70h12v7h-5v5H33v-5h6zM72 71h12v7h-5v5H66v-5h6z" fill="#81798f" stroke="#29223c" stroke-width="3" stroke-linejoin="round"/>
+<path d="M21 55v-9h5v-8h8v-6h13v4h8v5h5v9h4v9h-5v7H48v4H34v-4h-8v-5h-5z" fill="#aaa4b7" stroke="#29223c" stroke-width="3" stroke-linejoin="round"/>
+<path d="M27 47h6v-7h7v-4h8v4h7v5h4v7h4v6h-6v5H48v4H36v-4h-8v-5h-2z" fill="#d8d1df"/>
+<!-- bone-like markings -->
+<path d="M35 39h7v3h-3v5h-4zM49 58h4v8h-4zM58 68h8v3h-8zM75 53h6v3h-6zM91 62h5v3h-5z" fill="#eee8f2"/>
+<path d="M31 49h8v5h-8zM47 47h8v5h-8z" fill="#f5efff"/>
+<path d="M34 50h4v4h-4zM50 48h4v4h-4z" fill="#251b3b"/>
+<path d="M39 60h10v3h-7v2h-3z" fill="#514363"/>
+<path d="M27 58h3v3h-3zM55 58h3v3h-3z" fill="#eee8f2"/>
+<g fill="#d9d0ed"><path d="M17 32h4v4h-4zM108 28h3v3h-3zM101 75h4v4h-4z"/></g>
+</svg>
