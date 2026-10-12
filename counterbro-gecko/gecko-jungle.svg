@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" shape-rendering="crispEdges">
+<ellipse cx="64" cy="84" rx="42" ry="4" fill="#080713" opacity=".45"/>
+<!-- tail -->
+<path d="M83 63h13v-7h9v-7h7v-8h7v-6h5v12h-5v8h-7v8h-8v7h-9v6H82z" fill="#a62232" stroke="#260e19" stroke-width="3" stroke-linejoin="round"/>
+<path d="M87 65h10v-6h8v-7h7v-8h5v7h-5v7h-7v7h-8v5h-8z" fill="#e24a3c"/>
+<!-- body -->
+<path d="M32 59V49h9v-7h12v-4h19v4h12v6h9v9h5v13H87v7H74v4H49v-4H39v-5h-7v-8h-4v-5z" fill="#a62232" stroke="#260e19" stroke-width="3" stroke-linejoin="round"/>
+<path d="M42 54h12v-5h14v4h14v5h7v8h-7v6H69v4H50v-4H40v-7h-4v-6h6z" fill="#e24a3c"/>
+<!-- legs -->
+<path d="M39 70h12v7h-5v5H33v-5h6zM72 71h12v7h-5v5H66v-5h6z" fill="#a62232" stroke="#260e19" stroke-width="3" stroke-linejoin="round"/>
+<path d="M35 78h9v3h-6v3h-5zM68 79h9v3h-6v3h-5z" fill="#e24a3c"/>
+<!-- oversized head -->
+<path d="M21 55v-9h5v-8h8v-6h13v4h8v5h5v9h4v9h-5v7H48v4H34v-4h-8v-5h-5z" fill="#a62232" stroke="#260e19" stroke-width="3" stroke-linejoin="round"/>
+<path d="M27 47h6v-7h7v-4h8v4h7v5h4v7h4v6h-6v5H48v4H36v-4h-8v-5h-2z" fill="#e24a3c"/>
+<!-- eyes and markings -->
+<path d="M31 49h8v5h-8zM47 47h8v5h-8z" fill="#f5f1ff"/>
+<path d="M34 50h4v4h-4zM50 48h4v4h-4z" fill="#171126"/>
+<path d="M39 60h10v3h-7v2h-3z" fill="#260e19"/>
+<path d="M29 58h4v4h-4zM55 58h4v4h-4z" fill="#e24a3c"/>
+<!-- aggressive black dorsal spines -->
+<path d="M27 42l-3-13 10 8 3-16 8 13 8-12 4 15 10-10 3 14 10-8 3 13 10-3-6 12-12-2-10 5-10-4-10 3-8-6z" fill="#17141b" stroke="#260e19" stroke-width="2" stroke-linejoin="round"/>
+<path d="M25 58l-10-5 5 12-7 5 16 1zM87 69l12 1-7 7 7 4-16-1zM107 57l12-5-5 12 7 5-17-1z" fill="#17141b" stroke="#260e19" stroke-width="2"/>
+<path d="M31 48h8v6h-8zM47 46h8v6h-8z" fill="#fff06a"/>
+</svg>
