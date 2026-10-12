@@ -1,63 +1,59 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 128" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 96" shape-rendering="crispEdges">
 <style>
-@keyframes legFront{0%,100%{transform:translate(0,0)}50%{transform:translate(2px,-3px)}}
-@keyframes legBack{0%,100%{transform:translate(0,0)}50%{transform:translate(-2px,2px)}}
-@keyframes tailMove{0%,100%{transform:rotate(0)}50%{transform:rotate(-4deg)}}
-@keyframes bodyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
-.front{animation:legFront .34s steps(2,end) infinite;transform-box:fill-box;transform-origin:top center}
-.back{animation:legBack .34s steps(2,end) infinite;transform-box:fill-box;transform-origin:top center}
-.tail{animation:tailMove .8s steps(2,end) infinite;transform-box:fill-box;transform-origin:20% 80%}
-.body{animation:bodyBob .8s steps(2,end) infinite}
-@media(prefers-reduced-motion:reduce){.front,.back,.tail,.body{animation:none}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes tail{0%,100%{transform:rotate(0)}50%{transform:rotate(-5deg)}}
+@keyframes step{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.body{animation:bounce .85s steps(2,end) infinite}.tail{animation:tail .9s steps(2,end) infinite;transform-box:fill-box;transform-origin:15% 80%}.legs{animation:step .28s steps(2,end) infinite;transform-box:fill-box;transform-origin:top center}
+@media(prefers-reduced-motion:reduce){.body,.tail,.legs{animation:none}}
 </style>
-<!-- soft pixel shadow beneath feet and belly -->
-<ellipse cx="101" cy="109" rx="66" ry="7" fill="#090613" opacity=".78"/>
-<path d="M48 106h20v-3h22v3h38v3H48z" fill="#24113c" opacity=".8"/>
-<!-- tail curls up from the rump and tapers to a rounded tip -->
-<g class="tail" stroke="#35145d" stroke-width="3" stroke-linejoin="round">
- <path fill="#7d35c5" d="M68 76H51V72H39V65H31V53H34V42H39V32H46V25H57V28H64V35H57V39H51V47H47V57H51V64H61V68H75V72H83V78H68Z"/>
- <path fill="#a957ed" stroke="none" d="M38 51V41H43V33H50V29H57V32H62V35H55V39H50V47H46V58H50V64H59V68H70V72H61V69H50V65H43V59H39V51Z"/>
- <path fill="#d39aff" stroke="none" d="M40 43h4v-7h6v-4h7v4h-7v5h-5v9h-4zM44 57h5v6h7v4h-7v-3h-5z"/>
- <path fill="#c17afa" stroke="none" d="M50 49h5v5h-5zM54 59h5v5h-5zM61 66h5v4h-5z"/>
+<!-- soft ground shadow -->
+<ellipse cx="65" cy="84" rx="43" ry="5" fill="#080713" opacity=".6"/>
+<g stroke="#32145b" stroke-width="3" stroke-linejoin="round">
+<!-- tail curled like a gecko's, with bright tip -->
+<g class="tail">
+ <path fill="#7b39c8" d="M78 61H91V54H99V44H94V37H99V29H108V34H114V42H108V49H104V58H97V66H86V71H77Z"/>
+ <path fill="#bd83ff" stroke="none" d="M101 32h6v5h5v5h-5v7h-5v7h-6v-7h5v-8h-5v-4h5z"/>
+ <path fill="#9a5be8" stroke="none" d="M82 62h10v-5h7v-7h5v7h-5v8h-7v5h-8z"/>
 </g>
-<!-- far-side feet, visibly splayed with toe pads -->
-<g class="back" stroke="#35145d" stroke-width="3" stroke-linejoin="round">
- <path fill="#7836bc" d="M78 77h11v9h-4v9h-7v-8h-4z"/>
- <path fill="#ad62e8" d="M78 93h6v4h7v3h-5v4h-4v-4h-5v-3h-4v-3h5z"/>
- <path fill="#7836bc" d="M127 78h11v8h-4v9h-7v-8h-4z"/>
- <path fill="#ad62e8" d="M126 93h6v4h7v3h-5v4h-4v-4h-5v-3h-4v-3h5z"/>
+<!-- far legs -->
+<g class="legs" fill="#7838bd">
+ <path d="M48 62h9v8h-4v7h-6v-7h-3z"/>
+ <path fill="#c18aff" d="M46 75h5v3h5v3h-4v3h-3v-3h-4v-3h-3v-2h4z" stroke="none"/>
+ <path d="M76 64h9v8h-4v7h-6v-7h-3z"/>
+ <path fill="#c18aff" d="M74 77h5v3h5v3h-4v3h-3v-3h-4v-3h-3v-2h4z" stroke="none"/>
 </g>
-<!-- main torso: elongated, gently arched back and pale belly -->
+<!-- compact, rounded body -->
 <g class="body">
- <path fill="#6e2cb4" stroke="#35145d" stroke-width="4" stroke-linejoin="round" d="M49 70H62V62H78V57H99V60H119V65H136V72H148V82H141V91H126V97H97V94H79V88H62V83H49Z"/>
- <path fill="#a957e8" stroke="none" d="M56 70h10v-7h13v-4h19v4h17v5h15v7h11v7h-9v6h-16v5H98v-4H81v-6H65v-4H56z"/>
- <path fill="#d69cff" stroke="none" d="M69 66h11v-4h11v4H80v4H69zM94 64h9v4h-9zM115 70h10v4h-10z"/>
- <path fill="#e2baff" stroke="none" d="M69 78h8v4h-8zM86 73h6v4h-6zM103 81h8v4h-8zM123 78h6v4h-6zM93 88h8v3h-8z"/>
- <path fill="#7130b0" stroke="none" d="M66 84h16v4h17v4h28v-4h-16v-4H92v-3H77v3z"/>
- <!-- scattered gecko spots -->
- <path fill="#efcfff" stroke="none" d="M78 68h4v4h-4zM91 63h4v4h-4zM108 69h4v4h-4zM119 76h4v4h-4zM84 81h4v4h-4zM101 86h4v4h-4z"/>
+ <path fill="#7131b8" d="M34 56H47V49H63V46H79V51H89V59H96V68H87V75H72V78H52V73H39V68H32V61H34Z"/>
+ <path fill="#984fe0" stroke="none" d="M38 57h10v-6h15v-3h14v5h10v6h6v8h-9v6H71v4H53v-5H42v-5h-4z"/>
+ <path fill="#c38bff" stroke="none" d="M48 53h9v-4h9v4h-9v4h-9zM68 54h8v4h-8zM79 61h8v4h-8z"/>
+ <!-- cute bright spots -->
+ <path fill="#e2baff" stroke="none" d="M47 61h4v4h-4zM59 57h4v4h-4zM68 66h5v4h-5zM81 56h4v4h-4zM56 69h4v4h-4z"/>
+ <!-- belly -->
+ <path fill="#d6a5ff" stroke="none" d="M45 68h10v4h13v3H53v-3H45z"/>
 </g>
-<!-- near legs: bent, articulated, with distinct sticky toes -->
-<g class="front" stroke="#35145d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
- <path fill="#a957e8" d="M66 78H78V85H74V94H67V88H63V83H66Z"/>
- <path fill="#c47bf4" d="M66 92h6v4h7v3h-5v4h-4v-4h-5v-3h-4v-3h5z"/>
- <path fill="#a957e8" d="M111 83h12v7h-4v8h-7v-7h-4z"/>
- <path fill="#c47bf4" d="M110 96h6v4h7v3h-5v4h-4v-4h-5v-3h-4v-3h5z"/>
+<!-- near legs, splayed toes -->
+<g class="legs" stroke="#32145b" stroke-width="3">
+ <path fill="#a968ef" d="M40 64h9v7h-3v7h-6v-6h-3z"/>
+ <path fill="#d2a0ff" d="M39 76h5v3h6v3h-4v3h-3v-3h-4v-3h-3v-2h3z"/>
+ <path fill="#a968ef" d="M64 70h9v7h-3v7h-6v-6h-3z"/>
+ <path fill="#d2a0ff" d="M63 82h5v3h6v3h-4v3h-3v-3h-4v-3h-3v-2h3z"/>
 </g>
-<!-- head, broad at the back, rounded crown, defined snout -->
-<path fill="#6f2cb4" stroke="#35145d" stroke-width="4" stroke-linejoin="round" d="M19 65V52H24V42H33V34H46V30H62V35H73V41H80V51H87V61H81V68H68V73H48V69H35V66H24V65Z"/>
-<path fill="#a958ed" stroke="none" d="M24 54V44H33V37H46V34H60V38H70V43H76V52H82V59H77V64H65V69H48V65H34V62H25V54Z"/>
-<path fill="#d49aff" stroke="none" d="M31 43h8v-5h9v4h-9v5h-8zM49 36h9v4h-9zM25 53h6v5h-6z"/>
-<!-- large glossy eye with a dark vertical slit -->
-<path fill="#42166e" stroke="#35145d" stroke-width="3" d="M43 39H57V43H62V57H57V62H43V57H39V43H43Z"/>
-<path fill="#fff2d9" stroke="none" d="M44 42h10v14H44z"/>
-<path fill="#21102e" stroke="none" d="M49 42h5v14h-5z"/>
-<path fill="#ffffff" stroke="none" d="M44 43h4v4h-4zM54 54h3v3h-3z"/>
-<!-- second eye peeking over the far side of the head -->
-<path fill="#42166e" stroke="#35145d" stroke-width="2" d="M65 43h8v3h3v8h-3v3h-8v-3h-3v-8h3z"/>
-<path fill="#fff2d9" stroke="none" d="M66 46h5v5h-5z"/>
-<path fill="#21102e" stroke="none" d="M69 46h2v5h-2z"/>
-<!-- nostrils, cheek and curious smile -->
-<path fill="#55217e" stroke="none" d="M76 58h3v3h-3zM70 61h3v3h-3z"/>
-<path fill="none" stroke="#4c1c72" stroke-width="2" d="M62 65h7v-2h7"/>
-</svg>
+<!-- oversized friendly head, wide cheeks and little snout -->
+<g class="body">
+ <path fill="#7131b8" d="M12 49V38H17V29H27V23H43V27H53V32H60V41H65V51H59V59H49V64H31V60H20V56H14V52H12Z"/>
+ <path fill="#a968ef" stroke="none" d="M17 40h5v-9h8v-5h12v4h9v5h5v8h5v8h-7v6H46v4H32v-4H22v-4h-5z"/>
+ <path fill="#d9a8ff" stroke="none" d="M22 34h7v-4h8v4h-8v5h-7zM42 30h7v4h-7zM17 43h5v5h-5z"/>
+ <!-- big glossy eye -->
+ <path fill="#48206f" stroke="#32145b" stroke-width="3" d="M30 32h12v3h4v13h-4v4H30v-4h-4V35h4z"/>
+ <path fill="#fff6e8" stroke="none" d="M30 35h10v10H30z"/>
+ <path fill="#26143a" stroke="none" d="M35 35h5v10h-5z"/>
+ <path fill="#fff" stroke="none" d="M30 35h4v4h-4z"/>
+ <!-- tiny far eye, smile and nostril -->
+ <path fill="#48206f" stroke="none" d="M49 39h6v3h3v6h-3v3h-6v-3h-3v-6h3z"/>
+ <path fill="#fff6e8" stroke="none" d="M50 42h4v4h-4z"/>
+ <path fill="#26143a" stroke="none" d="M52 42h2v4h-2z"/>
+ <path fill="#48206f" stroke="none" d="M19 49h3v3h-3z"/>
+ <path fill="none" stroke="#48206f" stroke-width="2" d="M24 55h7v2h6"/>
+</g>
+</g></svg>
