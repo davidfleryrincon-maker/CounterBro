@@ -3,7 +3,7 @@
  const settings=window.COUNTERBRO_GECKO||{enabled:false};
  if(!settings.enabled||document.getElementById('counterbro-gecko-widget'))return;
  const root=document.createElement('div');root.id='counterbro-gecko-widget';root.setAttribute('aria-hidden','true');
- const img=document.createElement('img');img.src='counterbro-gecko/gecko.svg';img.alt='';root.appendChild(img);document.body.appendChild(root);
+ const img=document.createElement('img');const awakeSprite='counterbro-gecko/gecko.svg',sleepSprite='counterbro-gecko/gecko-sleep.svg';img.src=awakeSprite;img.alt='';root.appendChild(img);document.body.appendChild(root);
  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
  let x=0,y=0,tx=0,ty=0,raf=0,scrollTimer=0,previousScroll=scrollY,scrolling=false;
  let mouseTimer=0,lastReact=0,mouseX=null,mouseY=null,resultTimer=0,resultReturnTimer=0,peeking=false,wanderTimer=0,jumpTimer=0,idleTimer=0,napTimer=0;
@@ -29,7 +29,7 @@
   clearTimeout(jumpTimer);jumpTimer=setTimeout(()=>root.classList.remove('is-jumping','is-pouncing'),700);
  }
  function reactToClick(){
-  const now=Date.now();lastClick=now;clearTimeout(napTimer);clearTimeout(wanderTimer);
+  const now=Date.now();lastClick=now;clearTimeout(napTimer);clearTimeout(wanderTimer);if(root.classList.contains('is-resting')){root.classList.remove('is-resting');img.src=awakeSprite;}
   const r=root.getBoundingClientRect(),s=size();
   const roll=Math.random();
   if(roll<.2){setMood('aloof',2200);go(x+(Math.random()<.5?-1:1)*(55+Math.random()*55),y+(Math.random()-.5)*35);return}
@@ -50,8 +50,8 @@
  function wander(){
   if(scrolling||peeking){scheduleWander(1200);return}
   const s=size(),rects=rectsToAvoid(),roll=Math.random();
-  if(roll<.16){setMood('resting',0);root.classList.add('is-resting');napTimer=setTimeout(()=>{root.classList.remove('is-resting');setMood('curious');scheduleWander(500)},2200+Math.random()*2600);scheduleWander(6200+Math.random()*3600);return}
-  root.classList.remove('is-resting');
+  if(roll<.16){setMood('resting',0);root.classList.add('is-resting');img.src=sleepSprite;napTimer=setTimeout(()=>{root.classList.remove('is-resting');img.src=awakeSprite;setMood('curious');scheduleWander(500)},3800+Math.random()*3600);scheduleWander(8200+Math.random()*4200);return}
+  if(root.classList.contains('is-resting')){root.classList.remove('is-resting');img.src=awakeSprite;clearTimeout(napTimer)}
   if(roll<.36)setMood('watchful',1300);else setMood('curious',1800);
   let best=null,bestScore=Infinity;
   for(let i=0;i<24;i++){
@@ -87,7 +87,7 @@
    if(d>360)return;const now=Date.now();if(now-lastReact<1100)return;lastReact=now;
    // Cats may investigate, lose interest, or hop away when something gets too close.
    if(d<62&&Math.random()<.58){
-    setMood('startled',900);root.classList.remove('is-resting');const angle=Math.atan2(cy-mouseY,cx-mouseX)+(Math.random()-.5)*.65;
+    setMood('startled',900);root.classList.remove('is-resting');img.src=awakeSprite;const angle=Math.atan2(cy-mouseY,cx-mouseX)+(Math.random()-.5)*.65;
     go(x+Math.cos(angle)*(70+Math.random()*50),y+Math.sin(angle)*(50+Math.random()*35));hop('pounce');scheduleWander(1700);return;
    }
    if(Math.random()<.24){setMood('aloof',1300);return}
