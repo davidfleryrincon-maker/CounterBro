@@ -164,7 +164,7 @@
  spark.setAttribute('aria-hidden','true');
  document.body.appendChild(spark);
  let sparkVisible=false,sparkX=0,sparkY=0,sparkRAF=0,sparkRespawnTimer=0;
- let orbitX=0,orbitY=0,orbitAngle=0,orbitRadius=80,orbitDirection=1,orbitSpeed=.003,lastSparkTime=0;
+ let orbitX=0,orbitY=0,orbitAngle=0,orbitRadius=80,orbitDirection=1,orbitSpeed=.003,lastSparkTime=0,sparkFleeUntil=0;
  const sparkMargin=12;
  function sparkPlace(){spark.style.transform='translate3d('+sparkX+'px,'+sparkY+'px,0)'}
  function fitOrbit(){
@@ -210,8 +210,19 @@
   const dt=Math.min(2,(now-lastSparkTime)/16.67||1);lastSparkTime=now;
   const r=root.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   if(Math.hypot(cx-(sparkX+7),cy-(sparkY+7))<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
-  // Center and radius remain fixed: no drifting ellipse or clipped straight segments.
-  orbitAngle+=orbitSpeed*orbitDirection*dt;
+  // When the pointer gets close, choose the orbit direction that moves the sparkle farther away.
+  if(mouseX!=null&&mouseY!=null){
+   const mx=sparkX+7-mouseX,my=sparkY+7-mouseY,mouseDist=Math.hypot(mx,my);
+   if(mouseDist<125){
+    const probe=.22,clockwiseX=orbitX+Math.cos(orbitAngle+probe)*orbitRadius,clockwiseY=orbitY+Math.sin(orbitAngle+probe)*orbitRadius;
+    const counterX=orbitX+Math.cos(orbitAngle-probe)*orbitRadius,counterY=orbitY+Math.sin(orbitAngle-probe)*orbitRadius;
+    const clockwiseDist=Math.hypot(clockwiseX-mouseX,clockwiseY-mouseY),counterDist=Math.hypot(counterX-mouseX,counterY-mouseY);
+    orbitDirection=clockwiseDist>=counterDist?1:-1;sparkFleeUntil=now+850;
+   }
+  }
+  // Center and radius remain fixed: fleeing changes speed/direction, never the circular path.
+  const fleeing=now<sparkFleeUntil;
+  orbitAngle+=orbitSpeed*(fleeing?3.2:1)*orbitDirection*dt;
   if(orbitAngle>=Math.PI*2)orbitAngle-=Math.PI*2;
   else if(orbitAngle<0)orbitAngle+=Math.PI*2;
   sparkX=orbitX+Math.cos(orbitAngle)*orbitRadius;
