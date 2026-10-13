@@ -202,8 +202,8 @@
   const dt=Math.min(2,(now-lastSparkTime)/16.67||1);lastSparkTime=now;
   const r=root.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   if(Math.hypot(cx-(sparkX+7),cy-(sparkY+7))<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
-  // One full, clearly visible orbit takes about 15–20 seconds.
-  orbitAngle+=.006*dt;
+  // Half speed: one full, clearly visible orbit takes about 30–40 seconds.
+  orbitAngle+=.003*dt;
   const minCX=sparkMargin+orbitRadius,maxCX=Math.max(minCX,innerWidth-sparkMargin-orbitRadius);
   const minCY=sparkMargin+orbitRadius,maxCY=Math.max(minCY,innerHeight-sparkMargin-orbitRadius);
   let nextCX=orbitX+orbitVX*dt,nextCY=orbitY+orbitVY*dt;
