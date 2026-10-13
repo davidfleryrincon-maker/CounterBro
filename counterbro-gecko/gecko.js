@@ -158,27 +158,29 @@
  const results=document.getElementById('resultadosCounter');
  if(results)new MutationObserver(schedulePeek).observe(results,{attributes:true,attributeFilter:['style','class','hidden'],childList:true,subtree:true});
 
- // Floating sparkle: broad, slow circular arcs with physical edge rebounds.
+ // Sparkle: unmistakable slow circles; the orbit center itself bounces at screen edges.
  const spark=document.createElement('div');
  spark.id='counterbro-gecko-spark';
  spark.setAttribute('aria-hidden','true');
  document.body.appendChild(spark);
  let sparkVisible=false,sparkX=0,sparkY=0,sparkRAF=0,sparkRespawnTimer=0;
- let pointerX=-9999,pointerY=-9999,lastSparkTime=0,sparkVX=.55,sparkVY=.25,sparkTurn=.0035;
- let sparkFleeUntil=0;
+ let orbitX=0,orbitY=0,orbitVX=.12,orbitVY=.08,orbitAngle=0,orbitRadius=90,lastSparkTime=0;
+ const sparkMargin=12;
  function sparkPlace(){spark.style.transform='translate3d('+sparkX+'px,'+sparkY+'px,0)'}
  function spawnSpark(){
   clearTimeout(sparkRespawnTimer);
-  const margin=12;
-  sparkX=margin+Math.random()*Math.max(1,innerWidth-margin*2);
-  sparkY=margin+Math.random()*Math.max(1,innerHeight-margin*2);
-  const direction=Math.random()*Math.PI*2;
-  const speed=.58+Math.random()*.22;
-  sparkVX=Math.cos(direction)*speed;
-  sparkVY=Math.sin(direction)*speed;
-  const radius=Math.max(55,Math.min(230,innerWidth*.28,innerHeight*.28));
-  sparkTurn=(speed/radius)*(Math.random()<.5?-1:1);
-  sparkVisible=true;sparkFleeUntil=0;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
+  orbitRadius=Math.max(28,Math.min(105,innerWidth*.22,innerHeight*.22));
+  const minCX=sparkMargin+orbitRadius,maxCX=Math.max(minCX,innerWidth-sparkMargin-orbitRadius);
+  const minCY=sparkMargin+orbitRadius,maxCY=Math.max(minCY,innerHeight-sparkMargin-orbitRadius);
+  orbitX=minCX+Math.random()*Math.max(0,maxCX-minCX);
+  orbitY=minCY+Math.random()*Math.max(0,maxCY-minCY);
+  const drift=Math.random()*Math.PI*2;
+  orbitVX=Math.cos(drift)*(.07+Math.random()*.05);
+  orbitVY=Math.sin(drift)*(.07+Math.random()*.05);
+  orbitAngle=Math.random()*Math.PI*2;
+  sparkVisible=true;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
+  sparkX=orbitX+Math.cos(orbitAngle)*orbitRadius;
+  sparkY=orbitY+Math.sin(orbitAngle)*orbitRadius;
   sparkPlace();lastSparkTime=performance.now();
   if(!sparkRAF)sparkRAF=requestAnimationFrame(moveSpark);
  }
@@ -200,39 +202,28 @@
   const dt=Math.min(2,(now-lastSparkTime)/16.67||1);lastSparkTime=now;
   const r=root.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   if(Math.hypot(cx-(sparkX+7),cy-(sparkY+7))<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
-  const mx=pointerX-(sparkX+7),my=pointerY-(sparkY+7),md=Math.hypot(mx,my);
-  if(md<118&&md>0){
-   sparkFleeUntil=now+650;
-   spark.classList.add('is-fleeing');
-   const speed=Math.max(.7,Math.hypot(sparkVX,sparkVY));
-   sparkVX=(-mx/md)*speed;sparkVY=(-my/md)*speed;
-  }else if(now>sparkFleeUntil){
-   spark.classList.remove('is-fleeing');
-  }
-  // Gentle perpendicular steering creates broad circular arcs at a steady speed.
-  const speed=Math.hypot(sparkVX,sparkVY)||.65;
-  const turn=sparkTurn*dt;
-  const cos=Math.cos(turn),sin=Math.sin(turn);
-  const vx=sparkVX*cos-sparkVY*sin,vy=sparkVX*sin+sparkVY*cos;
-  sparkVX=vx;sparkVY=vy;
-  let nextX=sparkX+sparkVX*dt,nextY=sparkY+sparkVY*dt;
-  const minX=10,maxX=Math.max(10,innerWidth-10),minY=10,maxY=Math.max(10,innerHeight-10);
-  let hitX=false,hitY=false;
-  if(nextX<minX){nextX=minX;sparkVX=Math.abs(sparkVX);hitX=true}
-  else if(nextX>maxX){nextX=maxX;sparkVX=-Math.abs(sparkVX);hitX=true}
-  if(nextY<minY){nextY=minY;sparkVY=Math.abs(sparkVY);hitY=true}
-  else if(nextY>maxY){nextY=maxY;sparkVY=-Math.abs(sparkVY);hitY=true}
-  if(hitX!==hitY)sparkTurn=-sparkTurn;
-  else if(hitX&&hitY)sparkTurn=sparkTurn;
-  // Keep speed constant so the particle remains slow and fluid after each rebound.
-  const newSpeed=Math.hypot(sparkVX,sparkVY)||speed;
-  sparkVX=sparkVX/newSpeed*speed;sparkVY=sparkVY/newSpeed*speed;
-  sparkX=clamp(nextX,minX,maxX);sparkY=clamp(nextY,minY,maxY);
+  // One full, clearly visible orbit takes about 15–20 seconds.
+  orbitAngle+=.006*dt;
+  const minCX=sparkMargin+orbitRadius,maxCX=Math.max(minCX,innerWidth-sparkMargin-orbitRadius);
+  const minCY=sparkMargin+orbitRadius,maxCY=Math.max(minCY,innerHeight-sparkMargin-orbitRadius);
+  let nextCX=orbitX+orbitVX*dt,nextCY=orbitY+orbitVY*dt;
+  if(nextCX<minCX){nextCX=minCX;orbitVX=Math.abs(orbitVX)}
+  else if(nextCX>maxCX){nextCX=maxCX;orbitVX=-Math.abs(orbitVX)}
+  if(nextCY<minCY){nextCY=minCY;orbitVY=Math.abs(orbitVY)}
+  else if(nextCY>maxCY){nextCY=maxCY;orbitVY=-Math.abs(orbitVY)}
+  orbitX=nextCX;orbitY=nextCY;
+  sparkX=orbitX+Math.cos(orbitAngle)*orbitRadius;
+  sparkY=orbitY+Math.sin(orbitAngle)*orbitRadius;
+  sparkX=clamp(sparkX,sparkMargin,Math.max(sparkMargin,innerWidth-sparkMargin));
+  sparkY=clamp(sparkY,sparkMargin,Math.max(sparkMargin,innerHeight-sparkMargin));
   sparkPlace();sparkRAF=requestAnimationFrame(moveSpark);
  }
- addEventListener('mousemove',e=>{pointerX=e.clientX;pointerY=e.clientY},{passive:true});
- addEventListener('touchmove',e=>{if(e.touches&&e.touches[0]){pointerX=e.touches[0].clientX;pointerY=e.touches[0].clientY}},{passive:true});
- addEventListener('resize',()=>{if(sparkVisible){sparkX=clamp(sparkX,10,Math.max(10,innerWidth-10));sparkY=clamp(sparkY,10,Math.max(10,innerHeight-10));sparkPlace()}},{passive:true});
+ addEventListener('resize',()=>{
+  orbitRadius=Math.max(28,Math.min(105,innerWidth*.22,innerHeight*.22));
+  orbitX=clamp(orbitX,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerWidth-sparkMargin-orbitRadius));
+  orbitY=clamp(orbitY,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerHeight-sparkMargin-orbitRadius));
+  if(sparkVisible){sparkX=clamp(orbitX+Math.cos(orbitAngle)*orbitRadius,sparkMargin,Math.max(sparkMargin,innerWidth-sparkMargin));sparkY=clamp(orbitY+Math.sin(orbitAngle)*orbitRadius,sparkMargin,Math.max(sparkMargin,innerHeight-sparkMargin));sparkPlace()}
+ },{passive:true});
  setTimeout(spawnSpark,9000+Math.random()*13000);
 
 })();
