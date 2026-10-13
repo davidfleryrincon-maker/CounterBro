@@ -208,8 +208,11 @@
  function moveSpark(now){
   sparkRAF=0;if(!sparkVisible)return;
   const dt=Math.min(2,(now-lastSparkTime)/16.67||1);lastSparkTime=now;
-  const r=root.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-  if(Math.hypot(cx-(sparkX+7),cy-(sparkY+7))<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
+  const r=root.getBoundingClientRect();
+  // Eat the sparkle on first visual contact with Gecko, not only when their centers nearly overlap.
+  const sparkSize=14;
+  const touching=sparkX+sparkSize>=r.left&&sparkX<=r.right&&sparkY+sparkSize>=r.top&&sparkY<=r.bottom;
+  if(touching){eatSpark();return}
   // When the pointer gets close, choose the orbit direction that moves the sparkle farther away.
   if(mouseX!=null&&mouseY!=null){
    const mx=sparkX+7-mouseX,my=sparkY+7-mouseY,mouseDist=Math.hypot(mx,my);
