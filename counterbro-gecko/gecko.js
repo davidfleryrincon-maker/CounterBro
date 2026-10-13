@@ -239,7 +239,7 @@
   sparkPlace();sparkRAF=requestAnimationFrame(moveSpark);
  }
  addEventListener('resize',()=>{
-  orbitRadius=Math.max(28,Math.min(105,innerWidth*.22,innerHeight*.22));
+  orbitRadius=Math.min(orbitRadius,Math.max(55,Math.min(240,Math.min(innerWidth,innerHeight)*.34)));
   orbitX=clamp(orbitX,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerWidth-sparkMargin-orbitRadius));
   orbitY=clamp(orbitY,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerHeight-sparkMargin-orbitRadius));
   if(sparkVisible){sparkX=clamp(orbitX+Math.cos(orbitAngle)*orbitRadius,sparkMargin,Math.max(sparkMargin,innerWidth-sparkMargin));sparkY=clamp(orbitY+Math.sin(orbitAngle)*orbitRadius,sparkMargin,Math.max(sparkMargin,innerHeight-sparkMargin));sparkPlace()}
