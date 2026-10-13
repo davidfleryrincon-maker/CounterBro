@@ -175,8 +175,8 @@
   orbitX=minCX+Math.random()*Math.max(0,maxCX-minCX);
   orbitY=minCY+Math.random()*Math.max(0,maxCY-minCY);
   const drift=Math.random()*Math.PI*2;
-  orbitVX=Math.cos(drift)*(.07+Math.random()*.05);
-  orbitVY=Math.sin(drift)*(.07+Math.random()*.05);
+  orbitVX=Math.cos(drift)*(.035+Math.random()*.025);
+  orbitVY=Math.sin(drift)*(.035+Math.random()*.025);
   orbitAngle=Math.random()*Math.PI*2;
   sparkVisible=true;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
   sparkX=orbitX+Math.cos(orbitAngle)*orbitRadius;
@@ -202,8 +202,8 @@
   const dt=Math.min(2,(now-lastSparkTime)/16.67||1);lastSparkTime=now;
   const r=root.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   if(Math.hypot(cx-(sparkX+7),cy-(sparkY+7))<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
-  // Half speed: one full, clearly visible orbit takes about 30–40 seconds.
-  orbitAngle+=.003*dt;
+  // Restore the original orbit speed; reduce the sparkle's travel speed by 50%.
+  orbitAngle+=.006*dt;
   const minCX=sparkMargin+orbitRadius,maxCX=Math.max(minCX,innerWidth-sparkMargin-orbitRadius);
   const minCY=sparkMargin+orbitRadius,maxCY=Math.max(minCY,innerHeight-sparkMargin-orbitRadius);
   let nextCX=orbitX+orbitVX*dt,nextCY=orbitY+orbitVY*dt;
