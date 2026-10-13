@@ -168,23 +168,23 @@
  const sparkMargin=12;
  function sparkPlace(){spark.style.transform='translate3d('+sparkX+'px,'+sparkY+'px,0)'}
  function fitOrbit(){
-  const maxRadius=Math.max(24,Math.min(240,(Math.min(innerWidth,innerHeight)-2*sparkMargin-14)/2));
+  const maxRadius=Math.max(28,Math.min(360,(Math.min(innerWidth,innerHeight)-2*sparkMargin-14)/2));
   orbitRadius=Math.min(orbitRadius,maxRadius);
   orbitX=clamp(orbitX,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerWidth-sparkMargin-orbitRadius));
   orbitY=clamp(orbitY,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerHeight-sparkMargin-orbitRadius));
  }
  function spawnSpark(){
   clearTimeout(sparkRespawnTimer);
-  const maxRadius=Math.max(24,Math.min(240,(Math.min(innerWidth,innerHeight)-2*sparkMargin-14)/2));
-  const minRadius=Math.min(80,maxRadius);
+  const maxRadius=Math.max(28,Math.min(360,(Math.min(innerWidth,innerHeight)-2*sparkMargin-14)/2));
+  const minRadius=Math.min(110,maxRadius);
   orbitRadius=minRadius+Math.random()*Math.max(0,maxRadius-minRadius);
   const minCX=sparkMargin+orbitRadius,maxCX=Math.max(minCX,innerWidth-sparkMargin-orbitRadius);
   const minCY=sparkMargin+orbitRadius,maxCY=Math.max(minCY,innerHeight-sparkMargin-orbitRadius);
   orbitX=minCX+Math.random()*Math.max(0,maxCX-minCX);
   orbitY=minCY+Math.random()*Math.max(0,maxCY-minCY);
-  orbitDirection=Math.random()<.2?-1:1;
-  // Half the previous angular speed, while keeping the orbit a real circle.
-  orbitSpeed=.00275+Math.random()*.00025;
+  orbitDirection=Math.random()<.5?-1:1;
+  // Slower orbit, with a fresh random radius, center, angle, and direction each appearance.
+  orbitSpeed=.00125+Math.random()*.00035;
   orbitAngle=Math.random()*Math.PI*2;
   sparkVisible=true;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
   sparkX=orbitX+Math.cos(orbitAngle)*orbitRadius;
