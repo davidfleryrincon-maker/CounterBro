@@ -158,31 +158,33 @@
  const results=document.getElementById('resultadosCounter');
  if(results)new MutationObserver(schedulePeek).observe(results,{attributes:true,attributeFilter:['style','class','hidden'],childList:true,subtree:true});
 
- // Sparkle: unmistakable slow circles; the orbit center itself bounces at screen edges.
+ // Sparkle: true circular motion with a fixed center and radius for each appearance.
  const spark=document.createElement('div');
  spark.id='counterbro-gecko-spark';
  spark.setAttribute('aria-hidden','true');
  document.body.appendChild(spark);
  let sparkVisible=false,sparkX=0,sparkY=0,sparkRAF=0,sparkRespawnTimer=0;
- let orbitX=0,orbitY=0,orbitVX=.02,orbitVY=.015,orbitAngle=0,orbitRadius=160,orbitDirection=1,orbitSpeed=.006,orbitTurns=0,lastSparkTime=0;
+ let orbitX=0,orbitY=0,orbitAngle=0,orbitRadius=80,orbitDirection=1,orbitSpeed=.003,lastSparkTime=0;
  const sparkMargin=12;
  function sparkPlace(){spark.style.transform='translate3d('+sparkX+'px,'+sparkY+'px,0)'}
+ function fitOrbit(){
+  const maxRadius=Math.max(24,Math.min(240,(Math.min(innerWidth,innerHeight)-2*sparkMargin-14)/2));
+  orbitRadius=Math.min(orbitRadius,maxRadius);
+  orbitX=clamp(orbitX,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerWidth-sparkMargin-orbitRadius));
+  orbitY=clamp(orbitY,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerHeight-sparkMargin-orbitRadius));
+ }
  function spawnSpark(){
   clearTimeout(sparkRespawnTimer);
-  // Larger circles; vary their size and direction between loops, not mid-loop.
-  const maxRadius=Math.max(55,Math.min(240,Math.min(innerWidth,innerHeight)*.34));
-  const minRadius=Math.min(95,maxRadius);
+  const maxRadius=Math.max(24,Math.min(240,(Math.min(innerWidth,innerHeight)-2*sparkMargin-14)/2));
+  const minRadius=Math.min(80,maxRadius);
   orbitRadius=minRadius+Math.random()*Math.max(0,maxRadius-minRadius);
   const minCX=sparkMargin+orbitRadius,maxCX=Math.max(minCX,innerWidth-sparkMargin-orbitRadius);
   const minCY=sparkMargin+orbitRadius,maxCY=Math.max(minCY,innerHeight-sparkMargin-orbitRadius);
   orbitX=minCX+Math.random()*Math.max(0,maxCX-minCX);
   orbitY=minCY+Math.random()*Math.max(0,maxCY-minCY);
-  const drift=Math.random()*Math.PI*2;
-  orbitVX=Math.cos(drift)*(.012+Math.random()*.01);
-  orbitVY=Math.sin(drift)*(.012+Math.random()*.01);
-  orbitDirection=Math.random()<.18?-1:1;
-  orbitSpeed=.0055+Math.random()*.001;
-  orbitTurns=0;
+  orbitDirection=Math.random()<.2?-1:1;
+  // Half the previous angular speed, while keeping the orbit a real circle.
+  orbitSpeed=.00275+Math.random()*.00025;
   orbitAngle=Math.random()*Math.PI*2;
   sparkVisible=true;spark.classList.remove('is-fleeing','is-eaten');spark.classList.add('is-visible');
   sparkX=orbitX+Math.cos(orbitAngle)*orbitRadius;
@@ -208,41 +210,17 @@
   const dt=Math.min(2,(now-lastSparkTime)/16.67||1);lastSparkTime=now;
   const r=root.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   if(Math.hypot(cx-(sparkX+7),cy-(sparkY+7))<Math.max(30,Math.min(r.width,r.height)*.48)){eatSpark();return}
-  // Keep each loop circular. Randomize its pace/direction after a full turn;
-  // the orbit center drifts gently and bounces inside the viewport.
-  const previousAngle=orbitAngle;
+  // Center and radius remain fixed: no drifting ellipse or clipped straight segments.
   orbitAngle+=orbitSpeed*orbitDirection*dt;
-  if((orbitDirection>0&&orbitAngle>=Math.PI*2)||(orbitDirection<0&&orbitAngle<=0)){
-   orbitTurns++;
-   orbitAngle=orbitDirection>0?orbitAngle%(Math.PI*2):Math.PI*2-(Math.abs(orbitAngle)%(Math.PI*2));
-   if(orbitTurns>=1){
-    orbitTurns=0;
-    if(Math.random()<.42)orbitDirection*=-1;
-    orbitSpeed=.0055+Math.random()*.001;
-    const maxRadius=Math.max(55,Math.min(240,Math.min(innerWidth,innerHeight)*.34));
-    const nextRadius=Math.min(maxRadius,Math.max(95,orbitRadius*(.78+Math.random()*.44)));
-    orbitRadius=nextRadius;
-   }
-  }
-  const minCX=sparkMargin+orbitRadius,maxCX=Math.max(minCX,innerWidth-sparkMargin-orbitRadius);
-  const minCY=sparkMargin+orbitRadius,maxCY=Math.max(minCY,innerHeight-sparkMargin-orbitRadius);
-  let nextCX=orbitX+orbitVX*dt,nextCY=orbitY+orbitVY*dt;
-  if(nextCX<minCX){nextCX=minCX;orbitVX=Math.abs(orbitVX)}
-  else if(nextCX>maxCX){nextCX=maxCX;orbitVX=-Math.abs(orbitVX)}
-  if(nextCY<minCY){nextCY=minCY;orbitVY=Math.abs(orbitVY)}
-  else if(nextCY>maxCY){nextCY=maxCY;orbitVY=-Math.abs(orbitVY)}
-  orbitX=nextCX;orbitY=nextCY;
+  if(orbitAngle>=Math.PI*2)orbitAngle-=Math.PI*2;
+  else if(orbitAngle<0)orbitAngle+=Math.PI*2;
   sparkX=orbitX+Math.cos(orbitAngle)*orbitRadius;
   sparkY=orbitY+Math.sin(orbitAngle)*orbitRadius;
-  sparkX=clamp(sparkX,sparkMargin,Math.max(sparkMargin,innerWidth-sparkMargin));
-  sparkY=clamp(sparkY,sparkMargin,Math.max(sparkMargin,innerHeight-sparkMargin));
   sparkPlace();sparkRAF=requestAnimationFrame(moveSpark);
  }
  addEventListener('resize',()=>{
-  orbitRadius=Math.min(orbitRadius,Math.max(55,Math.min(240,Math.min(innerWidth,innerHeight)*.34)));
-  orbitX=clamp(orbitX,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerWidth-sparkMargin-orbitRadius));
-  orbitY=clamp(orbitY,sparkMargin+orbitRadius,Math.max(sparkMargin+orbitRadius,innerHeight-sparkMargin-orbitRadius));
-  if(sparkVisible){sparkX=clamp(orbitX+Math.cos(orbitAngle)*orbitRadius,sparkMargin,Math.max(sparkMargin,innerWidth-sparkMargin));sparkY=clamp(orbitY+Math.sin(orbitAngle)*orbitRadius,sparkMargin,Math.max(sparkMargin,innerHeight-sparkMargin));sparkPlace()}
+  fitOrbit();
+  if(sparkVisible){sparkX=orbitX+Math.cos(orbitAngle)*orbitRadius;sparkY=orbitY+Math.sin(orbitAngle)*orbitRadius;sparkPlace()}
  },{passive:true});
  setTimeout(spawnSpark,9000+Math.random()*13000);
 
